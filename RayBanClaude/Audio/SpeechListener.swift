@@ -52,6 +52,8 @@ final class SpeechListener {
     private var captureStarted = Date.distantPast
     private var generation = UUID()
     private var configurationObserver: NSObjectProtocol?
+    /// Движок остановлен намеренно (ответ в режиме A2DP) — смена конфигурации не должна его поднимать.
+    private var engineWanted = false
 
     static func requestPermissions() async -> Bool {
         let speechStatus = await requestSpeechAuthorization()
@@ -85,6 +87,7 @@ final class SpeechListener {
         input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.makeTapBlock(requestBox))
         engine.prepare()
         try engine.start()
+        engineWanted = true
 
         if configurationObserver == nil {
             // Смена маршрута (очки подключились/отключились) меняет формат входа и останавливает движок.
@@ -97,6 +100,7 @@ final class SpeechListener {
     }
 
     func stopEngine() {
+        engineWanted = false
         cancelCapture()
         engine.stop()
         engine.inputNode.removeTap(onBus: 0)
@@ -118,6 +122,7 @@ final class SpeechListener {
     }
 
     private func restartEngine() {
+        guard engineWanted else { return }
         let wasCapturing = isCapturing
         engine.stop()
         engine.inputNode.removeTap(onBus: 0)

@@ -80,6 +80,9 @@ final class AssistantController {
             guard let self else { return }
             self.microphone = self.audio.inputDescription
         }
+        speaker.onVoiceProblem = { [weak self] message in
+            self?.entries.append(TranscriptEntry(role: .info, text: message))
+        }
     }
 
     private var tools: [any ClaudeTool] {
@@ -125,7 +128,11 @@ final class AssistantController {
         speaker.stop()
         listener.cancelCapture()
         phase = .idle
-        if handsFree { startListening() }
+        if handsFree {
+            startListening()
+        } else {
+            releasePlaybackAudio()
+        }
     }
 
     func newConversation() {
@@ -147,6 +154,25 @@ final class AssistantController {
         errorMessage = nil
     }
 
+    /// Кнопка «Проверить голос» в настройках.
+    func previewVoice() async {
+        guard phase == .idle else { return }
+        applyVoiceSettings()
+        if handsFree || !settings.stereoAnswers {
+            guard await prepareAudio() else { return }
+        } else {
+            switchToPlaybackIfNeeded()
+        }
+        phase = .speaking
+        speaker.speak(settings.language == .russian
+            ? "Привет! Так звучит мой голос. Спросите меня о чём-нибудь."
+            : "Hi! This is how I sound. Ask me anything.")
+        await speaker.waitUntilFinished()
+        guard phase == .speaking else { return }
+        phase = .idle
+        releasePlaybackAudio()
+    }
+
     // MARK: - Listening
 
     private func prepareAudio() async -> Bool {
@@ -157,10 +183,11 @@ final class AssistantController {
             }
             audioPermissionsGranted = true
         }
-        // Движок мог остановиться (звонок, Siri, сброс медиасервисов) — проверяем каждый раз.
+        // Движок мог остановиться (звонок, Siri, сброс медиасервисов, ответ через A2DP) — проверяем каждый раз.
         if !listener.isEngineRunning {
             do {
                 try audio.activate()
+                await audio.waitForGlassesInput()
                 try listener.startEngine()
             } catch {
                 errorMessage = "Не удалось включить микрофон: \(error.localizedDescription)"
@@ -170,8 +197,33 @@ final class AssistantController {
         audio.preferGlassesInput()
         microphone = audio.inputDescription
         listener.setLanguage(settings.language.rawValue)
-        speaker.languageCode = settings.language.rawValue
+        applyVoiceSettings()
         return true
+    }
+
+    private func applyVoiceSettings() {
+        speaker.languageCode = settings.language.rawValue
+        speaker.elevenLabs = settings.elevenLabsConfiguration
+    }
+
+    /// Режим кнопки: пока Claude думает и отвечает, микрофон не нужен. Переводим очки из гарнитуры (HFP)
+    /// в A2DP — ответ звучит в стерео и полном качестве. Заодно освобождается полоса Bluetooth для камеры.
+    private func switchToPlaybackIfNeeded() {
+        // Без проверки текущего режима: после звонка или сброса медиасервисов сессию нужно поднять заново.
+        guard settings.stereoAnswers, !handsFree else { return }
+        // Новый движок к следующему вопросу: старый мог запомнить формат входа до смены режима.
+        listener.rebuildEngine()
+        do {
+            try audio.activatePlayback()
+        } catch {
+            NSLog("[RayBanClaude] A2DP недоступен, отвечаю через гарнитуру: \(error)")
+        }
+    }
+
+    /// После ответа в режиме кнопки отпускаем аудио — снова заиграет музыка, если она была.
+    private func releasePlaybackAudio() {
+        guard !handsFree, audio.mode == .playback, !speaker.isSpeaking else { return }
+        audio.deactivate()
     }
 
     private func startListening() {
@@ -270,6 +322,8 @@ final class AssistantController {
             return
         }
         entries.append(TranscriptEntry(role: .user, text: text))
+        applyVoiceSettings()
+        switchToPlaybackIfNeeded()
         phase = .thinking
         turnTask?.cancel()
         let turnID = UUID()
@@ -331,6 +385,8 @@ final class AssistantController {
         if handsFree {
             try? await Task.sleep(nanoseconds: 300_000_000) // хвост звука не должен попасть в микрофон
             if handsFree, phase == .idle { startListening() }
+        } else {
+            releasePlaybackAudio()
         }
     }
 

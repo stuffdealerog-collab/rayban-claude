@@ -37,6 +37,14 @@ enum AssistantLanguage: String, CaseIterable, Identifiable {
         case .english: return "Claude"
         }
     }
+
+    /// ISO 639-1 для ElevenLabs.
+    var isoCode: String {
+        switch self {
+        case .russian: return "ru"
+        case .english: return "en"
+        }
+    }
 }
 
 /// Настройки приложения. API-ключ хранится в Keychain, остальное — в UserDefaults.
@@ -63,9 +71,43 @@ final class AppSettings {
         didSet { defaults.set(webSearchEnabled, forKey: Keys.webSearch) }
     }
 
+    /// Ключ ElevenLabs. Пустой — ассистент говорит голосом iOS.
+    var elevenLabsAPIKey: String {
+        didSet { KeychainStore.write(trimmedElevenLabsKey, account: Keys.elevenLabsKey) }
+    }
+    var elevenLabsVoiceID: String {
+        didSet { defaults.set(elevenLabsVoiceID, forKey: Keys.elevenLabsVoiceID) }
+    }
+    /// Имя выбранного голоса — чтобы показать его, пока список голосов не загружен.
+    var elevenLabsVoiceName: String {
+        didSet { defaults.set(elevenLabsVoiceName, forKey: Keys.elevenLabsVoiceName) }
+    }
+    var elevenLabsModel: ElevenLabsModel {
+        didSet { defaults.set(elevenLabsModel.rawValue, forKey: Keys.elevenLabsModel) }
+    }
+    /// В режиме кнопки отвечать через A2DP (стерео, полное качество) вместо гарнитурного HFP.
+    var stereoAnswers: Bool {
+        didSet { defaults.set(stereoAnswers, forKey: Keys.stereoAnswers) }
+    }
+
     @ObservationIgnored private let defaults: UserDefaults
 
     var trimmedAPIKey: String { apiKey.trimmingCharacters(in: .whitespacesAndNewlines) }
+    var trimmedElevenLabsKey: String { elevenLabsAPIKey.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+    /// Настройки синтеза ElevenLabs или nil, если ключ или голос не заданы.
+    var elevenLabsConfiguration: ElevenLabsConfiguration? {
+        let voiceID = elevenLabsVoiceID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedElevenLabsKey.isEmpty, !voiceID.isEmpty,
+              voiceID.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber) })
+        else { return nil }
+        return ElevenLabsConfiguration(
+            apiKey: trimmedElevenLabsKey,
+            voiceID: voiceID,
+            model: elevenLabsModel,
+            languageCode: language.isoCode
+        )
+    }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -76,6 +118,11 @@ final class AppSettings {
         wakeWordEnabled = defaults.object(forKey: Keys.wakeWordEnabled) as? Bool ?? true
         wakeWord = defaults.string(forKey: Keys.wakeWord) ?? language.defaultWakeWord
         webSearchEnabled = defaults.object(forKey: Keys.webSearch) as? Bool ?? true
+        elevenLabsAPIKey = KeychainStore.read(account: Keys.elevenLabsKey) ?? ""
+        elevenLabsVoiceID = defaults.string(forKey: Keys.elevenLabsVoiceID) ?? ""
+        elevenLabsVoiceName = defaults.string(forKey: Keys.elevenLabsVoiceName) ?? ""
+        elevenLabsModel = defaults.string(forKey: Keys.elevenLabsModel).flatMap(ElevenLabsModel.init(rawValue:)) ?? .flash
+        stereoAnswers = defaults.object(forKey: Keys.stereoAnswers) as? Bool ?? true
     }
 
     private enum Keys {
@@ -85,6 +132,11 @@ final class AppSettings {
         static let wakeWordEnabled = "wakeWordEnabled"
         static let wakeWord = "wakeWord"
         static let webSearch = "webSearchEnabled"
+        static let elevenLabsKey = "elevenlabs-api-key"
+        static let elevenLabsVoiceID = "elevenLabsVoiceID"
+        static let elevenLabsVoiceName = "elevenLabsVoiceName"
+        static let elevenLabsModel = "elevenLabsModel"
+        static let stereoAnswers = "stereoAnswers"
     }
 }
 

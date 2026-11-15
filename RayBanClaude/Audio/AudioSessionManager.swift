@@ -1,12 +1,18 @@
 import AVFoundation
 
-/// Настраивает общую аудиосессию: запись + воспроизведение через Bluetooth HFP очков.
+/// Настраивает общую аудиосессию. Два режима:
 ///
-/// Очки подключаются к iPhone как гарнитура (HFP): их 5 микрофонов с шумоподавлением дают
-/// речевой сигнал 16 кГц, а синтезированный ответ звучит в динамиках очков. Пока открыт
-/// микрофон, воспроизведение тоже идёт по HFP (моно) — это ограничение Bluetooth.
+/// - **разговор** — запись + воспроизведение через Bluetooth HFP: очки работают как гарнитура,
+///   их 5 микрофонов с шумоподавлением дают речевой сигнал 16 кГц. Пока открыт микрофон,
+///   звук тоже идёт по HFP — моно и в «телефонном» качестве (ограничение Bluetooth);
+/// - **ответ** — только воспроизведение: очки получают звук по A2DP, как музыку, — стерео
+///   и полное качество. Используется в режиме кнопки, пока Claude думает и говорит.
 @MainActor
 final class AudioSessionManager {
+    enum Mode { case inactive, conversation, playback }
+
+    private(set) var mode: Mode = .inactive
+
     /// Звонок, Siri, другое приложение забрали аудио.
     var onInterruptionBegan: (() -> Void)?
     /// Прерывание закончилось — сессию и движок нужно поднять заново.
@@ -34,15 +40,37 @@ final class AudioSessionManager {
         })
     }
 
+    /// Режим разговора: микрофон очков и звук по HFP.
     func activate() throws {
         // .defaultToSpeaker — без очков звук идёт в динамик телефона, а не в разговорный.
         try session.setCategory(.playAndRecord, mode: .default, options: [.allowBluetoothHFP, .defaultToSpeaker])
         try session.setActive(true)
+        mode = .conversation
         preferGlassesInput()
     }
 
+    /// Режим ответа: микрофон выключен, звук по A2DP (стерео, полное качество).
+    /// Без очков звук идёт в динамик телефона.
+    func activatePlayback() throws {
+        try session.setCategory(.playback, mode: .default)
+        try session.setActive(true)
+        mode = .playback
+    }
+
+    /// Отпускает аудио: другие приложения (музыка, подкасты) могут продолжить играть.
     func deactivate() {
         try? session.setActive(false, options: .notifyOthersOnDeactivation)
+        mode = .inactive
+    }
+
+    /// После переключения из A2DP канал гарнитуры (HFP) поднимается не сразу. Ждём его,
+    /// чтобы первые слова не записались микрофоном телефона. Без очков возвращается сразу.
+    func waitForGlassesInput(timeout: TimeInterval = 2) async {
+        guard session.availableInputs?.contains(where: { $0.portType == .bluetoothHFP }) == true else { return }
+        let deadline = Date().addingTimeInterval(timeout)
+        while !isUsingGlassesInput, Date() < deadline {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
     }
 
     /// Выбирает микрофон очков, если они подключены. Иначе остаётся встроенный микрофон телефона.
