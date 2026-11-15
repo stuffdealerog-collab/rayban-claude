@@ -69,10 +69,14 @@ final class AssistantController {
     /// После такой паузы диалог начинается заново (контекст не раздувается бесконечно).
     private let conversationTimeout: TimeInterval = 10 * 60
 
+    /// Для команд Siri и кнопки «Действие» (App Intents создаются системой, без доступа к окружению SwiftUI).
+    static weak var shared: AssistantController?
+
     init(settings: AppSettings, glasses: GlassesManager, memory: MemoryStore) {
         self.settings = settings
         self.glasses = glasses
         self.memory = memory
+        Self.shared = self
 
         listener.onPartial = { [weak self] text in
             self?.partialTranscript = text
@@ -178,6 +182,15 @@ final class AssistantController {
         } else {
             releasePlaybackAudioNow()
         }
+    }
+
+    /// Команда «Спросить ассистента»: приложение открылось — сразу слушаем.
+    func listenFromShortcut() async {
+        if translatorActive { return }
+        if phase == .thinking || phase == .speaking { interrupt() }
+        guard phase == .idle else { return }
+        guard await prepareAudio() else { return }
+        startListening()
     }
 
     func newConversation() {

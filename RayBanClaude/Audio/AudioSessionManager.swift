@@ -98,9 +98,9 @@ final class AudioSessionManager {
 
     private func handleInterruption(_ typeValue: UInt?, reason: UInt?) {
         guard let typeValue, let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
-        // «Приложение было приостановлено» приходит задним числом после разблокировки — это не звонок,
-        // и прерывать из-за него ответ не нужно.
-        if let reason, AVAudioSession.InterruptionReason(rawValue: reason) == .appWasSuspended { return }
+        // С iOS 16 прерывание «приложение было приостановлено» не приходит; на случай старых
+        // систем пропускаем его по сырому значению (1) — это не звонок.
+        if reason == 1 { return }
         switch type {
         case .began: onInterruptionBegan?()
         case .ended: onInterruptionEnded?()

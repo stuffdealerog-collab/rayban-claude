@@ -25,6 +25,9 @@ struct MainTabView: View {
                 .tabItem { Label("Настройки", systemImage: "gearshape") }
                 .tag(Tab.settings)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .openTranslator)) { _ in
+            tab = .translator
+        }
         .onChange(of: tab) { oldValue, _ in
             // Переводчик отдаёт микрофон ассистенту, как только с него уходят.
             if oldValue == .translator { translator.stop() }

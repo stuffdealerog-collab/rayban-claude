@@ -38,6 +38,7 @@
 		C9777EB45CC715183D725D75 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2F0E5EF191E24DB30F0CCFD /* Assets.xcassets */; };
 		C9918E74CD5E710671ED5083 /* TranslatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64F563BB82BF7EF123CBB52 /* TranslatorController.swift */; };
 		CDFB201E8AFAD887A6EF18C9 /* SystemVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B77204B82072FB25B93711 /* SystemVoice.swift */; };
+		D8F97EA7E9E6E631C9E1DECD /* AssistantShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C763A412D920005E5101EA8 /* AssistantShortcuts.swift */; };
 		DC040F094A272E3A02187ECB /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = FB08C23D0181092893F845F7 /* MWDATCore */; };
 		DDBEBFFD349D1B15E94298C2 /* AssistantCore in Frameworks */ = {isa = PBXBuildFile; productRef = 18FB947502930D7F2F2022A1 /* AssistantCore */; };
 		E3BF26E9C39158B603460E2B /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF0890A86FF10EAAB06A0D5 /* MainTabView.swift */; };
@@ -57,6 +58,7 @@
 		30CFD4ED2CA32110FEF7F11B /* MailTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailTools.swift; sourceTree = "<group>"; };
 		38CAD8ED43499D590FB7A373 /* Persona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persona.swift; sourceTree = "<group>"; };
 		463BF752A1FF462EA93EB239 /* TranscriptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptView.swift; sourceTree = "<group>"; };
+		4C763A412D920005E5101EA8 /* AssistantShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantShortcuts.swift; sourceTree = "<group>"; };
 		54D2E2DE6ABF51F9F0B62DBD /* SystemPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPrompt.swift; sourceTree = "<group>"; };
 		6A6A2A6A818BA9C4C86E4525 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
 		6FCC6EFEE0127BFDF6F8024A /* ClaudeKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ClaudeKit; path = Packages/ClaudeKit; sourceTree = SOURCE_ROOT; };
@@ -108,6 +110,7 @@
 		446059F7E1C0508E2E682AF4 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				4C763A412D920005E5101EA8 /* AssistantShortcuts.swift */,
 				F0AC4FAE7528878B23525AF5 /* RayBanClaude.entitlements */,
 				DEFBA8239F0CF2A5E5386D02 /* RayBanClaudeApp.swift */,
 			);
@@ -364,6 +367,7 @@
 			files = (
 				2018C2B9D85D9B47F6E2B006 /* AppSettings.swift in Sources */,
 				7149990F5D019AA3ACE7304D /* AssistantController.swift in Sources */,
+				D8F97EA7E9E6E631C9E1DECD /* AssistantShortcuts.swift in Sources */,
 				E83B8CBE9309A2A729B84DBB /* AssistantTools.swift in Sources */,
 				34DE6F1C96F1F3EF0F5639C8 /* AssistantView.swift in Sources */,
 				13F7C141114E19BE9816B43F /* AudioSessionManager.swift in Sources */,

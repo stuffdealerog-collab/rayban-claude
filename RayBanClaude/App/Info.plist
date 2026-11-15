@@ -118,6 +118,23 @@
 		<string>shortcuts</string>
 	</array>
 
+	<!-- Как ещё Siri может называть приложение: «Спросить Джарвис». -->
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Джарвис</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>ассистент</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Jarvis</string>
+		</dict>
+	</array>
+
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
