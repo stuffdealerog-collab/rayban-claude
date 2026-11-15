@@ -1,0 +1,13 @@
+.DS_Store
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+*.xcuserstate
+build/
+*.ipa
+# Ключи и подпись — никогда не коммитить (они идут в GitHub Secrets)
+*.p8
+*.p12
+*.mobileprovision
+*cert_key*

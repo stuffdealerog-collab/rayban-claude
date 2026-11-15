@@ -1,0 +1,64 @@
+# На каждый push: тесты ClaudeKit и сборка iOS-приложения без подписи (аккаунт Apple не нужен).
+# Результат — артефакт RayBanClaude-ipa: неподписанный IPA, который можно бесплатно поставить
+# на свой iPhone через Sideloadly с обычным Apple ID (см. README, «Бесплатно: Sideloadly»).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Тесты и сборка
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      XCODE_VERSION: ${{ vars.XCODE_VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Выбрать Xcode
+        run: scripts/ci/select-xcode.sh
+
+      - name: Тесты ClaudeKit
+        run: swift test --package-path Packages/ClaudeKit
+
+      - name: Сгенерировать Xcode-проект
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      # Debug: в настройках приложения есть раздел «Отладка» (виртуальные очки на камере телефона).
+      # ENABLE_DEBUG_DYLIB=NO — весь код в одном исполняемом файле, как у обычного приложения.
+      - name: Сборка для iPhone (Debug, без подписи)
+        run: |
+          xcodebuild build -quiet \
+            -project RayBanClaude.xcodeproj -scheme RayBanClaude -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO ENABLE_DEBUG_DYLIB=NO
+
+      - name: Упаковать IPA
+        run: |
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Debug-iphoneos/RayBanClaude.app"
+          if [[ ! -d "$APP" ]]; then echo "::error::Не найден $APP"; exit 1; fi
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/ipa/Payload/"
+          cd "$RUNNER_TEMP/ipa"
+          zip -qry RayBanClaude.ipa Payload
+          ls -lh RayBanClaude.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RayBanClaude-ipa
+          path: ${{ runner.temp }}/ipa/RayBanClaude.ipa
+          retention-days: 14
+          if-no-files-found: error
+
+      # Release отдельно не собираем: минуты macOS дорогие, а Release собирает workflow TestFlight.

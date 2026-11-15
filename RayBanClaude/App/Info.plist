@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ru</string>
+	<key>CFBundleDisplayName</key>
+	<string>Claude Glasses</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<!-- Только HTTPS (стандартное шифрование iOS) — экспортная декларация в TestFlight не потребуется. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<!-- URL-схема для возврата из Meta AI (регистрация, разрешения). Должна совпадать с MWDAT > AppLinkURLScheme. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>raybanclaude</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Meta Wearables Device Access Toolkit.
+	     В режиме разработчика Meta AI значения MetaAppID/ClientToken можно не заполнять (META_APP_ID = 0).
+	     Для распространения через release channels — взять из Wearables Developer Center. -->
+	<key>MWDAT</key>
+	<dict>
+		<key>AppLinkURLScheme</key>
+		<string>raybanclaude://</string>
+		<key>MetaAppID</key>
+		<string>$(META_APP_ID)</string>
+		<key>ClientToken</key>
+		<string>$(CLIENT_TOKEN)</string>
+		<key>TeamID</key>
+		<string>$(DEVELOPMENT_TEAM)</string>
+	</dict>
+
+	<!-- Каналы связи с очками: BLE, Bluetooth Classic (видеопоток), Wi-Fi (большие объёмы).
+	     audio — чтобы режим «без рук» работал при заблокированном экране. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>processing</string>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>external-accessory</string>
+	</array>
+	<!-- Режим processing (его требует DAT) без этого ключа App Store Connect не принимает. -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).processing</string>
+	</array>
+	<key>UISupportedExternalAccessoryProtocols</key>
+	<array>
+		<string>com.meta.ar.wearable</string>
+	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Нужен для связи с очками Ray-Ban Meta.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Нужен для связи с очками Ray-Ban Meta.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Позволяет телефону находить очки и обмениваться с ними данными по Wi-Fi.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_bonjour._tcp</string>
+	</array>
+
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Микрофон очков нужен, чтобы слышать ваши вопросы ассистенту.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Распознавание речи превращает ваши вопросы в текст для Claude.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Камера телефона используется только в режиме отладки вместо камеры очков.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Чтобы отвечать на вопросы «где я» и «что рядом».</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Чтобы создавать напоминания по голосовой просьбе.</string>
+
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+</dict>
+</plist>
