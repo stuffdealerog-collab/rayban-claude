@@ -26,8 +26,10 @@ jobs:
       - name: Выбрать Xcode
         run: scripts/ci/select-xcode.sh
 
-      - name: Тесты ClaudeKit
-        run: swift test --package-path Packages/ClaudeKit
+      - name: Тесты ClaudeKit и AssistantCore
+        run: |
+          swift test --package-path Packages/ClaudeKit
+          swift test --package-path Packages/AssistantCore
 
       - name: Сгенерировать Xcode-проект
         run: |

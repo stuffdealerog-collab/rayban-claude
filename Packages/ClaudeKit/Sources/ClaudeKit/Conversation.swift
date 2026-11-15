@@ -14,6 +14,11 @@ public struct ClaudeConfiguration: Sendable {
     public var serverFallbacks: Bool
     /// Серверный инструмент веб-поиска.
     public var webSearch: Bool
+    /// Контекстное редактирование: когда диалог разрастается (снимки, результаты поиска),
+    /// сервер сам убирает старые результаты инструментов. История на клиенте не меняется.
+    public var contextEditing: Bool
+    /// Инструменты, чьи результаты нельзя убирать (например, заметки памяти).
+    public var contextEditingExcludedTools: [String]
 
     public init(
         apiKey: String,
@@ -22,7 +27,9 @@ public struct ClaudeConfiguration: Sendable {
         maxTokens: Int = 16_000,
         effort: String? = "low",
         serverFallbacks: Bool = true,
-        webSearch: Bool = true
+        webSearch: Bool = true,
+        contextEditing: Bool = true,
+        contextEditingExcludedTools: [String] = []
     ) {
         self.apiKey = apiKey
         self.model = model
@@ -31,9 +38,12 @@ public struct ClaudeConfiguration: Sendable {
         self.effort = effort
         self.serverFallbacks = serverFallbacks
         self.webSearch = webSearch
+        self.contextEditing = contextEditing
+        self.contextEditingExcludedTools = contextEditingExcludedTools
     }
 
     static let fallbackBeta = "server-side-fallback-2026-07-01"
+    static let contextManagementBeta = "context-management-2025-06-27"
 }
 
 /// События хода, которые нужны UI и озвучке.
@@ -77,6 +87,8 @@ public actor ClaudeConversation {
     private let client: ClaudeClient
     private let maxToolIterations: Int
     private let maxContinuations: Int
+    /// API отклонил `context_management` (модель или аккаунт без беты) — дальше без него.
+    private var contextEditingRejected = false
 
     public init(client: ClaudeClient = ClaudeClient(), maxToolIterations: Int = 8, maxContinuations: Int = 5) {
         self.client = client
@@ -147,19 +159,31 @@ public actor ClaudeConversation {
             while true {
                 try Task.checkCancellation()
 
-                let body = Self.requestBody(messages: messages, configuration: configuration, tools: tools)
-                let betas = configuration.serverFallbacks ? [ClaudeConfiguration.fallbackBeta] : []
-                let response = try await client.streamMessage(body: body, apiKey: configuration.apiKey, betas: betas) { delta in
-                    switch delta {
-                    case .textDelta(let text):
-                        await onEvent(.textDelta(text))
-                    case .blockStarted(let type, let name) where type == "server_tool_use":
-                        await onEvent(.serverToolStarted(name: name ?? "server_tool"))
-                    case .fallback(let from, let to):
-                        await onEvent(.fallback(from: from, to: to))
-                    default:
-                        break
+                let contextEditing = configuration.contextEditing && !contextEditingRejected
+                let body = Self.requestBody(
+                    messages: messages, configuration: configuration, tools: tools, contextEditing: contextEditing
+                )
+                var betas: [String] = []
+                if configuration.serverFallbacks { betas.append(ClaudeConfiguration.fallbackBeta) }
+                if contextEditing { betas.append(ClaudeConfiguration.contextManagementBeta) }
+                let response: AssembledMessage
+                do {
+                    response = try await client.streamMessage(body: body, apiKey: configuration.apiKey, betas: betas) { delta in
+                        switch delta {
+                        case .textDelta(let text):
+                            await onEvent(.textDelta(text))
+                        case .blockStarted(let type, let name) where type == "server_tool_use":
+                            await onEvent(.serverToolStarted(name: name ?? "server_tool"))
+                        case .fallback(let from, let to):
+                            await onEvent(.fallback(from: from, to: to))
+                        default:
+                            break
+                        }
                     }
+                } catch let error as ClaudeAPIError where contextEditing && Self.rejectsContextManagement(error) {
+                    // Ошибка пришла до начала стрима — повторяем тот же запрос без контекстного редактирования.
+                    contextEditingRejected = true
+                    continue
                 }
                 try Task.checkCancellation()
 
@@ -220,7 +244,12 @@ public actor ClaudeConversation {
 
     // MARK: - Request
 
-    static func requestBody(messages: [JSONValue], configuration: ClaudeConfiguration, tools: [any ClaudeTool]) -> JSONValue {
+    static func requestBody(
+        messages: [JSONValue],
+        configuration: ClaudeConfiguration,
+        tools: [any ClaudeTool],
+        contextEditing: Bool = false
+    ) -> JSONValue {
         var toolDefinitions = tools.map(\.definition)
         if configuration.webSearch {
             toolDefinitions.append(["type": "web_search_20260209", "name": "web_search", "max_uses": 3])
@@ -244,7 +273,29 @@ public actor ClaudeConversation {
         if configuration.serverFallbacks {
             body["fallbacks"] = "default"
         }
+        if contextEditing {
+            // Старые результаты инструментов (снимки, поиск) убираются, когда запрос перерастает
+            // ~30 тыс. токенов; три последних остаются. Чистить меньше 5 тыс. невыгодно: очистка
+            // сбрасывает кэш промпта.
+            var edit: [String: JSONValue] = [
+                "type": "clear_tool_uses_20250919",
+                "trigger": ["type": "input_tokens", "value": 30_000],
+                "keep": ["type": "tool_uses", "value": 3],
+                "clear_at_least": ["type": "input_tokens", "value": 5_000],
+            ]
+            if !configuration.contextEditingExcludedTools.isEmpty {
+                edit["exclude_tools"] = .array(configuration.contextEditingExcludedTools.map { .string($0) })
+            }
+            body["context_management"] = ["edits": [.object(edit)]]
+        }
         return .object(body)
+    }
+
+    /// 400 из-за `context_management`: бета недоступна для модели или аккаунта.
+    static func rejectsContextManagement(_ error: ClaudeAPIError) -> Bool {
+        guard error.statusCode == 400 else { return false }
+        let text = error.message.lowercased()
+        return text.contains("context_management") || text.contains("context-management") || text.contains("clear_tool_uses")
     }
 
     // MARK: - Tools

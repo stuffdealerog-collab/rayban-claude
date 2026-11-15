@@ -136,6 +136,29 @@ actor EventLog {
         #expect(second["messages"]?.arrayValue?.count == 3)
     }
 
+    @Test func contextEditingIsSentAndDroppedWhenRejected() async throws {
+        let rejection = #"{"type":"error","error":{"type":"invalid_request_error","message":"context_management: unsupported for this model"}}"#
+        MockAPIProtocol.responses = [(400, rejection), (200, finalAnswerStream), (200, finalAnswerStream)]
+        MockAPIProtocol.requests = []
+        let conversation = ClaudeConversation(client: MockAPIProtocol.makeClient())
+        var config = configuration
+        config.contextEditingExcludedTools = ["notes"]
+
+        let outcome = try await conversation.send(userText: "Привет", configuration: config, tools: []) { _ in }
+        #expect(outcome == .completed(text: " Это кружка."))
+        #expect(MockAPIProtocol.requests.count == 2)
+        let edit = MockAPIProtocol.requests[0]["context_management"]?["edits"]?.arrayValue?.first
+        #expect(edit?["type"] == "clear_tool_uses_20250919")
+        #expect(edit?["exclude_tools"]?.arrayValue?.first == "notes")
+        #expect(MockAPIProtocol.requests[1]["context_management"] == nil)
+        #expect(await conversation.messages.count == 2)
+
+        // Отказ запоминается: следующий ход сразу без context_management.
+        _ = try await conversation.send(userText: "Ещё", configuration: config, tools: []) { _ in }
+        #expect(MockAPIProtocol.requests.count == 3)
+        #expect(MockAPIProtocol.requests[2]["context_management"] == nil)
+    }
+
     @Test func refusalRollsBackHistory() async throws {
         let refusal = sse([
             ("message_start", #"{"type":"message_start","message":{"id":"m","model":"claude-opus-5-5"}}"#),

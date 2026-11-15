@@ -6,7 +6,7 @@ import ClaudeKit
 @MainActor
 final class SystemVoice: NSObject {
     var languageCode = "ru-RU" {
-        didSet { cachedVoice = nil }
+        didSet { if oldValue != languageCode { cachedVoice = nil } }
     }
 
     var isSpeaking: Bool { !activeUtterances.isEmpty }
@@ -85,15 +85,18 @@ final class SystemVoice: NSObject {
         guard watchdog == nil else { return }
         watchdog = Task { [weak self] in
             var silentChecks = 0
+            var heardSpeech = false
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 guard let self, !Task.isCancelled else { return }
                 if self.synthesizer.isSpeaking {
                     silentChecks = 0
+                    heardSpeech = true
                 } else {
                     silentChecks += 1
                 }
-                if silentChecks >= 2, self.isSpeaking {
+                // Премиум-голос может начинать дольше секунды: до первого звука ждём дольше.
+                if silentChecks >= (heardSpeech ? 2 : 6), self.isSpeaking {
                     self.activeUtterances.removeAll()
                     self.resumeWaiters()
                     return

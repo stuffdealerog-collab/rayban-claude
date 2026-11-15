@@ -13,6 +13,8 @@ packages:
     exactVersion: 1.0.1
   ClaudeKit:
     path: Packages/ClaudeKit
+  AssistantCore:
+    path: Packages/AssistantCore
 
 settings:
   base:
@@ -49,6 +51,7 @@ targets:
         CLIENT_TOKEN: ""
     dependencies:
       - package: ClaudeKit
+      - package: AssistantCore
       - package: MetaWearablesDAT
         product: MWDATCore
       - package: MetaWearablesDAT

@@ -29,7 +29,8 @@ final class AudioSessionManager {
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: session, queue: .main) { [weak self] note in
             let typeValue = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
-            Task { @MainActor in self?.handleInterruption(typeValue) }
+            let reasonValue = note.userInfo?[AVAudioSessionInterruptionReasonKey] as? UInt
+            Task { @MainActor in self?.handleInterruption(typeValue, reason: reasonValue) }
         })
         observers.append(center.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: session, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.onMediaServicesReset?() }
@@ -92,8 +93,14 @@ final class AudioSessionManager {
         return input.portType == .bluetoothHFP ? "очки (\(input.portName))" : "телефон"
     }
 
-    private func handleInterruption(_ typeValue: UInt?) {
+    /// Задержка вывода (Bluetooth — до нескольких сотен миллисекунд): столько ещё звучит уже отданный звук.
+    var outputLatency: TimeInterval { session.outputLatency }
+
+    private func handleInterruption(_ typeValue: UInt?, reason: UInt?) {
         guard let typeValue, let type = AVAudioSession.InterruptionType(rawValue: typeValue) else { return }
+        // «Приложение было приостановлено» приходит задним числом после разблокировки — это не звонок,
+        // и прерывать из-за него ответ не нужно.
+        if let reason, AVAudioSession.InterruptionReason(rawValue: reason) == .appWasSuspended { return }
         switch type {
         case .began: onInterruptionBegan?()
         case .ended: onInterruptionEnded?()

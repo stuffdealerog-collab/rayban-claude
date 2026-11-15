@@ -6,6 +6,8 @@ enum ElevenLabsModel: String, CaseIterable, Identifiable, Sendable {
     case flash = "eleven_flash_v2_5"
     /// Медленнее, но естественнее интонации.
     case multilingual = "eleven_multilingual_v2"
+    /// Самая выразительная, 70+ языков, в том числе узбекский. Отвечает медленнее Flash.
+    case v3 = "eleven_v3"
 
     var id: String { rawValue }
 
@@ -13,11 +15,18 @@ enum ElevenLabsModel: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .flash: return "Быстрая (Flash v2.5)"
         case .multilingual: return "Качественная (Multilingual v2)"
+        case .v3: return "Выразительная (v3)"
         }
     }
 
-    /// `language_code` и принудительная нормализация текста (числа, даты) есть только у Flash.
-    fileprivate var supportsLanguageCode: Bool { self == .flash }
+    /// `language_code` не поддерживает только Multilingual v2.
+    fileprivate var supportsLanguageCode: Bool { self != .multilingual }
+
+    /// Языки Flash v2.5 (ISO 639-1). Для остальных, например узбекского, нужна v3.
+    static let flashLanguages: Set<String> = [
+        "en", "ja", "zh", "de", "hi", "fr", "ko", "pt", "it", "es", "id", "nl", "tr", "fil", "pl", "sv",
+        "bg", "ro", "ar", "cs", "el", "fi", "hr", "ms", "sk", "da", "ta", "uk", "ru", "hu", "no", "vi",
+    ]
 }
 
 /// Всё, что нужно для запроса синтеза.
@@ -27,6 +36,17 @@ struct ElevenLabsConfiguration: Equatable, Sendable {
     var model: ElevenLabsModel
     /// ISO 639-1: «ru», «en».
     var languageCode: String
+}
+
+extension ElevenLabsConfiguration {
+    /// Та же настройка для фразы на другом языке: язык, которого нет у Flash и Multilingual
+    /// (например, узбекский), озвучивает v3.
+    func adapted(to language: String) -> ElevenLabsConfiguration {
+        var copy = self
+        copy.languageCode = language
+        if !ElevenLabsModel.flashLanguages.contains(language) { copy.model = .v3 }
+        return copy
+    }
 }
 
 /// Голос из библиотеки пользователя ElevenLabs.
@@ -78,6 +98,7 @@ enum ElevenLabsError: LocalizedError, Equatable {
     case quotaExceeded
     case paymentRequired(String)
     case voiceNotFound
+    case badRequest(String)
     case busy(Int)
     case server(Int, String)
     case emptyAudio
@@ -92,6 +113,8 @@ enum ElevenLabsError: LocalizedError, Equatable {
             return "нужен платный тариф ElevenLabs\(Self.suffix(detail))."
         case .voiceNotFound:
             return "выбранный голос не найден — выберите другой в настройках."
+        case .badRequest(let detail):
+            return "ElevenLabs отклонил запрос\(Self.suffix(detail))."
         case .busy(let status):
             return "ElevenLabs перегружен (HTTP \(status))."
         case .server(let status, let detail):
@@ -104,7 +127,7 @@ enum ElevenLabsError: LocalizedError, Equatable {
     /// Сама не пройдёт (ключ, лимит, голос): до смены настроек говорим голосом iOS.
     var isPermanent: Bool {
         switch self {
-        case .unauthorized, .quotaExceeded, .paymentRequired, .voiceNotFound: return true
+        case .unauthorized, .quotaExceeded, .paymentRequired, .voiceNotFound, .badRequest: return true
         case .busy, .server, .emptyAudio: return false
         }
     }
@@ -137,14 +160,13 @@ struct ElevenLabsClient: Sendable {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("audio/mpeg", forHTTPHeaderField: "Accept")
 
-        let flash = configuration.model.supportsLanguageCode
+        // apply_text_normalization не отправляем: для v2.5 принудительная нормализация была только
+        // на корпоративных тарифах, а числа Claude и так пишет словами (см. системный промпт).
         let body = SpeechRequest(
             text: text,
             modelID: configuration.model.rawValue,
-            languageCode: flash ? configuration.languageCode : nil,
-            previousText: previousText,
-            // У Flash нормализация по умолчанию выключена — без неё числа и даты читаются плохо.
-            applyTextNormalization: flash ? "on" : nil
+            languageCode: configuration.model.supportsLanguageCode ? configuration.languageCode : nil,
+            previousText: configuration.model == .v3 ? nil : previousText
         )
         request.httpBody = try JSONEncoder().encode(body)
 
@@ -152,6 +174,33 @@ struct ElevenLabsClient: Sendable {
         try Self.check(response, data)
         guard !data.isEmpty else { throw ElevenLabsError.emptyAudio }
         return data
+    }
+
+    /// Распознаёт речь (Scribe): 16 кГц, моно, 16 бит PCM. Нужна для узбекского — у Apple его нет.
+    func transcribe(pcm16kHz: Data, languageCode: String?, apiKey: String) async throws -> String {
+        var request = URLRequest(url: Self.baseURL.appendingPathComponent("v1/speech-to-text"))
+        request.httpMethod = "POST"
+        request.timeoutInterval = 20
+        request.setValue(apiKey, forHTTPHeaderField: "xi-api-key")
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+        func field(_ name: String, _ value: String) {
+            body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"\r\n\r\n\(value)\r\n".utf8))
+        }
+        field("model_id", "scribe_v2")
+        field("file_format", "pcm_s16le_16")
+        if let languageCode { field("language_code", languageCode) }
+        body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"speech.pcm\"\r\nContent-Type: application/octet-stream\r\n\r\n".utf8))
+        body.append(pcm16kHz)
+        body.append(Data("\r\n--\(boundary)--\r\n".utf8))
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+        try Self.check(response, data)
+        let result = try JSONDecoder().decode(TranscriptionResponse.self, from: data)
+        return result.text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     /// Голоса из библиотеки пользователя (стандартные, клонированные и добавленные из Voice Library).
@@ -192,10 +241,13 @@ struct ElevenLabsClient: Sendable {
         if lowered.contains("quota") || lowered.contains("credits") {
             throw ElevenLabsError.quotaExceeded
         }
+        if lowered.contains("voice_not_found") { throw ElevenLabsError.voiceNotFound }
+        if lowered.contains("paid_plan_required") || lowered.contains("payment") { throw ElevenLabsError.paymentRequired(detail) }
         switch http.statusCode {
         case 401, 403: throw ElevenLabsError.unauthorized(detail)
         case 402: throw ElevenLabsError.paymentRequired(detail)
         case 404: throw ElevenLabsError.voiceNotFound
+        case 400, 422: throw ElevenLabsError.badRequest(detail)
         case 429, 500..<600: throw ElevenLabsError.busy(http.statusCode)
         default: throw ElevenLabsError.server(http.statusCode, detail)
         }
@@ -229,15 +281,17 @@ private struct SpeechRequest: Encodable {
     let modelID: String
     let languageCode: String?
     let previousText: String?
-    let applyTextNormalization: String?
 
     enum CodingKeys: String, CodingKey {
         case text
         case modelID = "model_id"
         case languageCode = "language_code"
         case previousText = "previous_text"
-        case applyTextNormalization = "apply_text_normalization"
     }
+}
+
+private struct TranscriptionResponse: Decodable {
+    let text: String
 }
 
 private struct VoicePage: Decodable {

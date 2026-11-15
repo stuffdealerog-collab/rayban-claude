@@ -94,8 +94,29 @@
 	<string>Камера телефона используется только в режиме отладки вместо камеры очков.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Чтобы отвечать на вопросы «где я» и «что рядом».</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Чтобы рассказывать о ваших планах и добавлять события по голосовой просьбе.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Чтобы рассказывать о ваших планах и добавлять события по голосовой просьбе.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Чтобы находить номер или почту человека, которому вы просите написать или позвонить.</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
 	<string>Чтобы создавать напоминания по голосовой просьбе.</string>
+
+	<!-- Папка «Память» видна в приложении «Файлы»: заметки можно открыть, скопировать в Obsidian. -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<!-- Приложения, которые ассистент открывает: карты для маршрутов, мессенджеры, «Команды». -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>yandexmaps</string>
+		<string>comgooglemaps</string>
+		<string>tg</string>
+		<string>whatsapp</string>
+		<string>shortcuts</string>
+	</array>
 
 	<key>UIApplicationSceneManifest</key>
 	<dict>

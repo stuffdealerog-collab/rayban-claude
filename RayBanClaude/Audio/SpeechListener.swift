@@ -5,12 +5,14 @@ enum SpeechListenerError: LocalizedError {
     case noAudioInput
     case engineStopped
     case recognizerUnavailable
+    case cloudRecognizerMissing
 
     var errorDescription: String? {
         switch self {
         case .noAudioInput: return "Нет доступного микрофона."
         case .engineStopped: return "Микрофон выключен — аудио нужно перезапустить."
         case .recognizerUnavailable: return "Распознавание речи сейчас недоступно для выбранного языка."
+        case .cloudRecognizerMissing: return "Apple не распознаёт этот язык (например, узбекский) или нет разрешения на распознавание речи. Добавьте ключ ElevenLabs в настройках — тогда речь распознает он."
         }
     }
 }
@@ -23,11 +25,15 @@ struct ListenerIdleReason {
     var isQuickFailure: Bool
 }
 
-/// Слушает микрофон (очков или телефона) и превращает речь в текст через Apple Speech.
+/// Слушает микрофон (очков или телефона) и превращает речь в текст.
 ///
 /// Аудио-движок работает постоянно, а распознавание включается на одну фразу:
 /// конец фразы определяется по паузе. Пока ассистент говорит, распознавание выключено,
 /// чтобы он не слышал сам себя.
+///
+/// Два способа распознавания: Apple Speech (на устройстве, с промежуточным текстом) и облачный —
+/// фраза записывается и отправляется в ElevenLabs Scribe. Облачный нужен для языков, которых
+/// у Apple нет, прежде всего узбекского.
 @MainActor
 final class SpeechListener {
     /// Промежуточный текст для UI.
@@ -36,18 +42,24 @@ final class SpeechListener {
     var onUtterance: ((String) -> Void)?
     /// Распознавание закончилось без текста (тишина, ошибка) — можно перезапустить.
     var onIdle: ((ListenerIdleReason) -> Void)?
+    /// Облачное распознавание: PCM 16 кГц моно → текст. nil — облака нет (нет ключа ElevenLabs).
+    var cloudTranscriber: (@Sendable (Data, String) async throws -> String)?
 
     /// Пауза после речи, по которой фраза считается законченной.
     var endOfUtteranceSilence: Double = 1.2
 
     private(set) var isCapturing = false
+    /// Язык распознаётся облаком (у Apple распознавателя для него нет).
+    private(set) var usesCloud = false
     var isEngineRunning: Bool { engine.isRunning }
 
     private var engine = AVAudioEngine()
-    private let requestBox = RecognitionRequestBox()
+    private let tapBox = TapBox()
     private var recognizer: SFSpeechRecognizer?
+    private var languageCode = "ru"
     private var task: SFSpeechRecognitionTask?
     private var silenceTimer: Task<Void, Never>?
+    private var cloudMonitor: Task<Void, Never>?
     private var latestText = ""
     private var captureStarted = Date.distantPast
     private var generation = UUID()
@@ -56,9 +68,14 @@ final class SpeechListener {
     private var engineWanted = false
 
     static func requestPermissions() async -> Bool {
-        let speechStatus = await requestSpeechAuthorization()
         let micGranted = await AVAudioApplication.requestRecordPermission()
-        return speechStatus == .authorized && micGranted
+        let speechStatus = await requestSpeechAuthorization()
+        // Без Apple Speech можно обойтись облачным распознаванием, без микрофона — нет.
+        return micGranted && (speechStatus == .authorized || speechStatus == .denied || speechStatus == .restricted)
+    }
+
+    static var speechRecognitionAuthorized: Bool {
+        SFSpeechRecognizer.authorizationStatus() == .authorized
     }
 
     /// Колбэк авторизации приходит на произвольной очереди — замыкание создаётся вне MainActor.
@@ -68,10 +85,14 @@ final class SpeechListener {
         }
     }
 
+    /// Язык распознавания (BCP-47, например `ru-RU`, `uz-UZ`).
     func setLanguage(_ identifier: String) {
+        languageCode = String(identifier.prefix(2))
         if recognizer?.locale.identifier != identifier {
             recognizer = SFSpeechRecognizer(locale: Locale(identifier: identifier))
         }
+        // Нет распознавателя Apple для языка или нет разрешения на него — распознаёт облако.
+        usesCloud = recognizer == nil || !Self.speechRecognitionAuthorized
     }
 
     // MARK: - Engine
@@ -84,7 +105,8 @@ final class SpeechListener {
         guard format.sampleRate > 0, format.channelCount > 0 else { throw SpeechListenerError.noAudioInput }
 
         input.removeTap(onBus: 0)
-        input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.makeTapBlock(requestBox))
+        tapBox.prepare(inputFormat: format)
+        input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.makeTapBlock(tapBox))
         engine.prepare()
         try engine.start()
         engineWanted = true
@@ -104,9 +126,10 @@ final class SpeechListener {
         cancelCapture()
         engine.stop()
         engine.inputNode.removeTap(onBus: 0)
+        AudioLevels.shared.input = 0
     }
 
-    /// После сброса медиасервисов iOS старый AVAudioEngine непригоден — создаём новый.
+    /// После сброса медиасервисов или смены режима аудио старый AVAudioEngine непригоден — создаём новый.
     func rebuildEngine() {
         stopEngine()
         if let configurationObserver {
@@ -117,7 +140,7 @@ final class SpeechListener {
     }
 
     /// Tap вызывается на аудиопотоке — замыкание создаётся вне MainActor.
-    private nonisolated static func makeTapBlock(_ box: RecognitionRequestBox) -> AVAudioNodeTapBlock {
+    private nonisolated static func makeTapBlock(_ box: TapBox) -> AVAudioNodeTapBlock {
         { buffer, _ in box.append(buffer) }
     }
 
@@ -141,6 +164,12 @@ final class SpeechListener {
     /// Начинает распознавание одной фразы.
     func beginCapture() throws {
         guard engine.isRunning else { throw SpeechListenerError.engineStopped }
+        if usesCloud {
+            guard cloudTranscriber != nil else { throw SpeechListenerError.cloudRecognizerMissing }
+            cancelCapture()
+            beginCloudCapture()
+            return
+        }
         guard let recognizer, recognizer.isAvailable else { throw SpeechListenerError.recognizerUnavailable }
         cancelCapture()
 
@@ -151,7 +180,7 @@ final class SpeechListener {
             // Распознавание на устройстве: приватнее, без лимита длительности и без сети.
             request.requiresOnDeviceRecognition = true
         }
-        requestBox.set(request)
+        tapBox.setRequest(request)
         latestText = ""
         isCapturing = true
         captureStarted = Date()
@@ -179,7 +208,10 @@ final class SpeechListener {
     func cancelCapture() {
         silenceTimer?.cancel()
         silenceTimer = nil
-        requestBox.set(nil)
+        cloudMonitor?.cancel()
+        cloudMonitor = nil
+        tapBox.setRequest(nil)
+        _ = tapBox.stopRecording()
         task?.cancel()
         task = nil
         isCapturing = false
@@ -219,14 +251,98 @@ final class SpeechListener {
             onUtterance?(text)
         }
     }
+
+    // MARK: - Облачное распознавание (узбекский)
+
+    /// Записывает фразу и сам определяет её конец по громкости: речь, затем пауза.
+    private func beginCloudCapture() {
+        tapBox.startRecording()
+        isCapturing = true
+        captureStarted = Date()
+        latestText = ""
+        let current = UUID()
+        generation = current
+        let silence = endOfUtteranceSilence
+
+        cloudMonitor = Task { [weak self] in
+            var noiseFloor: Float = 1
+            var speechFrames = 0
+            var heardSpeech = false
+            var lastVoice = Date()
+            let started = Date()
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 50_000_000)
+                guard let self, !Task.isCancelled, self.generation == current else { return }
+                let level = AudioLevels.shared.input
+                let elapsed = Date().timeIntervalSince(started)
+                if elapsed < 0.4 { noiseFloor = min(noiseFloor, level) }
+                let threshold = max(noiseFloor + 0.12, 0.18)
+                if level > threshold {
+                    speechFrames += 1
+                    if speechFrames >= 3 { heardSpeech = true }
+                    lastVoice = Date()
+                } else {
+                    speechFrames = 0
+                }
+                if heardSpeech, Date().timeIntervalSince(lastVoice) > silence || elapsed > 25 {
+                    self.finishCloudCapture(generation: current)
+                    return
+                }
+                if !heardSpeech, elapsed > 8 {
+                    // Тишина: фразы не было.
+                    self.cancelCapture()
+                    self.onIdle?(ListenerIdleReason(error: nil, isQuickFailure: false))
+                    return
+                }
+            }
+        }
+    }
+
+    private func finishCloudCapture(generation current: UUID) {
+        let audio = tapBox.stopRecording()
+        cloudMonitor = nil
+        guard let transcriber = cloudTranscriber, audio.count > 6_400 else { // меньше 0,2 с — не речь
+            cancelCapture()
+            onIdle?(ListenerIdleReason(error: nil, isQuickFailure: false))
+            return
+        }
+        onPartial?("Распознаю…")
+        let language = languageCode
+        Task { [weak self] in
+            do {
+                let text = try await transcriber(audio, language)
+                guard let self, self.generation == current else { return }
+                self.cancelCapture()
+                if text.isEmpty {
+                    self.onIdle?(ListenerIdleReason(error: nil, isQuickFailure: false))
+                } else {
+                    self.onUtterance?(text)
+                }
+            } catch {
+                guard let self, self.generation == current else { return }
+                self.cancelCapture()
+                self.onIdle?(ListenerIdleReason(error: error.localizedDescription, isQuickFailure: true))
+            }
+        }
+    }
 }
 
-/// Текущий запрос распознавания, доступный из аудиопотока (tap вызывается не на главном потоке).
-private final class RecognitionRequestBox: @unchecked Sendable {
+/// Мост между аудиопотоком и главным потоком: запрос Apple Speech, запись для облака и громкость.
+private final class TapBox: @unchecked Sendable {
     private let lock = NSLock()
     private var request: SFSpeechAudioBufferRecognitionRequest?
+    private var recording = false
+    private var recorded = Data()
+    private var converter: AVAudioConverter?
+    private let targetFormat = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16_000, channels: 1, interleaved: true)
 
-    func set(_ request: SFSpeechAudioBufferRecognitionRequest?) {
+    func prepare(inputFormat: AVAudioFormat) {
+        lock.lock()
+        defer { lock.unlock() }
+        converter = targetFormat.flatMap { AVAudioConverter(from: inputFormat, to: $0) }
+    }
+
+    func setRequest(_ request: SFSpeechAudioBufferRecognitionRequest?) {
         lock.lock()
         let previous = self.request
         self.request = request
@@ -234,10 +350,75 @@ private final class RecognitionRequestBox: @unchecked Sendable {
         previous?.endAudio()
     }
 
+    func startRecording() {
+        lock.lock()
+        recorded = Data()
+        recording = true
+        lock.unlock()
+    }
+
+    /// Останавливает запись и отдаёт её: PCM 16 бит, 16 кГц, моно.
+    func stopRecording() -> Data {
+        lock.lock()
+        defer { lock.unlock() }
+        recording = false
+        let data = recorded
+        recorded = Data()
+        return data
+    }
+
     func append(_ buffer: AVAudioPCMBuffer) {
+        AudioLevels.shared.input = Self.level(of: buffer)
+
         lock.lock()
         let request = self.request
+        let shouldRecord = recording && recorded.count < 16_000 * 2 * 30 // не больше 30 секунд
+        let converter = self.converter
         lock.unlock()
+
         request?.append(buffer)
+        guard shouldRecord, let converter, let targetFormat else { return }
+
+        let ratio = targetFormat.sampleRate / buffer.format.sampleRate
+        let capacity = AVAudioFrameCount(Double(buffer.frameLength) * ratio) + 32
+        guard let output = AVAudioPCMBuffer(pcmFormat: targetFormat, frameCapacity: capacity) else { return }
+        let once = OnceFlag()
+        var error: NSError?
+        converter.convert(to: output, error: &error) { _, status in
+            guard once.take() else {
+                status.pointee = .noDataNow
+                return nil
+            }
+            status.pointee = .haveData
+            return buffer
+        }
+        guard error == nil, let samples = output.int16ChannelData else { return }
+        let bytes = Data(bytes: samples[0], count: Int(output.frameLength) * 2)
+        lock.lock()
+        if recording { recorded.append(bytes) }
+        lock.unlock()
+    }
+
+    /// Громкость буфера 0…1 (по RMS в децибелах).
+    private static func level(of buffer: AVAudioPCMBuffer) -> Float {
+        guard let channel = buffer.floatChannelData?[0], buffer.frameLength > 0 else { return 0 }
+        let count = Int(buffer.frameLength)
+        var sum: Float = 0
+        for index in 0..<count {
+            let sample = channel[index]
+            sum += sample * sample
+        }
+        let rms = (sum / Float(count)).squareRoot()
+        return AudioLevels.normalize(decibels: 20 * log10(max(rms, 0.000_001)))
+    }
+}
+
+/// Отдаёт входной буфер конвертеру ровно один раз.
+private final class OnceFlag: @unchecked Sendable {
+    private var used = false
+    func take() -> Bool {
+        guard !used else { return false }
+        used = true
+        return true
     }
 }

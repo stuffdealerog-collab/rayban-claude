@@ -9,48 +9,84 @@
 /* Begin PBXBuildFile section */
 		01B5FCEBE82024B2973FC21E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA627BA5C6F8633823568B5 /* SettingsView.swift */; };
 		08DAE1C1D131AD651671832D /* mock_feed.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A32F9AB94B86116F488C4E29 /* mock_feed.mp4 */; };
+		0F0A367AD9800BC67F687D27 /* MemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3B469C50DE4C8F31C7385B /* MemoryView.swift */; };
 		13F7C141114E19BE9816B43F /* AudioSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6A2A6A818BA9C4C86E4525 /* AudioSessionManager.swift */; };
+		177873B8F7A4C2020F98267D /* ElevenLabsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C071B7674AFB2E692F135370 /* ElevenLabsClient.swift */; };
 		2018C2B9D85D9B47F6E2B006 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE1791136191FD270B1A22F /* AppSettings.swift */; };
+		22829123B9CCF9E598B5847E /* TranslatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2A3C420F3A67A78ADA8B93F /* TranslatorView.swift */; };
 		2EB1E6B847A05D0D7D3A2BB0 /* SpeechListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = C847DB760B381A68F1BC2C6E /* SpeechListener.swift */; };
 		30A6C7D3C1BA2865B75C3388 /* TranscriptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463BF752A1FF462EA93EB239 /* TranscriptView.swift */; };
 		325CA4D803F879D5F09192EF /* GlassesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747FDA98E8C4FAA83DB28EC6 /* GlassesManager.swift */; };
 		32879881229A7E3E49AF4525 /* SystemPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54D2E2DE6ABF51F9F0B62DBD /* SystemPrompt.swift */; };
+		34DE6F1C96F1F3EF0F5639C8 /* AssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A21BBDECBAA96ABF182EAA /* AssistantView.swift */; };
+		43209CD5A63FC1AA6D22483F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7742868E92B4282D854FA3E6 /* Theme.swift */; };
 		439263CEF78391744B629CE6 /* MockGlassesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970FC86E11FC5EFFD0544332 /* MockGlassesSection.swift */; };
 		5B21823C1A93D0DB60940179 /* ClaudeKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9486A75EFF2B93692F7E7994 /* ClaudeKit */; };
-		69CCDF659112071D0140B670 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887146A4D2FA5503CCFF94A /* ContentView.swift */; };
+		69C464CFEEB611AA6E787BB3 /* CalendarTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = E091571B9AEE859624245D15 /* CalendarTools.swift */; };
 		6F7920E7DB3F174EE17DE673 /* SpeechSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BAB797D6915FB63837F7CD /* SpeechSpeaker.swift */; };
 		7149990F5D019AA3ACE7304D /* AssistantController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261F1E4794591BF8CF1CA31B /* AssistantController.swift */; };
-		76345FDCD2525AA515851ACD /* MWDATMockDevice in Frameworks */ = {isa = PBXBuildFile; productRef = DDA0E9521EDB53D9EDD40D9F /* MWDATMockDevice */; };
+		7318BF72A9B84B2680CC7371 /* NotesTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3B6017BFAD49691422A806 /* NotesTool.swift */; };
+		76345FDCD2525AA515851ACD /* MWDATCamera in Frameworks */ = {isa = PBXBuildFile; productRef = E921CCC882D056E802AD8100 /* MWDATCamera */; };
+		7889DEBC0C29EBE2F6A74A62 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E66BDB459EA9FE0B5161DC /* OnboardingView.swift */; };
+		7C85CD63500D3F943006EF87 /* LanguageGuess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACC7B99FCC2456B1334C83 /* LanguageGuess.swift */; };
+		9019847D44BF321D3ED97AD9 /* MailTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CFD4ED2CA32110FEF7F11B /* MailTools.swift */; };
+		982C1B468CC67DDA10B7CC27 /* ToolSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BC594CFF6479014C170994 /* ToolSupport.swift */; };
+		AB1437926180500F677D3D59 /* CommunicationTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56C3DE33CAA2D94F0ACBB4F /* CommunicationTools.swift */; };
+		ACDF94863E2F6E0FED0DE9E3 /* LatticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E955732849E10FED8D963 /* LatticeView.swift */; };
 		BA37CF2B3E57A1853670CAD5 /* RayBanClaudeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFBA8239F0CF2A5E5386D02 /* RayBanClaudeApp.swift */; };
+		BE6C882400F178C29B89D102 /* MWDATMockDevice in Frameworks */ = {isa = PBXBuildFile; productRef = DDA0E9521EDB53D9EDD40D9F /* MWDATMockDevice */; };
 		C9777EB45CC715183D725D75 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2F0E5EF191E24DB30F0CCFD /* Assets.xcassets */; };
-		DC040F094A272E3A02187ECB /* MWDATCamera in Frameworks */ = {isa = PBXBuildFile; productRef = E921CCC882D056E802AD8100 /* MWDATCamera */; };
-		DDBEBFFD349D1B15E94298C2 /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = FB08C23D0181092893F845F7 /* MWDATCore */; };
+		C9918E74CD5E710671ED5083 /* TranslatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64F563BB82BF7EF123CBB52 /* TranslatorController.swift */; };
+		CDFB201E8AFAD887A6EF18C9 /* SystemVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B77204B82072FB25B93711 /* SystemVoice.swift */; };
+		DC040F094A272E3A02187ECB /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = FB08C23D0181092893F845F7 /* MWDATCore */; };
+		DDBEBFFD349D1B15E94298C2 /* AssistantCore in Frameworks */ = {isa = PBXBuildFile; productRef = 18FB947502930D7F2F2022A1 /* AssistantCore */; };
+		E3BF26E9C39158B603460E2B /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF0890A86FF10EAAB06A0D5 /* MainTabView.swift */; };
 		E83B8CBE9309A2A729B84DBB /* AssistantTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDB801EAE978F156C744916 /* AssistantTools.swift */; };
 		EEFBA64B048155F96887F5B4 /* mock_photo.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 097F8F21336988E67DAA9DE5 /* mock_photo.jpg */; };
+		EF5FBAE79ABF5AD44AC7B5E7 /* UtilityTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7838499A44EBCBA9DF20199A /* UtilityTools.swift */; };
+		F5A876706D2C26C763E59C59 /* Persona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CAD8ED43499D590FB7A373 /* Persona.swift */; };
 		FD48611D7FBD0BCA020EEF96 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1BD3C4CA72BB3845497BB2D1 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		097F8F21336988E67DAA9DE5 /* mock_photo.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = mock_photo.jpg; sourceTree = "<group>"; };
 		1BD3C4CA72BB3845497BB2D1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		2438600F6C005548C448C87A /* AssistantCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AssistantCore; path = Packages/AssistantCore; sourceTree = SOURCE_ROOT; };
 		261F1E4794591BF8CF1CA31B /* AssistantController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantController.swift; sourceTree = "<group>"; };
+		2AACC7B99FCC2456B1334C83 /* LanguageGuess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageGuess.swift; sourceTree = "<group>"; };
+		30CFD4ED2CA32110FEF7F11B /* MailTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailTools.swift; sourceTree = "<group>"; };
+		38CAD8ED43499D590FB7A373 /* Persona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persona.swift; sourceTree = "<group>"; };
 		463BF752A1FF462EA93EB239 /* TranscriptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptView.swift; sourceTree = "<group>"; };
 		54D2E2DE6ABF51F9F0B62DBD /* SystemPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPrompt.swift; sourceTree = "<group>"; };
 		6A6A2A6A818BA9C4C86E4525 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
 		6FCC6EFEE0127BFDF6F8024A /* ClaudeKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ClaudeKit; path = Packages/ClaudeKit; sourceTree = SOURCE_ROOT; };
 		747FDA98E8C4FAA83DB28EC6 /* GlassesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassesManager.swift; sourceTree = "<group>"; };
+		7742868E92B4282D854FA3E6 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		7838499A44EBCBA9DF20199A /* UtilityTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilityTools.swift; sourceTree = "<group>"; };
+		7B3B469C50DE4C8F31C7385B /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
+		84E66BDB459EA9FE0B5161DC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		8688E1A21C8C8C76422CA75E /* RayBanClaude.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RayBanClaude.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		86A21BBDECBAA96ABF182EAA /* AssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantView.swift; sourceTree = "<group>"; };
+		937E955732849E10FED8D963 /* LatticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatticeView.swift; sourceTree = "<group>"; };
 		93BAB797D6915FB63837F7CD /* SpeechSpeaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSpeaker.swift; sourceTree = "<group>"; };
 		970FC86E11FC5EFFD0544332 /* MockGlassesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockGlassesSection.swift; sourceTree = "<group>"; };
 		A32F9AB94B86116F488C4E29 /* mock_feed.mp4 */ = {isa = PBXFileReference; path = mock_feed.mp4; sourceTree = "<group>"; };
+		A64F563BB82BF7EF123CBB52 /* TranslatorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslatorController.swift; sourceTree = "<group>"; };
+		B56C3DE33CAA2D94F0ACBB4F /* CommunicationTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationTools.swift; sourceTree = "<group>"; };
 		BBE1791136191FD270B1A22F /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		BD3B6017BFAD49691422A806 /* NotesTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesTool.swift; sourceTree = "<group>"; };
+		C071B7674AFB2E692F135370 /* ElevenLabsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsClient.swift; sourceTree = "<group>"; };
+		C2A3C420F3A67A78ADA8B93F /* TranslatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslatorView.swift; sourceTree = "<group>"; };
+		C3BC594CFF6479014C170994 /* ToolSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolSupport.swift; sourceTree = "<group>"; };
 		C847DB760B381A68F1BC2C6E /* SpeechListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechListener.swift; sourceTree = "<group>"; };
 		D2F0E5EF191E24DB30F0CCFD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DDF0890A86FF10EAAB06A0D5 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		DEFBA8239F0CF2A5E5386D02 /* RayBanClaudeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RayBanClaudeApp.swift; sourceTree = "<group>"; };
 		DFDB801EAE978F156C744916 /* AssistantTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantTools.swift; sourceTree = "<group>"; };
+		E091571B9AEE859624245D15 /* CalendarTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarTools.swift; sourceTree = "<group>"; };
+		E2B77204B82072FB25B93711 /* SystemVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemVoice.swift; sourceTree = "<group>"; };
 		EAA627BA5C6F8633823568B5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F0AC4FAE7528878B23525AF5 /* RayBanClaude.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RayBanClaude.entitlements; sourceTree = "<group>"; };
-		F887146A4D2FA5503CCFF94A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,9 +95,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B21823C1A93D0DB60940179 /* ClaudeKit in Frameworks */,
-				DDBEBFFD349D1B15E94298C2 /* MWDATCore in Frameworks */,
-				DC040F094A272E3A02187ECB /* MWDATCamera in Frameworks */,
-				76345FDCD2525AA515851ACD /* MWDATMockDevice in Frameworks */,
+				DDBEBFFD349D1B15E94298C2 /* AssistantCore in Frameworks */,
+				DC040F094A272E3A02187ECB /* MWDATCore in Frameworks */,
+				76345FDCD2525AA515851ACD /* MWDATCamera in Frameworks */,
+				BE6C882400F178C29B89D102 /* MWDATMockDevice in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +112,15 @@
 				DEFBA8239F0CF2A5E5386D02 /* RayBanClaudeApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		6B4243623A6992743F646298 /* Translator */ = {
+			isa = PBXGroup;
+			children = (
+				A64F563BB82BF7EF123CBB52 /* TranslatorController.swift */,
+				C2A3C420F3A67A78ADA8B93F /* TranslatorView.swift */,
+			);
+			path = Translator;
 			sourceTree = "<group>";
 		};
 		7C9AAFF8B81E59B64CC80493 /* Glasses */ = {
@@ -97,8 +143,10 @@
 			isa = PBXGroup;
 			children = (
 				6A6A2A6A818BA9C4C86E4525 /* AudioSessionManager.swift */,
+				C071B7674AFB2E692F135370 /* ElevenLabsClient.swift */,
 				C847DB760B381A68F1BC2C6E /* SpeechListener.swift */,
 				93BAB797D6915FB63837F7CD /* SpeechSpeaker.swift */,
+				E2B77204B82072FB25B93711 /* SystemVoice.swift */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -112,12 +160,34 @@
 			);
 			sourceTree = "<group>";
 		};
+		B00AF04C62F1C1A119BE18FE /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				84E66BDB459EA9FE0B5161DC /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		B92D0B618D8FF6E1DAB87BE0 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				2438600F6C005548C448C87A /* AssistantCore */,
 				6FCC6EFEE0127BFDF6F8024A /* ClaudeKit */,
 			);
 			path = Packages;
+			sourceTree = "<group>";
+		};
+		BA8D9F45C21F8A4848CBCB18 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				E091571B9AEE859624245D15 /* CalendarTools.swift */,
+				B56C3DE33CAA2D94F0ACBB4F /* CommunicationTools.swift */,
+				30CFD4ED2CA32110FEF7F11B /* MailTools.swift */,
+				BD3B6017BFAD49691422A806 /* NotesTool.swift */,
+				C3BC594CFF6479014C170994 /* ToolSupport.swift */,
+				7838499A44EBCBA9DF20199A /* UtilityTools.swift */,
+			);
+			path = Tools;
 			sourceTree = "<group>";
 		};
 		C3872E8BF2F593A81BA33999 /* RayBanClaude */ = {
@@ -126,9 +196,14 @@
 				446059F7E1C0508E2E682AF4 /* App */,
 				EDDFF369CDC3755EC6A72637 /* Assistant */,
 				951865AF1B3FE594759A6F23 /* Audio */,
+				CB76BF47FF50E274BB8B754E /* Design */,
 				7C9AAFF8B81E59B64CC80493 /* Glasses */,
+				D11533B0C15C606A42C20350 /* Memory */,
+				B00AF04C62F1C1A119BE18FE /* Onboarding */,
+				CB870071DE16A7D1902BDE5A /* Persona */,
 				C7EF2F08B059BFCE326963E9 /* Resources */,
 				C890FB3ACFCC63401ABE21AB /* Settings */,
+				6B4243623A6992743F646298 /* Translator */,
 				FF44BA0BD7D370AC29291AD3 /* Views */,
 			);
 			path = RayBanClaude;
@@ -153,12 +228,39 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		CB76BF47FF50E274BB8B754E /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				937E955732849E10FED8D963 /* LatticeView.swift */,
+				7742868E92B4282D854FA3E6 /* Theme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		CB870071DE16A7D1902BDE5A /* Persona */ = {
+			isa = PBXGroup;
+			children = (
+				38CAD8ED43499D590FB7A373 /* Persona.swift */,
+			);
+			path = Persona;
+			sourceTree = "<group>";
+		};
+		D11533B0C15C606A42C20350 /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				7B3B469C50DE4C8F31C7385B /* MemoryView.swift */,
+			);
+			path = Memory;
+			sourceTree = "<group>";
+		};
 		EDDFF369CDC3755EC6A72637 /* Assistant */ = {
 			isa = PBXGroup;
 			children = (
 				261F1E4794591BF8CF1CA31B /* AssistantController.swift */,
 				DFDB801EAE978F156C744916 /* AssistantTools.swift */,
+				2AACC7B99FCC2456B1334C83 /* LanguageGuess.swift */,
 				54D2E2DE6ABF51F9F0B62DBD /* SystemPrompt.swift */,
+				BA8D9F45C21F8A4848CBCB18 /* Tools */,
 			);
 			path = Assistant;
 			sourceTree = "<group>";
@@ -166,7 +268,8 @@
 		FF44BA0BD7D370AC29291AD3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				F887146A4D2FA5503CCFF94A /* ContentView.swift */,
+				86A21BBDECBAA96ABF182EAA /* AssistantView.swift */,
+				DDF0890A86FF10EAAB06A0D5 /* MainTabView.swift */,
 				970FC86E11FC5EFFD0544332 /* MockGlassesSection.swift */,
 				EAA627BA5C6F8633823568B5 /* SettingsView.swift */,
 				463BF752A1FF462EA93EB239 /* TranscriptView.swift */,
@@ -192,6 +295,7 @@
 			name = RayBanClaude;
 			packageProductDependencies = (
 				9486A75EFF2B93692F7E7994 /* ClaudeKit */,
+				18FB947502930D7F2F2022A1 /* AssistantCore */,
 				FB08C23D0181092893F845F7 /* MWDATCore */,
 				E921CCC882D056E802AD8100 /* MWDATCamera */,
 				DDA0E9521EDB53D9EDD40D9F /* MWDATMockDevice */,
@@ -226,6 +330,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				77287592AB77333A0BD7261F /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */,
+				28AB0F386710BCB318F0D46A /* XCLocalSwiftPackageReference "Packages/AssistantCore" */,
 				6EC7A8598E2EFAC2667D916D /* XCLocalSwiftPackageReference "Packages/ClaudeKit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -260,16 +365,33 @@
 				2018C2B9D85D9B47F6E2B006 /* AppSettings.swift in Sources */,
 				7149990F5D019AA3ACE7304D /* AssistantController.swift in Sources */,
 				E83B8CBE9309A2A729B84DBB /* AssistantTools.swift in Sources */,
+				34DE6F1C96F1F3EF0F5639C8 /* AssistantView.swift in Sources */,
 				13F7C141114E19BE9816B43F /* AudioSessionManager.swift in Sources */,
-				69CCDF659112071D0140B670 /* ContentView.swift in Sources */,
+				69C464CFEEB611AA6E787BB3 /* CalendarTools.swift in Sources */,
+				AB1437926180500F677D3D59 /* CommunicationTools.swift in Sources */,
+				177873B8F7A4C2020F98267D /* ElevenLabsClient.swift in Sources */,
 				325CA4D803F879D5F09192EF /* GlassesManager.swift in Sources */,
+				7C85CD63500D3F943006EF87 /* LanguageGuess.swift in Sources */,
+				ACDF94863E2F6E0FED0DE9E3 /* LatticeView.swift in Sources */,
+				9019847D44BF321D3ED97AD9 /* MailTools.swift in Sources */,
+				E3BF26E9C39158B603460E2B /* MainTabView.swift in Sources */,
+				0F0A367AD9800BC67F687D27 /* MemoryView.swift in Sources */,
 				439263CEF78391744B629CE6 /* MockGlassesSection.swift in Sources */,
+				7318BF72A9B84B2680CC7371 /* NotesTool.swift in Sources */,
+				7889DEBC0C29EBE2F6A74A62 /* OnboardingView.swift in Sources */,
+				F5A876706D2C26C763E59C59 /* Persona.swift in Sources */,
 				BA37CF2B3E57A1853670CAD5 /* RayBanClaudeApp.swift in Sources */,
 				01B5FCEBE82024B2973FC21E /* SettingsView.swift in Sources */,
 				2EB1E6B847A05D0D7D3A2BB0 /* SpeechListener.swift in Sources */,
 				6F7920E7DB3F174EE17DE673 /* SpeechSpeaker.swift in Sources */,
 				32879881229A7E3E49AF4525 /* SystemPrompt.swift in Sources */,
+				CDFB201E8AFAD887A6EF18C9 /* SystemVoice.swift in Sources */,
+				43209CD5A63FC1AA6D22483F /* Theme.swift in Sources */,
+				982C1B468CC67DDA10B7CC27 /* ToolSupport.swift in Sources */,
 				30A6C7D3C1BA2865B75C3388 /* TranscriptView.swift in Sources */,
+				C9918E74CD5E710671ED5083 /* TranslatorController.swift in Sources */,
+				22829123B9CCF9E598B5847E /* TranslatorView.swift in Sources */,
+				EF5FBAE79ABF5AD44AC7B5E7 /* UtilityTools.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,6 +597,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		28AB0F386710BCB318F0D46A /* XCLocalSwiftPackageReference "Packages/AssistantCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/AssistantCore;
+		};
 		6EC7A8598E2EFAC2667D916D /* XCLocalSwiftPackageReference "Packages/ClaudeKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/ClaudeKit;
@@ -493,6 +619,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		18FB947502930D7F2F2022A1 /* AssistantCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AssistantCore;
+		};
 		9486A75EFF2B93692F7E7994 /* ClaudeKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ClaudeKit;

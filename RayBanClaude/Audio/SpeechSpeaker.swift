@@ -30,6 +30,8 @@ final class SpeechSpeaker: NSObject {
 
     private struct Segment {
         let text: String
+        /// ISO 639-1 языка фразы — по нему выбирается голос iOS и модель ElevenLabs.
+        let language: String?
         /// Синтез ElevenLabs; nil — фразу говорит голос iOS. Результат nil — синтез не удался.
         let audio: Task<Data?, Never>?
     }
@@ -53,11 +55,11 @@ final class SpeechSpeaker: NSObject {
     private var consecutiveNeuralFailures = 0
     private var reportedProblem: String?
 
-    /// Ставит фразу в очередь озвучки.
-    func speak(_ text: String) {
+    /// Ставит фразу в очередь озвучки. `language` — ISO 639-1 фразы; nil — язык из настроек.
+    func speak(_ text: String, language: String? = nil) {
         let clean = SpeechText.clean(text)
         guard !clean.isEmpty else { return }
-        queue.append(Segment(text: clean, audio: synthesisTask(for: clean)))
+        queue.append(Segment(text: clean, language: language, audio: synthesisTask(for: clean, language: language)))
         spokenContext = String((spokenContext + " " + clean).suffix(400))
         startPlaybackLoopIfNeeded()
     }
@@ -75,6 +77,8 @@ final class SpeechSpeaker: NSObject {
         player = nil
         finishPlayback(started: true)
         systemVoice.stop()
+        AudioLevels.shared.output = 0
+        AudioLevels.shared.systemVoiceActive = false
         resumeWaiters()
     }
 
@@ -98,8 +102,9 @@ final class SpeechSpeaker: NSObject {
         return true
     }
 
-    private func synthesisTask(for text: String) -> Task<Data?, Never>? {
-        guard let configuration = elevenLabs, neuralUsable else { return nil }
+    private func synthesisTask(for text: String, language: String?) -> Task<Data?, Never>? {
+        guard let base = elevenLabs, neuralUsable else { return nil }
+        let configuration = language.map { base.adapted(to: $0) } ?? base
         let previous = lastSynthesis
         let context = spokenContext.trimmingCharacters(in: .whitespaces)
         let client = self.client
@@ -162,12 +167,16 @@ final class SpeechSpeaker: NSObject {
     private func playQueue(generation current: UUID) async {
         while current == generation, let segment = queue.first {
             var played = false
-            if let audio = segment.audio, let data = await audio.value, current == generation {
+            // Плохая сеть: дольше 5 секунд не ждём — фразу скажет голос iOS.
+            if let audio = segment.audio, let data = await Self.value(of: audio, timeout: 5), current == generation {
                 played = await play(data)
             }
             if !played, current == generation {
+                AudioLevels.shared.systemVoiceActive = true
+                systemVoice.languageCode = segment.language.map(LanguageGuess.bcp47(for:)) ?? languageCode
                 systemVoice.speak(segment.text)
                 await systemVoice.waitUntilFinished()
+                AudioLevels.shared.systemVoiceActive = false
             }
             guard current == generation else { return }
             queue.removeFirst()
@@ -179,12 +188,28 @@ final class SpeechSpeaker: NSObject {
         resumeWaiters()
     }
 
-    /// Проигрывает MP3 и ждёт конца. false — звук не запустился (тогда фразу скажет голос iOS).
+    /// Результат синтеза, но не дольше `timeout` секунд.
+    private static func value(of task: Task<Data?, Never>, timeout: TimeInterval) async -> Data? {
+        await withTaskGroup(of: Data?.self) { group in
+            group.addTask { await task.value }
+            group.addTask {
+                try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+                return nil
+            }
+            let first = await group.next() ?? nil
+            group.cancelAll()
+            return first
+        }
+    }
+
+    /// Проигрывает MP3 и ждёт конца. false — звук не воспроизвёлся (тогда фразу скажет голос iOS).
     private func play(_ data: Data) async -> Bool {
         guard let player = try? AVAudioPlayer(data: data, fileTypeHint: AVFileType.mp3.rawValue) else { return false }
         player.delegate = self
+        player.isMeteringEnabled = true
         self.player = player
-        let started = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+        let meter = startMeter(for: player)
+        let played = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
             playerFinished = continuation
             if player.play() {
                 startPlayerWatchdog(for: player)
@@ -192,8 +217,21 @@ final class SpeechSpeaker: NSObject {
                 finishPlayback(started: false)
             }
         }
+        meter.cancel()
+        AudioLevels.shared.output = 0
         if self.player === player { self.player = nil }
-        return started
+        return played
+    }
+
+    /// Громкость голоса для решётки — 20 раз в секунду.
+    private func startMeter(for player: AVAudioPlayer) -> Task<Void, Never> {
+        Task { @MainActor [weak player] in
+            while !Task.isCancelled, let player {
+                player.updateMeters()
+                AudioLevels.shared.output = AudioLevels.normalize(decibels: player.averagePower(forChannel: 0))
+                try? await Task.sleep(nanoseconds: 50_000_000)
+            }
+        }
     }
 
     private func finishPlayback(started: Bool) {
@@ -216,10 +254,11 @@ final class SpeechSpeaker: NSObject {
         }
     }
 
-    private func playerEnded(_ id: ObjectIdentifier) {
+    private func playerEnded(_ id: ObjectIdentifier, successfully: Bool) {
         // Проверка isPlaying: поздний колбэк освобождённого плеера не должен закончить новый с тем же адресом.
         guard let player, ObjectIdentifier(player) == id, !player.isPlaying else { return }
-        finishPlayback(started: true)
+        // Ошибка декодирования — фразу повторит голос iOS, а не потеряет.
+        finishPlayback(started: successfully)
     }
 
     private func resumeWaiters() {
@@ -232,11 +271,11 @@ final class SpeechSpeaker: NSObject {
 extension SpeechSpeaker: AVAudioPlayerDelegate {
     nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         let id = ObjectIdentifier(player)
-        Task { @MainActor in self.playerEnded(id) }
+        Task { @MainActor in self.playerEnded(id, successfully: flag) }
     }
 
     nonisolated func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         let id = ObjectIdentifier(player)
-        Task { @MainActor in self.playerEnded(id) }
+        Task { @MainActor in self.playerEnded(id, successfully: false) }
     }
 }
