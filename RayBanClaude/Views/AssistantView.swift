@@ -199,7 +199,10 @@ struct AssistantView: View {
         .background(alignment: .top) {
             Rectangle().fill(Theme.hairline).frame(height: 1)
         }
-        .sensoryFeedback(.impact(weight: .light), trigger: assistant.phase)
+        .sensoryFeedback(.impact(weight: .light), trigger: assistant.phase) { _, new in
+            // Только когда слушать начали по кнопке, а не на каждом перезапуске «без рук».
+            new == .listening && !assistant.handsFree
+        }
     }
 
     private func sendTyped() {

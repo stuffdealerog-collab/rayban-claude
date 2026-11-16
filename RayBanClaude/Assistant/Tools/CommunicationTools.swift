@@ -32,10 +32,18 @@ enum ContactsDirectory {
         return contacts.prefix(8).map { contact in
             FoundContact(
                 name: CNContactFormatter.string(from: contact, style: .fullName) ?? contact.nickname,
-                phones: contact.phoneNumbers.map { $0.value.stringValue },
+                // Мобильный — первым: на него пишут и звонят чаще всего.
+                phones: contact.phoneNumbers
+                    .sorted { isMobile($0.label) && !isMobile($1.label) }
+                    .map { $0.value.stringValue },
                 emails: contact.emailAddresses.map { $0.value as String }
             )
         }
+    }
+
+    private static func isMobile(_ label: String?) -> Bool {
+        guard let label else { return false }
+        return label == CNLabelPhoneNumberMobile || label == CNLabelPhoneNumberiPhone || label == CNLabelPhoneNumberMain
     }
 
     /// Номер из текста («+998 90 123-45-67») или из контакта по имени.
@@ -111,7 +119,7 @@ struct SendMessageTool: ClaudeTool {
 
         switch app {
         case "telegram":
-            let encoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let encoded = ToolSupport.queryEncode(text)
             guard let url = URL(string: "tg://msg?text=\(encoded)"), await open(url) else {
                 return .error("Telegram не установлен.")
             }
@@ -120,7 +128,7 @@ struct SendMessageTool: ClaudeTool {
         case "whatsapp":
             guard let recipient else { return .error("Для WhatsApp нужен получатель.") }
             let target = try await ContactsDirectory.resolvePhone(recipient)
-            let encoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let encoded = ToolSupport.queryEncode(text)
             let digits = target.phone.filter { $0.isNumber }
             guard let url = URL(string: "https://wa.me/\(digits)?text=\(encoded)"), await open(url) else {
                 return .error("Не удалось открыть WhatsApp.")
@@ -164,15 +172,29 @@ final class MessageComposer: NSObject, MFMessageComposeViewControllerDelegate {
         controller.recipients = [phone]
         controller.body = text
         controller.messageComposeDelegate = composer
-        return await withCheckedContinuation { continuation in
-            composer.continuation = continuation
-            presenter.present(controller, animated: true)
-            // Не держим разговор бесконечно: через 2 минуты отвечаем, что окно ещё открыто.
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 120_000_000_000)
-                composer.finish(.pending)
+        composer.controller = controller
+        // Ответ прервали — закрываем окно, иначе следующий вопрос ждал бы его в очереди ходов.
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                composer.continuation = continuation
+                presenter.present(controller, animated: true)
+                // Не держим разговор бесконечно: через 2 минуты отвечаем, что окно ещё открыто.
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 120_000_000_000)
+                    composer.finish(.pending)
+                }
             }
+        } onCancel: {
+            Task { @MainActor in composer.cancel() }
         }
+    }
+
+    private weak var controller: MFMessageComposeViewController?
+
+    private func cancel() {
+        controller?.dismiss(animated: true)
+        finish(.cancelled)
+        if Self.active === self { Self.active = nil }
     }
 
     private func finish(_ outcome: Outcome) {
@@ -261,14 +283,27 @@ final class MailComposer: NSObject, MFMailComposeViewControllerDelegate {
         controller.setSubject(subject)
         controller.setMessageBody(body, isHTML: false)
         controller.mailComposeDelegate = composer
-        return await withCheckedContinuation { continuation in
-            composer.continuation = continuation
-            presenter.present(controller, animated: true)
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 180_000_000_000)
-                composer.finish(.pending)
+        composer.controller = controller
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                composer.continuation = continuation
+                presenter.present(controller, animated: true)
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 180_000_000_000)
+                    composer.finish(.pending)
+                }
             }
+        } onCancel: {
+            Task { @MainActor in composer.cancel() }
         }
+    }
+
+    private weak var controller: MFMailComposeViewController?
+
+    private func cancel() {
+        controller?.dismiss(animated: true)
+        finish(.cancelled)
+        if Self.active === self { Self.active = nil }
     }
 
     private func finish(_ outcome: Outcome) {

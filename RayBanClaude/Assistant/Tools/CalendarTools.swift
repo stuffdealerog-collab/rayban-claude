@@ -101,7 +101,7 @@ struct CreateEventTool: ClaudeTool {
         event.location = ToolSupport.string(input, "location")
         event.notes = ToolSupport.string(input, "notes")
         event.calendar = calendar
-        if let minutes = ToolSupport.int(input, "alert_minutes"), minutes >= 0 {
+        if let minutes = ToolSupport.int(input, "alert_minutes"), (0...10_080).contains(minutes) {
             event.addAlarm(EKAlarm(relativeOffset: TimeInterval(-minutes * 60)))
         }
         try store.save(event, span: .thisEvent, commit: true)

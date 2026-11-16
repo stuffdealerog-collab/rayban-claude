@@ -23,6 +23,8 @@ struct ListenerIdleReason {
     var error: String?
     /// Закончилось подозрительно быстро — признак неисправного распознавателя, а не тишины.
     var isQuickFailure: Bool
+    /// Ошибка, которая сама не пройдёт (неверный ключ ElevenLabs, кончился лимит): повторять бессмысленно.
+    var isFatal = false
 }
 
 /// Слушает микрофон (очков или телефона) и превращает речь в текст.
@@ -310,7 +312,8 @@ final class SpeechListener {
         let language = languageCode
         Task { [weak self] in
             do {
-                let text = try await transcriber(audio, language)
+                let raw = try await transcriber(audio, language)
+                let text = Self.withoutSoundTags(raw)
                 guard let self, self.generation == current else { return }
                 self.cancelCapture()
                 if text.isEmpty {
@@ -321,9 +324,23 @@ final class SpeechListener {
             } catch {
                 guard let self, self.generation == current else { return }
                 self.cancelCapture()
-                self.onIdle?(ListenerIdleReason(error: error.localizedDescription, isQuickFailure: true))
+                let permanent = (error as? ElevenLabsError)?.isPermanent ?? false
+                let message = permanent ? "Распознавание ElevenLabs: \(error.localizedDescription)" : error.localizedDescription
+                // Сетевой сбой — не поломка распознавателя: просто слушаем снова.
+                self.onIdle?(ListenerIdleReason(error: message, isQuickFailure: false, isFatal: permanent))
             }
         }
+    }
+}
+
+extension SpeechListener {
+    /// Scribe помечает звуки «(кашель)», «[музыка]» — это не речь.
+    nonisolated static func withoutSoundTags(_ text: String) -> String {
+        let stripped = text
+            .replacingOccurrences(of: #"\([^)]*\)|\[[^\]]*\]"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return stripped.trimmingCharacters(in: .punctuationCharacters).isEmpty ? "" : stripped
     }
 }
 

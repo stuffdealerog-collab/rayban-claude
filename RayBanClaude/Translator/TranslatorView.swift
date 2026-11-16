@@ -55,7 +55,6 @@ struct TranslatorView: View {
             } message: {
                 Text(translator.errorMessage ?? "")
             }
-            .onDisappear { translator.stop() }
         }
     }
 

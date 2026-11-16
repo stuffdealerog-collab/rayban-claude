@@ -11,7 +11,7 @@ struct MemoryView: View {
     @State private var query = ""
     @State private var path: [MemoryNote] = []
     @State private var showNewNote = false
-    @State private var exportURL: URL?
+    @State private var export: ExportTarget?
 
     private var memory: MemoryStore { assistant.memory }
 
@@ -40,7 +40,7 @@ struct MemoryView: View {
                             Label("Новая заметка", systemImage: "square.and.pencil")
                         }
                         Button {
-                            exportURL = memory.root
+                            export = ExportTarget(url: memory.root)
                         } label: {
                             Label("Сохранить копию в Файлы", systemImage: "folder")
                         }
@@ -55,8 +55,8 @@ struct MemoryView: View {
             .sheet(isPresented: $showNewNote) {
                 NoteEditorView(title: "", text: "", memory: memory, isNew: true) { reload() }
             }
-            .sheet(item: $exportURL) { url in
-                FolderExporter(url: url)
+            .sheet(item: $export) { target in
+                FolderExporter(url: target.url)
             }
             .onAppear(perform: reload)
             .onReceive(NotificationCenter.default.publisher(for: .memoryDidChange)) { _ in reload() }
@@ -246,6 +246,10 @@ private struct NoteEditorView: View {
     private func save() {
         let name = title.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "/", with: "-")
         let path = relativePath ?? (name.hasSuffix(".md") ? name : name + ".md")
+        if isNew, (try? memory.read(path)) != nil {
+            error = "Заметка «\(name)» уже есть — откройте её и допишите."
+            return
+        }
         do {
             try memory.write(path, text: text)
             NotificationCenter.default.post(name: .memoryDidChange, object: nil)
@@ -310,10 +314,12 @@ private struct MarkdownBlocks: View {
     private func inline(_ content: String) -> AttributedString {
         var converted = content
         while let open = converted.range(of: "[["), let close = converted.range(of: "]]", range: open.upperBound..<converted.endIndex) {
-            let title = String(converted[open.upperBound..<close.lowerBound])
-            let target = title.split(separator: "|").first.map(String.init) ?? title
+            let inner = String(converted[open.upperBound..<close.lowerBound])
+            let parts = inner.split(separator: "|", maxSplits: 1).map(String.init)
+            let target = parts.first ?? inner
+            let label = parts.count > 1 ? parts[1] : target
             let encoded = target.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? target
-            converted.replaceSubrange(open.lowerBound..<close.upperBound, with: "[\(title)](note://\(encoded))")
+            converted.replaceSubrange(open.lowerBound..<close.upperBound, with: "[\(label)](note://\(encoded))")
         }
         return (try? AttributedString(markdown: converted, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
             ?? AttributedString(content)
@@ -331,6 +337,7 @@ private struct FolderExporter: UIViewControllerRepresentable {
     func updateUIViewController(_ controller: UIDocumentPickerViewController, context: Context) {}
 }
 
-extension URL: @retroactive Identifiable {
-    public var id: String { absoluteString }
+private struct ExportTarget: Identifiable {
+    let url: URL
+    var id: String { url.absoluteString }
 }

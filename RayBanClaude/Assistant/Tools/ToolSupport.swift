@@ -66,8 +66,21 @@ enum ToolSupport {
         return value
     }
 
+    /// Целое из ввода модели. Огромные и дробные значения отбрасываются: `Int(1e20)` уронил бы приложение.
     static func int(_ input: [String: JSONValue], _ key: String) -> Int? {
-        input[key]?.doubleValue.map { Int($0) }
+        int(input[key])
+    }
+
+    static func int(_ value: JSONValue?) -> Int? {
+        guard let double = value?.doubleValue, double.isFinite, abs(double) < 1_000_000_000 else { return nil }
+        return Int(double.rounded())
+    }
+
+    /// Значение для параметра ссылки: `&`, `+`, `=`, `?` и `#` тоже кодируются, иначе текст обрежется.
+    static func queryEncode(_ text: String) -> String {
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&+=?#")
+        return text.addingPercentEncoding(withAllowedCharacters: allowed) ?? ""
     }
 
     static func bool(_ input: [String: JSONValue], _ key: String) -> Bool? {

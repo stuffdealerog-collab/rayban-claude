@@ -191,6 +191,7 @@ struct ElevenLabsClient: Sendable {
         }
         field("model_id", "scribe_v2")
         field("file_format", "pcm_s16le_16")
+        field("tag_audio_events", "false")
         if let languageCode { field("language_code", languageCode) }
         body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"speech.pcm\"\r\nContent-Type: application/octet-stream\r\n\r\n".utf8))
         body.append(pcm16kHz)

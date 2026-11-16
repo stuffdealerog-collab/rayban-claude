@@ -158,10 +158,13 @@ final class TranslatorController {
     /// Кнопка «я говорю» / «собеседник говорит»; в субтитрах — старт и стоп.
     func toggle(_ side: Side) async {
         if activeSide == side {
-            stop()
+            // Повторное нажатие — перестать слушать; микрофон остаётся у переводчика до ухода с вкладки.
+            sessionID = UUID()
+            activeSide = nil
+            isTranslating = false
+            assistant.pauseTranslationCapture()
             return
         }
-        stop()
         guard !settings.trimmedAPIKey.isEmpty else {
             errorMessage = TranslationError.noKey.localizedDescription
             return
@@ -179,7 +182,6 @@ final class TranslatorController {
             onIdle: { [weak self] in
                 guard let self, self.sessionID == session else { return }
                 self.activeSide = nil
-                self.assistant.endTranslationCapture()
             }
         )
         if !started, sessionID == session {
@@ -191,6 +193,7 @@ final class TranslatorController {
         }
     }
 
+    /// Полностью отдать микрофон ассистенту: уход с вкладки, смена режима или языков.
     func stop() {
         sessionID = UUID()
         activeSide = nil
@@ -233,7 +236,6 @@ final class TranslatorController {
             assistant.continueTranslationCapture()
         } else {
             activeSide = nil
-            assistant.endTranslationCapture()
         }
     }
 

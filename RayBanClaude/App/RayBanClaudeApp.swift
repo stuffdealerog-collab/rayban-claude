@@ -1,6 +1,7 @@
 import AssistantCore
 import MWDATCore
 import SwiftUI
+import UserNotifications
 
 @main
 struct RayBanClaudeApp: App {
@@ -16,6 +17,8 @@ struct RayBanClaudeApp: App {
         } catch {
             NSLog("[RayBanClaude] Wearables.configure failed: \(error)")
         }
+        // Таймеры звучат и при открытом приложении.
+        UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
         let settings = AppSettings()
         let glasses = GlassesManager()
         let memory = MemoryStore(root: Self.memoryFolder)
@@ -45,6 +48,18 @@ struct RayBanClaudeApp: App {
                     Task { await glasses.handle(url: url) }
                 }
         }
+    }
+}
+
+/// Показывает уведомления (таймеры, будильники) и когда приложение на экране.
+final class NotificationPresenter: NSObject, UNUserNotificationCenterDelegate, @unchecked Sendable {
+    static let shared = NotificationPresenter()
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound, .list]
     }
 }
 

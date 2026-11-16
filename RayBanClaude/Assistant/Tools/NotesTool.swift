@@ -50,7 +50,7 @@ struct NotesTool: ClaudeTool {
         let path = input["path"]?.stringValue
         switch input["command"]?.stringValue {
         case "view":
-            let range = input["view_range"]?.arrayValue?.compactMap { $0.doubleValue.map { Int($0) } }
+            let range = input["view_range"]?.arrayValue?.compactMap { ToolSupport.int($0) }
             return path.map { .view(path: $0, range: range) }
         case "create":
             guard let path, let text = input["file_text"]?.stringValue else { return nil }
@@ -59,10 +59,10 @@ struct NotesTool: ClaudeTool {
             guard let path, let old = input["old_str"]?.stringValue else { return nil }
             return .strReplace(path: path, old: old, new: input["new_str"]?.stringValue ?? "")
         case "insert":
-            guard let path, let line = input["insert_line"]?.doubleValue,
+            guard let path, let line = ToolSupport.int(input["insert_line"]),
                   let text = input["insert_text"]?.stringValue ?? input["new_str"]?.stringValue
             else { return nil }
-            return .insert(path: path, line: Int(line), text: text)
+            return .insert(path: path, line: line, text: text)
         case "delete":
             return path.map { .delete(path: $0) }
         case "rename":

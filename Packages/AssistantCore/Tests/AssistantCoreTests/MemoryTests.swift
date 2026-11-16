@@ -85,6 +85,8 @@ import Testing
         #expect(context.contains("- /memories/Люди/Анна.md"))
         #expect(store.notes().count == 2)
         #expect(store.note(titled: "анна")?.relativePath == "Люди/Анна.md")
+        #expect(store.note(titled: "Люди/Анна")?.relativePath == "Люди/Анна.md")
+        #expect(store.note(titled: "Места/Анна") == nil)
     }
 
     @Test func emptyContext() {

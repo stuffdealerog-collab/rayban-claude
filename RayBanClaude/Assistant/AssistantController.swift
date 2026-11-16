@@ -58,6 +58,10 @@ final class AssistantController {
     @ObservationIgnored private var releaseTask: Task<Void, Never>?
     /// Язык текущего ответа: по нему озвучиваются фразы без явных признаков языка.
     @ObservationIgnored private var replyLanguage = "ru"
+    /// «Новый разговор» нажали — история Claude очистится перед следующим ходом (в той же очереди ходов).
+    @ObservationIgnored private var resetPending = false
+    /// После «Джарвис» без вопроса и ответа «Да?» следующая фраза — вопрос, даже без обращения.
+    @ObservationIgnored private var wakeArmedUntil = Date.distantPast
 
     // Переводчик
     @ObservationIgnored private var translationHandler: ((String) -> Void)?
@@ -154,6 +158,10 @@ final class AssistantController {
 
     func setHandsFree(_ enabled: Bool) async {
         if enabled {
+            // Микрофон ещё включается по нажатию кнопки — дождёмся, а не откажем молча.
+            for _ in 0..<40 where isPreparingAudio {
+                try? await Task.sleep(nanoseconds: 50_000_000)
+            }
             guard await prepareAudio() else { return }
             handsFree = true
             if phase == .idle { startListening() }
@@ -178,9 +186,9 @@ final class AssistantController {
         phase = .idle
         endBackgroundWork()
         if handsFree {
-            startListening()
+            resumeListening()
         } else {
-            releasePlaybackAudioNow()
+            settleAudioWhenIdle(immediately: true)
         }
     }
 
@@ -196,7 +204,7 @@ final class AssistantController {
     func newConversation() {
         interrupt()
         entries.removeAll()
-        Task { await conversation.reset() }
+        resetPending = true
     }
 
     /// Вопрос текстом.
@@ -227,9 +235,9 @@ final class AssistantController {
         guard phase == .speaking else { return }
         phase = .idle
         if handsFree {
-            startListening()
+            resumeListening()
         } else {
-            scheduleAudioRelease()
+            settleAudioWhenIdle()
         }
     }
 
@@ -332,21 +340,29 @@ final class AssistantController {
 
         var query = text
         if handsFree && settings.wakeWordEnabled {
-            guard let stripped = WakeWord.strip(settings.effectiveWakeWord, from: text) else {
+            if Date() < wakeArmedUntil {
+                // Обращение уже было («Джарвис» → «Да?») — эта фраза и есть вопрос.
+                wakeArmedUntil = .distantPast
+                query = WakeWord.strip(settings.effectiveWakeWord, from: text) ?? text
+            } else if let stripped = WakeWord.strip(settings.effectiveWakeWord, from: text) {
+                query = stripped
+            } else {
                 // Фраза не к ассистенту — продолжаем слушать.
                 phase = .idle
-                startListening()
+                resumeListening()
                 return
             }
-            query = stripped
         }
 
         guard !query.isEmpty else {
-            phase = .idle
+            phase = .speaking
             speaker.speak(settings.language.acknowledgement, language: settings.language.isoCode)
             Task {
                 await speaker.waitUntilFinished()
-                if handsFree, phase == .idle { startListening() }
+                guard phase == .speaking else { return }
+                phase = .idle
+                wakeArmedUntil = Date().addingTimeInterval(8)
+                if handsFree { resumeListening() }
             }
             return
         }
@@ -356,6 +372,17 @@ final class AssistantController {
     private func handleListenerIdle(_ reason: ListenerIdleReason) {
         guard phase == .listening else { return }
         phase = .idle
+
+        // Ошибка, которая сама не пройдёт (ключ ElevenLabs, лимит): сразу останавливаемся и говорим как есть.
+        if reason.isFatal {
+            consecutiveRecognizerFailures = 0
+            handsFree = false
+            translationContinuous = false
+            errorMessage = reason.error ?? "Распознавание речи недоступно."
+            if translatorActive { translationIdleHandler?() }
+            releaseMicrophoneIfIdle()
+            return
+        }
 
         // Распознаватель падает сразу после старта (выключена диктовка, нет языковых данных и т. п.) —
         // это не тишина: после нескольких попыток останавливаемся и показываем ошибку.
@@ -380,8 +407,8 @@ final class AssistantController {
             releaseMicrophoneIfIdle()
             return
         }
-        // Тишина: перезапускаем; при частых сбоях — с паузой.
-        consecutiveIdleRestarts += 1
+        // Тишина — сразу слушаем снова; пауза только при частых сбоях распознавателя.
+        consecutiveIdleRestarts = reason.isQuickFailure ? consecutiveIdleRestarts + 1 : 0
         let delay: UInt64 = consecutiveIdleRestarts > 3 ? 2_000_000_000 : 300_000_000
         Task {
             try? await Task.sleep(nanoseconds: delay)
@@ -402,6 +429,8 @@ final class AssistantController {
         markRunningToolsFinished()
         phase = .idle
         endBackgroundWork()
+        // Переводчик в режиме диалога не должен остаться с «нажатой» кнопкой, которая не слушает.
+        if translatorActive && !translationContinuous { translationIdleHandler?() }
     }
 
     private func resumeAfterAudioInterruption() {
@@ -446,11 +475,31 @@ final class AssistantController {
         audio.deactivate()
     }
 
-    /// Вопрос в режиме кнопки так и не прозвучал: выключаем микрофон и гарнитурный режим очков.
+    /// Режим кнопки, ассистент ничего не делает: выключаем микрофон и гарнитурный режим очков —
+    /// не пишем звук в фоне и не держим музыку на паузе.
     private func releaseMicrophoneIfIdle() {
-        guard settings.stereoAnswers, !handsFree, !translatorActive, phase == .idle, !isPreparingAudio else { return }
+        guard !handsFree, !translatorActive, phase == .idle, !isPreparingAudio, audio.mode == .conversation else { return }
         listener.rebuildEngine()
         audio.deactivate()
+    }
+
+    /// После ответа или прерывания в режиме кнопки: отпускаем A2DP после хвоста звука, а если
+    /// ответ шёл через гарнитуру (стерео выключено или «Без рук» выключили посреди ответа) — микрофон.
+    private func settleAudioWhenIdle(immediately: Bool = false) {
+        if audio.mode == .playback {
+            if immediately { releasePlaybackAudioNow() } else { scheduleAudioRelease() }
+        } else {
+            releaseMicrophoneIfIdle()
+        }
+    }
+
+    /// Снова слушать (режим «без рук», субтитры): сначала убеждаемся, что микрофон жив —
+    /// движок мог упасть при смене маршрута, пока ассистент говорил.
+    private func resumeListening() {
+        Task {
+            guard await prepareAudio() else { return }
+            if phase == .idle { startListening() }
+        }
     }
 
     /// iOS держит фоновое приложение живым, пока оно играет или пишет звук. Пока Claude думает,
@@ -458,7 +507,8 @@ final class AssistantController {
     private func beginBackgroundWork() {
         guard backgroundTask == .invalid else { return }
         backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "assistant-turn") { [weak self] in
-            Task { @MainActor in self?.endBackgroundWork() }
+            // Обработчик истечения вызывается на главном потоке и должен закончить задачу до возврата.
+            MainActor.assumeIsolated { self?.endBackgroundWork() }
         }
     }
 
@@ -490,7 +540,8 @@ final class AssistantController {
 
     private func runTurn(_ text: String, turnID: UUID) async {
         defer { if currentTurnID == turnID || currentTurnID == nil { endBackgroundWork() } }
-        if Date().timeIntervalSince(lastInteraction) > conversationTimeout {
+        if resetPending || Date().timeIntervalSince(lastInteraction) > conversationTimeout {
+            resetPending = false
             await conversation.reset()
         }
         lastInteraction = Date()
@@ -554,9 +605,9 @@ final class AssistantController {
         phase = .idle
         if handsFree {
             try? await Task.sleep(nanoseconds: 300_000_000) // хвост звука не должен попасть в микрофон
-            if handsFree, phase == .idle { startListening() }
+            if handsFree, phase == .idle { resumeListening() }
         } else {
-            scheduleAudioRelease()
+            settleAudioWhenIdle()
         }
     }
 
@@ -670,7 +721,17 @@ final class AssistantController {
     /// Снова слушать в режиме субтитров (после озвучки перевода).
     func continueTranslationCapture() {
         guard translatorActive, translationContinuous, phase == .idle else { return }
-        startListening()
+        resumeListening()
+    }
+
+    /// Перестать слушать, но не отдавать микрофон: в режиме диалога собеседники говорят по очереди,
+    /// и переподключать гарнитуру очков перед каждой фразой — значит терять её начало.
+    func pauseTranslationCapture() {
+        guard translatorActive else { return }
+        listener.cancelCapture()
+        speaker.stop()
+        phase = .idle
+        partialTranscript = ""
     }
 
     func endTranslationCapture() {

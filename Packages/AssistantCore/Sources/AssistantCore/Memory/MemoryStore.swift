@@ -228,10 +228,15 @@ public final class MemoryStore: @unchecked Sendable {
         try fileManager.removeItem(at: url)
     }
 
-    /// Заметка по имени `[[ссылки]]` (без учёта регистра).
+    /// Заметка по `[[ссылке]]`: по имени файла или по пути (`Люди/Анна`), без учёта регистра.
     public func note(titled title: String) -> MemoryNote? {
         let wanted = title.trimmingCharacters(in: .whitespaces).lowercased()
-        return notes().first { $0.title.lowercased() == wanted }
+            .replacingOccurrences(of: ".md", with: "")
+        let all = notes()
+        if wanted.contains("/") {
+            return all.first { $0.relativePath.lowercased().replacingOccurrences(of: ".md", with: "") == wanted }
+        }
+        return all.first { $0.title.lowercased() == wanted }
     }
 
     /// Блок памяти для первого сообщения диалога: список заметок и главная заметка о пользователе.

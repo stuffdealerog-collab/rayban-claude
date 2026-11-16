@@ -89,7 +89,13 @@ struct SettingsView: View {
             .background(Theme.background)
             .sheet(isPresented: $showGlasses) { GlassesSheet() }
             .confirmationDialog("Пройти первую настройку заново?", isPresented: $confirmReset, titleVisibility: .visible) {
-                Button("Начать") { settings.onboardingCompleted = false }
+                Button("Начать") {
+                    Task {
+                        await assistant.setHandsFree(false)
+                        assistant.interrupt()
+                        settings.onboardingCompleted = false
+                    }
+                }
             } message: {
                 Text("Память, ключи и разговоры сохранятся.")
             }
