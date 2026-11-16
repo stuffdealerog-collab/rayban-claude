@@ -4,6 +4,12 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ru</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>ru</string>
+		<string>uz</string>
+		<string>en</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Claude Glasses</string>
 	<key>CFBundleExecutable</key>

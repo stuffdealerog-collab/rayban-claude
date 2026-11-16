@@ -18,15 +18,15 @@ enum GlassesError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .notRegistered: return "Приложение не подключено к очкам через Meta AI."
-        case .noDevice: return "Очки не найдены. Разложите дужки и проверьте Bluetooth."
-        case .sessionFailed(let reason): return "Не удалось подключиться к очкам: \(reason)"
-        case .sessionTimeout: return "Очки не ответили вовремя."
-        case .cameraPermissionRequired: return "Нет разрешения на камеру очков. Откройте приложение и нажмите «Разрешить камеру»."
-        case .cameraUnavailable(let reason): return "Камера очков недоступна" + (reason.map { ": \($0)" } ?? ".")
-        case .photoTimeout: return "Снимок не пришёл с очков вовремя."
-        case .photoFailed(let reason): return "Не удалось сделать снимок: \(reason)"
-        case .busy: return "Камера занята предыдущим снимком."
+        case .notRegistered: return L("Приложение не подключено к очкам через Meta AI.")
+        case .noDevice: return L("Очки не найдены. Разложите дужки и проверьте Bluetooth.")
+        case .sessionFailed(let reason): return L("Не удалось подключиться к очкам: %@", reason)
+        case .sessionTimeout: return L("Очки не ответили вовремя.")
+        case .cameraPermissionRequired: return L("Нет разрешения на камеру очков. Откройте приложение и нажмите «Разрешить камеру».")
+        case .cameraUnavailable(let reason): return L("Камера очков недоступна") + (reason.map { ": \($0)" } ?? ".")
+        case .photoTimeout: return L("Снимок не пришёл с очков вовремя.")
+        case .photoFailed(let reason): return L("Не удалось сделать снимок: %@", reason)
+        case .busy: return L("Камера занята предыдущим снимком.")
         }
     }
 }
@@ -257,7 +257,7 @@ final class GlassesManager {
     private func waitForSessionStart(_ session: DeviceSession, timeout: Double) async throws {
         try await waitUntil(timeout: timeout, success: { session.state == .started }, failure: {
             guard session.state == .stopped else { return nil }
-            return GlassesError.sessionFailed(lastSessionError ?? "сессия остановлена")
+            return GlassesError.sessionFailed(lastSessionError ?? L("сессия остановлена"))
         })
     }
 
@@ -412,7 +412,7 @@ final class GlassesManager {
             // Средняя чёткость и 15 к/с: меньше сжатия по Bluetooth, кадр годится как запасной снимок.
             let configuration = StreamConfiguration(videoCodec: .raw, resolution: .medium, frameRate: 15)
             guard let created = try session.addCamera(config: configuration) else {
-                throw GlassesError.cameraUnavailable("сессия ещё не запущена")
+                throw GlassesError.cameraUnavailable(L("сессия ещё не запущена"))
             }
             self.camera = created
             streamHasStarted = false
@@ -527,7 +527,7 @@ final class GlassesManager {
         let original: UIImage
         do {
             let data = try await capturePhoto(on: stream)
-            guard let image = UIImage(data: data) else { throw GlassesError.photoFailed("не удалось декодировать JPEG") }
+            guard let image = UIImage(data: data) else { throw GlassesError.photoFailed(L("не удалось декодировать JPEG")) }
             original = image
         } catch is CancellationError {
             throw CancellationError()
@@ -538,7 +538,7 @@ final class GlassesManager {
             original = frame
         }
         guard let jpeg = original.resizedJPEG(maxDimension: 1568, quality: 0.8) else {
-            throw GlassesError.photoFailed("не удалось сжать изображение")
+            throw GlassesError.photoFailed(L("не удалось сжать изображение"))
         }
         return jpeg
     }

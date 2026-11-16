@@ -1,0 +1,259 @@
+{
+  "sourceLanguage": "ru",
+  "strings": {
+    "NSBluetoothAlwaysUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Needed to connect to your Ray-Ban Meta glasses."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен для связи с очками Ray-Ban Meta."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ray-Ban Meta koʻzoynagi bilan aloqa uchun kerak."
+          }
+        }
+      }
+    },
+    "NSBluetoothPeripheralUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Needed to connect to your Ray-Ban Meta glasses."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен для связи с очками Ray-Ban Meta."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ray-Ban Meta koʻzoynagi bilan aloqa uchun kerak."
+          }
+        }
+      }
+    },
+    "NSCalendarsFullAccessUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To tell you about your plans and add events when you ask by voice."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы рассказывать о ваших планах и добавлять события по голосовой просьбе."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rejalaringiz haqida aytib berish va ovozli soʻrovingiz boʻyicha tadbirlar qoʻshish uchun."
+          }
+        }
+      }
+    },
+    "NSCalendarsUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To tell you about your plans and add events when you ask by voice."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы рассказывать о ваших планах и добавлять события по голосовой просьбе."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rejalaringiz haqida aytib berish va ovozli soʻrovingiz boʻyicha tadbirlar qoʻshish uchun."
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The phone camera is used only in debug mode, in place of the glasses camera."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Камера телефона используется только в режиме отладки вместо камеры очков."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefon kamerasi faqat nosozliklarni tuzatish rejimida koʻzoynak kamerasi oʻrnida ishlatiladi."
+          }
+        }
+      }
+    },
+    "NSContactsUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To find the number or email of the person you ask to message or call."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы находить номер или почту человека, которому вы просите написать или позвонить."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siz xat yozish yoki qoʻngʻiroq qilishni soʻragan odamning raqami yoki pochtasini topish uchun."
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lets your phone find the glasses and exchange data with them over Wi-Fi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Позволяет телефону находить очки и обмениваться с ними данными по Wi-Fi."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonga koʻzoynakni topish va u bilan Wi-Fi orqali maʼlumot almashish imkonini beradi."
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To answer questions like “where am I” and “what’s nearby.”"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы отвечать на вопросы «где я» и «что рядом»."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Men qayerdaman” va “yaqin atrofda nima bor” kabi savollarga javob berish uchun."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The glasses microphone is needed to hear your questions for the assistant."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Микрофон очков нужен, чтобы слышать ваши вопросы ассистенту."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak mikrofoni yordamchiga bergan savollaringizni eshitish uchun kerak."
+          }
+        }
+      }
+    },
+    "NSRemindersFullAccessUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To create reminders when you ask by voice."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы создавать напоминания по голосовой просьбе."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovozli soʻrovingiz boʻyicha eslatmalar yaratish uchun."
+          }
+        }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech recognition turns your questions into text for Claude."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознавание речи превращает ваши вопросы в текст для Claude."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutqni aniqlash savollaringizni Claude uchun matnga aylantiradi."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

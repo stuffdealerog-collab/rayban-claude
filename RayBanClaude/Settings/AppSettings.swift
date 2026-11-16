@@ -29,9 +29,9 @@ enum ClaudeModel: String, CaseIterable, Identifiable {
 
     var subtitle: String {
         switch self {
-        case .haiku55: return "Самый быстрый и в двадцать раз дешевле Sonnet"
-        case .sonnet55: return "Лучший баланс: живой разговор и хороший узбекский"
-        case .opus55: return "Умнее в сложных задачах, медленнее и дороже"
+        case .haiku55: return L("Самый быстрый и в двадцать раз дешевле Sonnet")
+        case .sonnet55: return L("Лучший баланс: живой разговор и хороший узбекский")
+        case .opus55: return L("Умнее в сложных задачах, медленнее и дороже")
         }
     }
 
@@ -55,7 +55,7 @@ enum AssistantLanguage: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .russian: return "Русский"
+        case .russian: return L("Русский")
         case .uzbek: return "Oʻzbekcha"
         case .english: return "English"
         }
@@ -142,8 +142,16 @@ final class AppSettings {
 
     // MARK: Речь
 
+    /// Язык ассистента и интерфейса приложения.
     var language: AssistantLanguage {
-        didSet { defaults.set(language.rawValue, forKey: Keys.language) }
+        didSet {
+            defaults.set(language.rawValue, forKey: Keys.language)
+            L10n.setLanguage(language.isoCode)
+            // Имя ещё не выбирали — пишем его так, как принято на новом языке.
+            if !onboardingCompleted, Persona.defaultNames.contains(persona.assistantName) {
+                persona.assistantName = language == .russian ? "Джарвис" : "Jarvis"
+            }
+        }
     }
     /// Когда отвечать на услышанное в режимах «Без рук» и «На связи».
     var addressing: AddressingMode {
@@ -295,7 +303,12 @@ final class AppSettings {
         instantAnswers = defaults.object(forKey: Keys.instantAnswers) as? Bool ?? true
         liveRecognition = defaults.object(forKey: Keys.liveRecognition) as? Bool ?? true
         mixedSpeech = defaults.object(forKey: Keys.mixedSpeech) as? Bool ?? false
-        language = defaults.string(forKey: Keys.language).flatMap(AssistantLanguage.init(rawValue:)) ?? .russian
+        language = defaults.string(forKey: Keys.language).flatMap(AssistantLanguage.init(rawValue:)) ?? Self.systemLanguage
+        // didSet в init не срабатывает — язык интерфейса задаём явно.
+        L10n.setLanguage(language.isoCode)
+        if !onboardingCompleted, Persona.defaultNames.contains(persona.assistantName) {
+            persona.assistantName = language == .russian ? "Джарвис" : "Jarvis"
+        }
         if let saved = defaults.string(forKey: Keys.addressing).flatMap(AddressingMode.init(rawValue:)) {
             addressing = saved
         } else {
@@ -317,6 +330,17 @@ final class AppSettings {
         translatorTheirs = defaults.string(forKey: Keys.translatorTheirs) ?? "en-US"
         translatorSpeaks = defaults.object(forKey: Keys.translatorSpeaks) as? Bool ?? true
         translatorPartnerSpeaker = defaults.object(forKey: Keys.translatorPartnerSpeaker) as? Bool ?? true
+    }
+
+    /// Язык при первом запуске — по языку iPhone: узбекский, английский, иначе русский.
+    private static var systemLanguage: AssistantLanguage {
+        for identifier in Locale.preferredLanguages {
+            let code = identifier.prefix(2).lowercased()
+            if code == "uz" { return .uzbek }
+            if code == "ru" { return .russian }
+            if code == "en" { return .english }
+        }
+        return .russian
     }
 
     private enum Keys {

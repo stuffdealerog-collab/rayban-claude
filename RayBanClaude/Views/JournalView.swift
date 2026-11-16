@@ -20,7 +20,7 @@ struct JournalView: View {
             .background(Theme.background)
             .overlay {
                 if lines.isEmpty {
-                    ContentUnavailableView("Журнал пуст", systemImage: "list.bullet.rectangle", description: Text("События появятся, как только вы начнёте разговор."))
+                    ContentUnavailableView(L("Журнал пуст"), systemImage: "list.bullet.rectangle", description: Text(L("События появятся, как только вы начнёте разговор.")))
                 }
             }
             .onAppear {
@@ -28,27 +28,27 @@ struct JournalView: View {
                 if let last = lines.indices.last { proxy.scrollTo(last, anchor: .bottom) }
             }
         }
-        .navigationTitle("Журнал")
+        .navigationTitle(L("Журнал"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 ShareLink(item: DiagnosticLog.shared.text) {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .accessibilityLabel("Поделиться журналом")
+                .accessibilityLabel(L("Поделиться журналом"))
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button("Обновить", systemImage: "arrow.clockwise") { reload() }
-                    Button("Очистить", systemImage: "trash", role: .destructive) { confirmClear = true }
+                    Button(L("Обновить"), systemImage: "arrow.clockwise") { reload() }
+                    Button(L("Очистить"), systemImage: "trash", role: .destructive) { confirmClear = true }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
-                .accessibilityLabel("Действия с журналом")
+                .accessibilityLabel(L("Действия с журналом"))
             }
         }
-        .confirmationDialog("Очистить журнал?", isPresented: $confirmClear, titleVisibility: .visible) {
-            Button("Очистить", role: .destructive) {
+        .confirmationDialog(L("Очистить журнал?"), isPresented: $confirmClear, titleVisibility: .visible) {
+            Button(L("Очистить"), role: .destructive) {
                 DiagnosticLog.shared.clear()
                 reload()
             }

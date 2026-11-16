@@ -14,17 +14,17 @@ enum AddressingMode: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .smart: return "Сам понимает"
-        case .name: return "Только по имени"
-        case .always: return "На каждую фразу"
+        case .smart: return L("Сам понимает")
+        case .name: return L("Только по имени")
+        case .always: return L("На каждую фразу")
         }
     }
 
     var detail: String {
         switch self {
-        case .smart: return "Отвечает, когда фраза обращена к нему, и молчит, когда вы говорите с другими. Имя не обязательно."
-        case .name: return "Отвечает, только если фраза начинается с имени."
-        case .always: return "Отвечает на всё, что слышит. Для тихого места, где вы один."
+        case .smart: return L("Отвечает, когда фраза обращена к нему, и молчит, когда вы говорите с другими. Имя не обязательно.")
+        case .name: return L("Отвечает, только если фраза начинается с имени.")
+        case .always: return L("Отвечает на всё, что слышит. Для тихого места, где вы один.")
         }
     }
 }

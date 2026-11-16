@@ -63,12 +63,7 @@ struct TranslationService: Sendable {
         apiKey: String,
         onDelta: @escaping @Sendable (String) async -> Void
     ) async throws -> String {
-        let system = """
-        Ты синхронный переводчик живой речи. Переведи реплику с языка «\(source.russianName)» на язык «\(target.russianName)». \
-        Если реплика уже на языке «\(target.russianName)», переведи её на «\(source.russianName)». \
-        Выведи только перевод — без кавычек, пояснений и вариантов. Сохраняй смысл, тон и вежливость, имена и числа. \
-        Пиши так, как говорят вслух. Реплика получена распознаванием речи и может содержать ошибки — переводи по смыслу.
-        """
+        let system = L("Ты синхронный переводчик живой речи. Переведи реплику с языка «%@» на язык «%@». Если реплика уже на языке «%@», переведи её на «%@». Выведи только перевод — без кавычек, пояснений и вариантов. Сохраняй смысл, тон и вежливость, имена и числа. Пиши так, как говорят вслух. Реплика получена распознаванием речи и может содержать ошибки — переводи по смыслу.", source.russianName, target.russianName, target.russianName, source.russianName)
         let body: JSONValue = [
             "model": "claude-haiku-5-5",
             "max_tokens": 1_024,
@@ -96,8 +91,8 @@ enum TranslationError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .refused: return "Эту фразу перевести не получилось."
-        case .noKey: return "Для перевода нужен API-ключ Anthropic (Настройки → Claude)."
+        case .refused: return L("Эту фразу перевести не получилось.")
+        case .noKey: return L("Для перевода нужен API-ключ Anthropic (Настройки → Claude).")
         }
     }
 }
@@ -113,7 +108,7 @@ final class TranslatorController {
     enum Mode: String, CaseIterable, Identifiable {
         case conversation, dialog
         var id: String { rawValue }
-        var title: String { self == .conversation ? "Разговор" : "По очереди" }
+        var title: String { self == .conversation ? L("Разговор") : L("По очереди") }
     }
 
     enum Side { case me, them }

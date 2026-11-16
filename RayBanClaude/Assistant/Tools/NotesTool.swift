@@ -83,9 +83,9 @@ struct NotesTool: ClaudeTool {
         let path = (input["path"]?.stringValue ?? input["new_path"]?.stringValue ?? "")
         let title = (path as NSString).lastPathComponent.replacingOccurrences(of: ".md", with: "")
         switch input["command"]?.stringValue {
-        case "view": return title.isEmpty || path == MemoryStore.virtualRoot ? "Вспоминаю" : "Вспоминаю: \(title)"
-        case "delete": return "Забываю: \(title)"
-        default: return title.isEmpty ? "Запоминаю" : "Запоминаю: \(title)"
+        case "view": return title.isEmpty || path == MemoryStore.virtualRoot ? L("Вспоминаю") : L("Вспоминаю: %@", title)
+        case "delete": return L("Забываю: %@", title)
+        default: return title.isEmpty ? L("Запоминаю") : L("Запоминаю: %@", title)
         }
     }
 }

@@ -131,8 +131,8 @@ final class AudioSessionManager {
 
     /// Человекочитаемое название текущего микрофона.
     var inputDescription: String {
-        guard let input = session.currentRoute.inputs.first else { return "нет" }
-        return input.portType == .bluetoothHFP ? "очки (\(input.portName))" : "телефон"
+        guard let input = session.currentRoute.inputs.first else { return L("нет") }
+        return input.portType == .bluetoothHFP ? L("очки (%@)", input.portName) : L("телефон")
     }
 
     /// Задержка вывода (Bluetooth — до нескольких сотен миллисекунд): столько ещё звучит уже отданный звук.

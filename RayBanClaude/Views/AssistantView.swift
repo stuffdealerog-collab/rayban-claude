@@ -57,7 +57,7 @@ struct AssistantView: View {
                     } label: {
                         Image(systemName: "square.and.pencil")
                     }
-                    .accessibilityLabel("Новый разговор")
+                    .accessibilityLabel(L("Новый разговор"))
                     .disabled(assistant.entries.isEmpty)
                 }
             }
@@ -74,42 +74,42 @@ struct AssistantView: View {
     // MARK: - Состояние
 
     private var stateLine: String {
-        if assistant.translatorActive { return "Микрофон у переводчика" }
+        if assistant.translatorActive { return L("Микрофон у переводчика") }
         switch assistant.callState {
-        case .ringing: return "Звоню вам"
-        case .connecting: return "Соединяю"
-        case .held: return "На удержании"
+        case .ringing: return L("Звоню вам")
+        case .connecting: return L("Соединяю")
+        case .held: return L("На удержании")
         case .active, .idle: break
         }
         switch assistant.phase {
         case .idle:
-            if assistant.onCall { return "На связи" }
-            return assistant.handsFree ? "Слушаю без звонка" : "Линия свободна"
-        case .listening: return assistant.onCall ? "На связи · слушаю" : "Слушаю"
-        case .thinking: return "Думаю"
-        case .speaking: return "Отвечаю"
+            if assistant.onCall { return L("На связи") }
+            return assistant.handsFree ? L("Слушаю без звонка") : L("Линия свободна")
+        case .listening: return assistant.onCall ? L("На связи · слушаю") : L("Слушаю")
+        case .thinking: return L("Думаю")
+        case .speaking: return L("Отвечаю")
         }
     }
 
     private var stateDetail: String? {
         guard !assistant.translatorActive else { return nil }
         switch assistant.phase {
-        case .listening: return assistant.microphone == "—" ? nil : "микрофон: \(assistant.microphone)"
-        case .speaking, .thinking: return "нажмите, чтобы перебить"
+        case .listening: return assistant.microphone == "—" ? nil : L("микрофон: %@", assistant.microphone)
+        case .speaking, .thinking: return L("нажмите, чтобы перебить")
         case .idle: return assistant.onCall || assistant.handsFree ? addressingHint : nil
         }
     }
 
     private var addressingHint: String {
         switch settings.addressing {
-        case .smart: return "поймёт, когда обращаются к нему"
-        case .name: return "отвечает на «\(settings.effectiveWakeWord)»"
-        case .always: return "отвечает на каждую фразу"
+        case .smart: return L("поймёт, когда обращаются к нему")
+        case .name: return L("отвечает на «%@»", settings.effectiveWakeWord)
+        case .always: return L("отвечает на каждую фразу")
         }
     }
 
     private var listeningCaption: String {
-        (assistant.handsFree || assistant.onCall) && assistant.partialTranscript.isEmpty ? "На линии" : "Слушаю"
+        (assistant.handsFree || assistant.onCall) && assistant.partialTranscript.isEmpty ? L("На линии") : L("Слушаю")
     }
 
     // MARK: - Пустое состояние
@@ -122,7 +122,7 @@ struct AssistantView: View {
                     Text(greeting)
                         .font(.sign(.title))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("Спросите голосом или выберите, с чего начать.")
+                    Text(L("Спросите голосом или выберите, с чего начать."))
                         .font(.callout)
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -158,21 +158,24 @@ struct AssistantView: View {
         let hour = Calendar.current.component(.hour, from: Date())
         let hello: String
         switch hour {
-        case 5..<12: hello = "Доброе утро"
-        case 12..<18: hello = "Добрый день"
-        case 18..<23: hello = "Добрый вечер"
-        default: hello = "Доброй ночи"
+        case 5..<12: hello = L("Доброе утро")
+        case 12..<18: hello = L("Добрый день")
+        case 18..<23: hello = L("Добрый вечер")
+        default: hello = L("Доброй ночи")
         }
         let user = settings.persona.userName.trimmingCharacters(in: .whitespaces)
         return user.isEmpty ? hello : "\(hello), \(user)"
     }
 
-    private static let examples: [(plate: String, text: String)] = [
-        ("Камера очков", "Что передо мной?"),
-        ("Календарь", "Какие у меня планы на завтра?"),
-        ("Почта", "Есть новые письма?"),
-        ("Напоминания", "Напомни через час позвонить маме"),
-    ]
+    /// Вычисляется заново: надписи зависят от языка интерфейса.
+    private static var examples: [(plate: String, text: String)] {
+        [
+        (L("Камера очков"), L("Что передо мной?")),
+        (L("Календарь"), L("Какие у меня планы на завтра?")),
+        (L("Почта"), L("Есть новые письма?")),
+        (L("Напоминания"), L("Напомни через час позвонить маме")),
+        ]
+    }
 
     // MARK: - Управление
 
@@ -180,7 +183,7 @@ struct AssistantView: View {
         VStack(spacing: Theme.Space.m) {
             if showKeyboard {
                 HStack(spacing: Theme.Space.s) {
-                    TextField("Спросить текстом", text: $typedText, axis: .vertical)
+                    TextField(L("Спросить текстом"), text: $typedText, axis: .vertical)
                         .lineLimit(1...4)
                         .focused($fieldFocused)
                         .submitLabel(.send)
@@ -196,7 +199,7 @@ struct AssistantView: View {
                             .foregroundStyle(.white)
                     }
                     .disabled(typedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityLabel("Отправить")
+                    .accessibilityLabel(L("Отправить"))
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -221,13 +224,13 @@ struct AssistantView: View {
                         Button {
                             Task { await assistant.setHandsFree(!assistant.handsFree) }
                         } label: {
-                            Label(assistant.handsFree ? "Перестать слушать" : "Слушать без звонка", systemImage: "ear")
+                            Label(assistant.handsFree ? L("Перестать слушать") : L("Слушать без звонка"), systemImage: "ear")
                         }
                     }
                 }
                 .disabled(assistant.translatorActive)
-                .accessibilityValue(assistant.onCall ? "на связи" : (assistant.handsFree ? "слушает" : "выключено"))
-                .accessibilityHint("Разговор продолжается с заблокированным телефоном")
+                .accessibilityValue(assistant.onCall ? L("на связи") : (assistant.handsFree ? L("слушает") : L("выключено")))
+                .accessibilityHint(L("Разговор продолжается с заблокированным телефоном"))
 
                 Spacer(minLength: Theme.Space.s)
 
@@ -240,7 +243,7 @@ struct AssistantView: View {
 
                 SideControl(
                     symbol: showKeyboard ? "keyboard.chevron.compact.down" : "keyboard",
-                    label: "Текстом",
+                    label: L("Текстом"),
                     isOn: showKeyboard,
                     tone: tone
                 ) {
@@ -260,8 +263,8 @@ struct AssistantView: View {
     }
 
     private var lineButtonLabel: String {
-        if assistant.onCall { return "Отбой" }
-        return assistant.handsFree ? "Слушаю" : "На связи"
+        if assistant.onCall { return L("Отбой") }
+        return assistant.handsFree ? L("Слушаю") : L("На связи")
     }
 
     private func sendTyped() {
@@ -307,9 +310,9 @@ struct MicButton: View {
 
     private var accessibilityTitle: String {
         switch phase {
-        case .idle: return "Говорить"
-        case .listening: return "Перестать слушать"
-        case .thinking, .speaking: return "Остановить ответ"
+        case .idle: return L("Говорить")
+        case .listening: return L("Перестать слушать")
+        case .thinking, .speaking: return L("Остановить ответ")
         }
     }
 }
@@ -391,7 +394,7 @@ private struct GlassesChip: View {
                 }
             }
         }
-        .accessibilityLabel(connected ? "Очки на связи" : "Очки не подключены")
+        .accessibilityLabel(connected ? L("Очки на связи") : L("Очки не подключены"))
     }
 
     private var connected: Bool { glasses.isRegistered && glasses.hasActiveDevice }
@@ -415,7 +418,7 @@ struct GlassesSheet: View {
                                 .font(.footnote)
                                 .foregroundStyle(Theme.textSecondary)
                             if let battery = glasses.batteryLevel {
-                                Text("Заряд \(battery)%")
+                                Text(L("Заряд %@%", battery))
                                     .font(.footnote.monospacedDigit())
                                     .foregroundStyle(Theme.textSecondary)
                             }
@@ -427,31 +430,31 @@ struct GlassesSheet: View {
 
                 Section {
                     if !glasses.isRegistered {
-                        Button("Подключить через Meta AI") {
+                        Button(L("Подключить через Meta AI")) {
                             Task { await glasses.connect() }
                         }
                         .disabled(glasses.registrationState == .registering)
                     } else {
                         if glasses.cameraPermissionGranted != true {
-                            Button("Разрешить камеру в Meta AI") {
+                            Button(L("Разрешить камеру в Meta AI")) {
                                 Task { await glasses.requestCameraPermission() }
                             }
                         }
-                        Button("Отключить приложение от очков", role: .destructive) {
+                        Button(L("Отключить приложение от очков"), role: .destructive) {
                             Task { await glasses.disconnect() }
                         }
                     }
                 } footer: {
-                    Text("Нужен Meta AI с включённым режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode.")
+                    Text(L("Нужен Meta AI с включённым режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode."))
                         .foregroundStyle(Theme.textMuted)
                 }
                 .listRowBackground(Theme.surface)
             }
-            .navigationTitle("Очки")
+            .navigationTitle(L("Очки"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Готово") { dismiss() }
+                    Button(L("Готово")) { dismiss() }
                 }
             }
             .task { await glasses.refreshCameraPermission() }
@@ -476,16 +479,16 @@ struct GlassesSheet: View {
 
     private var statusTitle: String {
         switch glasses.registrationState {
-        case .registered: return glasses.hasActiveDevice ? "Очки на связи" : "Очки не рядом"
-        case .registering: return "Подключение через Meta AI"
-        case .available: return "Очки не подключены"
-        case .unavailable: return "Meta AI недоступен"
+        case .registered: return glasses.hasActiveDevice ? L("Очки на связи") : L("Очки не рядом")
+        case .registering: return L("Подключение через Meta AI")
+        case .available: return L("Очки не подключены")
+        case .unavailable: return L("Meta AI недоступен")
         }
     }
 
     private var statusDetail: String {
-        if !glasses.isRegistered { return "Разрешите приложению доступ в Meta AI." }
-        if glasses.cameraPermissionGranted != true { return "Камера пока не разрешена." }
-        return glasses.isStreaming ? "Камера включена" : "Камера включится по запросу"
+        if !glasses.isRegistered { return L("Разрешите приложению доступ в Meta AI.") }
+        if glasses.cameraPermissionGranted != true { return L("Камера пока не разрешена.") }
+        return glasses.isStreaming ? L("Камера включена") : L("Камера включится по запросу")
     }
 }

@@ -34,16 +34,16 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $tab) {
             AssistantView()
-                .tabItem { Label("Ассистент", systemImage: "waveform") }
+                .tabItem { Label(L("Ассистент"), systemImage: "waveform") }
                 .tag(Tab.assistant)
             TranslatorView()
-                .tabItem { Label("Переводчик", systemImage: "character.bubble") }
+                .tabItem { Label(L("Переводчик"), systemImage: "character.bubble") }
                 .tag(Tab.translator)
             MemoryView()
-                .tabItem { Label("Память", systemImage: "books.vertical") }
+                .tabItem { Label(L("Память"), systemImage: "books.vertical") }
                 .tag(Tab.memory)
             SettingsView()
-                .tabItem { Label("Настройки", systemImage: "gearshape") }
+                .tabItem { Label(L("Настройки"), systemImage: "gearshape") }
                 .tag(Tab.settings)
         }
         // У каждой вкладки свой цвет линии.
@@ -55,7 +55,7 @@ struct MainTabView: View {
             // Переводчик отдаёт микрофон ассистенту, как только с него уходят.
             if oldValue == .translator { translator.stop() }
         }
-        .alert("Ошибка", isPresented: errorBinding) {
+        .alert(L("Ошибка"), isPresented: errorBinding) {
             Button("OK") {
                 assistant.dismissError()
                 glasses.clearError()

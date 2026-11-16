@@ -1,0 +1,5735 @@
+{
+  "sourceLanguage": "ru",
+  "strings": {
+    " · рус.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · Rus."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · rus."
+          }
+        }
+      }
+    },
+    " · узб.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · Uzb."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · oʻzb."
+          }
+        }
+      }
+    },
+    "%@ Действует в режимах «Без рук» и «На связи». Сразу после ответа можно продолжать без имени.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Applies in “Hands-free” and “On the line” modes. Right after an answer, you can continue without saying the name."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ “Qoʻlsiz” va “Aloqada” rejimlarida amal qiladi. Javobdan keyin darhol ismini aytmasdan davom etish mumkin."
+          }
+        }
+      }
+    },
+    "%@ думает": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is thinking"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ oʻylayapti"
+          }
+        }
+      }
+    },
+    "%@ запишет это в память и будет учитывать. Можно пропустить — он узнает вас в разговоре.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ will save this to memory and keep it in mind. You can skip this — it will get to know you as you talk."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ buni xotiraga yozib qoʻyadi va hisobga oladi. Oʻtkazib yuborsangiz ham boʻladi — u sizni suhbat davomida bilib oladi."
+          }
+        }
+      }
+    },
+    "%@ с": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ s"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ s"
+          }
+        }
+      }
+    },
+    "API-ключ Anthropic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anthropic API key"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anthropic API kaliti"
+          }
+        }
+      }
+    },
+    "Apple не распознаёт этот язык (например, узбекский) или нет разрешения на распознавание речи. Добавьте ключ ElevenLabs в настройках — тогда речь распознает он.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple doesn’t recognize this language (Uzbek, for example), or speech recognition isn’t allowed. Add an ElevenLabs key in Settings, and it will recognize speech instead."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple bu tilda (masalan, oʻzbek tilida) nutqni aniqlay olmaydi yoki nutqni aniqlashga ruxsat berilmagan. Sozlamalarda ElevenLabs kalitini qoʻshing — shunda nutqni u aniqlaydi."
+          }
+        }
+      }
+    },
+    "Claude — обязательно": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude — required"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude — majburiy"
+          }
+        }
+      }
+    },
+    "ElevenLabs вернул пустой звук.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs returned empty audio."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs boʻsh audio qaytardi."
+          }
+        }
+      }
+    },
+    "ElevenLabs не отвечает (%@). Минуту говорю голосом iOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs isn’t responding (%@). Using the iOS voice for a minute."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs javob bermayapti (%@). Bir daqiqa iOS ovozida gapiraman."
+          }
+        }
+      }
+    },
+    "ElevenLabs отклонил запрос%@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs rejected the request%@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs soʻrovni rad etdi%@."
+          }
+        }
+      }
+    },
+    "ElevenLabs перегружен (HTTP %@).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs is overloaded (HTTP %@)."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs haddan tashqari band (HTTP %@)."
+          }
+        }
+      }
+    },
+    "ElevenLabs — живой голос": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs — natural voice"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs — jonli ovoz"
+          }
+        }
+      }
+    },
+    "Markdown: # заголовок, - список, [[Другая заметка]] — ссылка.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown: # heading, - list, [[Another note]] — link."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown: # sarlavha, - roʻyxat, [[Boshqa qayd]] — havola."
+          }
+        }
+      }
+    },
+    "Meta AI недоступен": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta AI unavailable"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta AI mavjud emas"
+          }
+        }
+      }
+    },
+    "MockDeviceKit имитирует Ray-Ban Meta: регистрация и разрешения выдаются сразу. На iPhone «камерой очков» служит задняя камера телефона, в симуляторе — тестовый ролик и фото.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MockDeviceKit simulates Ray-Ban Meta: registration and permissions are granted right away. On iPhone, the phone’s rear camera stands in for the “glasses camera”; in the simulator, a test video and photo are used."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MockDeviceKit Ray-Ban Meta koʻzoynagini imitatsiya qiladi: roʻyxatdan oʻtish va ruxsatlar darhol beriladi. iPhone qurilmasida “koʻzoynak kamerasi” vazifasini telefonning orqa kamerasi bajaradi, simulyatorda esa — sinov videosi va surati."
+          }
+        }
+      }
+    },
+    "Siri: «%@, на связь» — ассистент позвонит в очки, даже если телефон заблокирован.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri: “%@, on the line” — the assistant will call your glasses, even when the phone is locked."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri: “%@, на связь” — telefon qulflangan boʻlsa ham, yordamchi koʻzoynakka qoʻngʻiroq qiladi."
+          }
+        }
+      }
+    },
+    "elevenlabs.io → Developers → API Keys. Есть бесплатный тариф. Нужен для узбекского языка.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "elevenlabs.io → Developers → API Keys. A free plan is available. Required for Uzbek."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "elevenlabs.io → Developers → API Keys. Bepul tarif bor. Oʻzbek tili uchun kerak."
+          }
+        }
+      }
+    },
+    "elevenlabs.io → Developers → API Keys. С ключом ассистент говорит живым голосом и понимает узбекский. Без ключа звучит голос iOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "elevenlabs.io → Developers → API Keys. With a key, the assistant speaks in a natural voice and understands Uzbek. Without a key, it uses the iOS voice."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "elevenlabs.io → Developers → API Keys. Kalit bilan yordamchi jonli ovozda gapiradi va oʻzbekchani tushunadi. Kalitsiz iOS ovozi eshitiladi."
+          }
+        }
+      }
+    },
+    "iOS не даёт приложению включить микрофон, когда оно уже свёрнуто. Исключение — звонки. Поэтому разговор с заблокированным телефоном идёт как звонок: нажмите «На связи» на главном экране, заблокируйте телефон и уберите его в карман.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS doesn’t let an app turn on the microphone once it’s in the background. Calls are the exception. That’s why a conversation with the phone locked runs as a call: tap “On the line” on the main screen, lock the phone, and put it in your pocket."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS fonga oʻtib boʻlgan ilovaga mikrofonni yoqishga ruxsat bermaydi. Qoʻngʻiroqlar bundan mustasno. Shu sababli telefon qulflangan paytdagi suhbat qoʻngʻiroq sifatida oʻtadi: asosiy ekranda “Aloqada” tugmasini bosing, telefonni qulflang va choʻntagingizga solib qoʻying."
+          }
+        }
+      }
+    },
+    "platform.claude.com → API Keys. Оплата — за использование.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "platform.claude.com → API Keys. Billed by usage."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "platform.claude.com → API Keys. Toʻlov — foydalanishga qarab."
+          }
+        }
+      }
+    },
+    "platform.claude.com → API Keys. Это «мозг» ассистента; оплата — за использование.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "platform.claude.com → API Keys. This is the assistant’s “brain”; billed by usage."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "platform.claude.com → API Keys. Bu — yordamchining “miyasi”; toʻlov — foydalanishga qarab."
+          }
+        }
+      }
+    },
+    "«Отвечать сразу»: модель не размышляет перед ответом, первая фраза звучит раньше. Для сложных вопросов выключите. Экономия: из длинного разговора сервер убирает старые снимки и результаты поиска.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Answer right away”: the model doesn’t think before answering, so the first phrase comes sooner. Turn it off for complex questions. Savings: the server removes old photos and search results from a long conversation."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Darhol javob berish”: model javob berishdan oldin oʻylab oʻtirmaydi, birinchi jumla tezroq eshitiladi. Murakkab savollar uchun oʻchirib qoʻying. Tejash: uzoq suhbatdan server eski suratlar va qidiruv natijalarini olib tashlaydi."
+          }
+        }
+      }
+    },
+    "Адрес, например you@gmail.com": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Address, for example you@gmail.com"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manzil, masalan you@gmail.com"
+          }
+        }
+      }
+    },
+    "Анна": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anna"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anna"
+          }
+        }
+      }
+    },
+    "Ассистент": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistant"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yordamchi"
+          }
+        }
+      }
+    },
+    "Ассистент в ваших очках": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An assistant in your glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynagingizdagi yordamchi"
+          }
+        }
+      }
+    },
+    "Ассистент звонит сам": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistant calls you"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yordamchi oʻzi qoʻngʻiroq qiladi"
+          }
+        }
+      }
+    },
+    "Быстрая (v4 Turbo)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fast (v4 Turbo)"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tezkor (v4 Turbo)"
+          }
+        }
+      }
+    },
+    "Ваше имя": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ismingiz"
+          }
+        }
+      }
+    },
+    "Вопрос": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Question"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Savol"
+          }
+        }
+      }
+    },
+    "Вспоминаю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recalling"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslayapman"
+          }
+        }
+      }
+    },
+    "Вспоминаю: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recalling: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslayapman: %@"
+          }
+        }
+      }
+    },
+    "Вы": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siz"
+          }
+        }
+      }
+    },
+    "Вы · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You · %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siz · %@"
+          }
+        }
+      }
+    },
+    "Выразительная (v4)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expressive (v4)"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ifodali (v4)"
+          }
+        }
+      }
+    },
+    "Главное": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Main"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asosiy"
+          }
+        }
+      }
+    },
+    "Говорите": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go ahead"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gapiring"
+          }
+        }
+      }
+    },
+    "Говорите по очереди": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take turns speaking"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navbat bilan gapiring"
+          }
+        }
+      }
+    },
+    "Говорите свободно": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speak freely"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bemalol gapiring"
+          }
+        }
+      }
+    },
+    "Говорить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speak"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gapirish"
+          }
+        }
+      }
+    },
+    "Голос": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovoz"
+          }
+        }
+      }
+    },
+    "Голос ElevenLabs недоступен: %@ Пока говорю голосом iOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs voice unavailable: %@ Using the iOS voice for now."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs ovozi ishlamayapti: %@ Hozircha iOS ovozida gapiraman."
+          }
+        }
+      }
+    },
+    "Готовлю письмо": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafting an email"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xat tayyorlayapman"
+          }
+        }
+      }
+    },
+    "Готовлю сообщение": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafting a message"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xabar tayyorlayapman"
+          }
+        }
+      }
+    },
+    "Готово": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tayyor"
+          }
+        }
+      }
+    },
+    "Дальше": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyingi"
+          }
+        }
+      }
+    },
+    "Данные": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maʼlumotlar"
+          }
+        }
+      }
+    },
+    "Двойное касание дужки или кнопка камеры вызывают ассистента и перебивают ответ. Это пробная возможность очков: что именно приходит с ваших очков, видно в журнале. Одиночное касание и удержание очки оставляют себе.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double-tapping the temple or pressing the camera button calls the assistant and interrupts an answer. This is an experimental glasses feature: the Log shows exactly what your glasses send. Single tap and touch and hold stay with the glasses."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak bandiga ikki marta tegish yoki kamera tugmasi yordamchini chaqiradi va javobini boʻladi. Bu koʻzoynakning sinov imkoniyati: koʻzoynagingizdan aynan nima kelayotgani jurnalda koʻrinadi. Bir marta tegish va bosib turish esa koʻzoynakning oʻzida qoladi."
+          }
+        }
+      }
+    },
+    "Действия переводчика": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translator actions"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjimon amallari"
+          }
+        }
+      }
+    },
+    "Действия с журналом": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log actions"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jurnal amallari"
+          }
+        }
+      }
+    },
+    "Действия с памятью": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memory actions"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xotira amallari"
+          }
+        }
+      }
+    },
+    "Деловой": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Businesslike"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ishchan"
+          }
+        }
+      }
+    },
+    "Джарвис": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jarvis"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jarvis"
+          }
+        }
+      }
+    },
+    "Для очков нужен Meta AI с режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode. Подключить можно и позже.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The glasses need Meta AI with Developer Mode: Meta AI → Settings → your glasses → Developer Mode. You can connect them later."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak uchun dasturchi rejimi yoqilgan Meta AI kerak: Meta AI → Sozlamalar → koʻzoynagingiz → Developer Mode. Keyinroq ulasangiz ham boʻladi."
+          }
+        }
+      }
+    },
+    "Для перевода нужен API-ключ Anthropic (Настройки → Claude).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translation needs an Anthropic API key (Settings → Claude)."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjima uchun Anthropic API kaliti kerak (Sozlamalar → Claude)."
+          }
+        }
+      }
+    },
+    "Для этого адреса нужен сервер IMAP.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This address needs an IMAP server."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu manzil uchun IMAP serveri kerak."
+          }
+        }
+      }
+    },
+    "Добавлю позже": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add later"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyinroq qoʻshaman"
+          }
+        }
+      }
+    },
+    "Добавляю в календарь": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adding to calendar"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taqvimga qoʻshyapman"
+          }
+        }
+      }
+    },
+    "Добавьте API-ключ Anthropic в настройках.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add an Anthropic API key in Settings."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sozlamalarda Anthropic API kalitini qoʻshing."
+          }
+        }
+      }
+    },
+    "Доброе утро": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good morning"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xayrli tong"
+          }
+        }
+      }
+    },
+    "Доброй ночи": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good night"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xayrli tun"
+          }
+        }
+      }
+    },
+    "Добрый вечер": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good evening"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xayrli kech"
+          }
+        }
+      }
+    },
+    "Добрый день": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good afternoon"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xayrli kun"
+          }
+        }
+      }
+    },
+    "Думаю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thinking"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻylayapman"
+          }
+        }
+      }
+    },
+    "Есть новые письма?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any new mail?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yangi xatlar bormi?"
+          }
+        }
+      }
+    },
+    "Жесты очков": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses gestures"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak ishoralari"
+          }
+        }
+      }
+    },
+    "Журнал": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jurnal"
+          }
+        }
+      }
+    },
+    "Журнал пуст": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log is empty"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jurnal boʻsh"
+          }
+        }
+      }
+    },
+    "Заботливый друг: замечает настроение, поддержит и напомнит о важном": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A caring friend: notices your mood, offers support, and reminds you of what matters"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gʻamxoʻr doʻst: kayfiyatingizni sezadi, qoʻllab-quvvatlaydi va muhim narsalarni eslatib turadi"
+          }
+        }
+      }
+    },
+    "Забываю: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forgetting: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unutyapman: %@"
+          }
+        }
+      }
+    },
+    "Закрыть": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yopish"
+          }
+        }
+      }
+    },
+    "Заметка «%@» уже есть — откройте её и допишите.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A note named “%@” already exists — open it and add to it."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” nomli qayd allaqachon bor — uni ochib, davomidan yozing."
+          }
+        }
+      }
+    },
+    "Заметки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notes"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qaydlar"
+          }
+        }
+      }
+    },
+    "Заметки памяти — файлы Markdown: Файлы → На iPhone → это приложение. Ключи и пароль почты хранятся только в Keychain этого iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memory notes are Markdown files: Files → On My iPhone → this app. Keys and the mail password are stored only in this iPhone’s Keychain."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xotira qaydlari — Markdown fayllari: Fayllar → iPhone xotirasida → shu ilova. Kalitlar va pochta paroli faqat shu iPhone qurilmasining Keychain xotirasida saqlanadi."
+          }
+        }
+      }
+    },
+    "Запоминаю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remembering"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslab qolyapman"
+          }
+        }
+      }
+    },
+    "Запоминаю: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remembering: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslab qolyapman: %@"
+          }
+        }
+      }
+    },
+    "Запускаю команду": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running a shortcut"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buyruqni bajaryapman"
+          }
+        }
+      }
+    },
+    "Заряд %@%": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battery %@%"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quvvat %@%"
+          }
+        }
+      }
+    },
+    "Звоню": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qoʻngʻiroq qilyapman"
+          }
+        }
+      }
+    },
+    "Звоню вам": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calling you"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sizga qoʻngʻiroq qilyapman"
+          }
+        }
+      }
+    },
+    "Здесь %@ хранит то, что узнаёт о вас": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is where %@ keeps what it learns about you"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ siz haqingizda bilib olganlarini shu yerda saqlaydi"
+          }
+        }
+      }
+    },
+    "Из фона ассистент может только позвонить вам — принять вызов нужно касанием очков или на экране.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From the background, the assistant can only call you — answer the call by tapping your glasses or on the screen."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fon rejimida yordamchi sizga faqat qoʻngʻiroq qila oladi — qoʻngʻiroqni koʻzoynakka tegib yoki ekranda qabul qilish kerak."
+          }
+        }
+      }
+    },
+    "Имя": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ism"
+          }
+        }
+      }
+    },
+    "Имя ассистента": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistant name"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yordamchi ismi"
+          }
+        }
+      }
+    },
+    "Имя для обращения: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name it answers to: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Murojaat uchun ism: %@"
+          }
+        }
+      }
+    },
+    "Имя, характер и манера общения.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name, character, and speaking style."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ismi, xarakteri va muloqot uslubi."
+          }
+        }
+      }
+    },
+    "Ищу в интернете": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Searching the web"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internetdan qidiryapman"
+          }
+        }
+      }
+    },
+    "Ищу в контактах": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Searching contacts"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontaktlardan qidiryapman"
+          }
+        }
+      }
+    },
+    "Как вас зовут": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What to call you"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ismingiz nima"
+          }
+        }
+      }
+    },
+    "Как его зовут": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name your assistant"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uning ismi nima"
+          }
+        }
+      }
+    },
+    "Как ему с вами говорить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How it talks to you"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "U siz bilan qanday gaplashsin"
+          }
+        }
+      }
+    },
+    "Как личный секретарь: коротко, чётко, всё под контролем": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Like a personal secretary: brief, clear, everything under control"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shaxsiy kotibdek: qisqa, aniq, hammasi nazoratda"
+          }
+        }
+      }
+    },
+    "Как это работает": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How it works"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qanday ishlaydi"
+          }
+        }
+      }
+    },
+    "Какие у меня планы на завтра?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What are my plans for tomorrow?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ertaga qanday rejalarim bor?"
+          }
+        }
+      }
+    },
+    "Какой у него характер": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a character"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uning xarakteri qanday"
+          }
+        }
+      }
+    },
+    "Календарь": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taqvim"
+          }
+        }
+      }
+    },
+    "Календарь, контакты и геолокацию %@ попросит, когда они впервые понадобятся.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ will ask for calendar, contacts, and location access the first time they’re needed."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taqvim, kontaktlar va geolokatsiyaga ruxsatni %@ ular ilk bor kerak boʻlganda soʻraydi."
+          }
+        }
+      }
+    },
+    "Камера": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera"
+          }
+        }
+      }
+    },
+    "Камера включена": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera is on"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera yoqilgan"
+          }
+        }
+      }
+    },
+    "Камера включится по запросу": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera turns on when asked"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera kerak boʻlganda yoqiladi"
+          }
+        }
+      }
+    },
+    "Камера занята предыдущим снимком.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is busy with the previous photo."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera oldingi surat bilan band."
+          }
+        }
+      }
+    },
+    "Камера очков": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses camera"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak kamerasi"
+          }
+        }
+      }
+    },
+    "Камера очков недоступна": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses camera unavailable"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak kamerasidan foydalanib boʻlmayapti"
+          }
+        }
+      }
+    },
+    "Камера пока не разрешена.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access isn’t allowed yet."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameraga hali ruxsat berilmagan."
+          }
+        }
+      }
+    },
+    "Ключ ElevenLabs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs key"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs kaliti"
+          }
+        }
+      }
+    },
+    "Ключи": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keys"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalitlar"
+          }
+        }
+      }
+    },
+    "Ключи хранятся только в Keychain этого iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keys are stored only in this iPhone’s Keychain."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalitlar faqat shu iPhone qurilmasining Keychain xotirasida saqlanadi."
+          }
+        }
+      }
+    },
+    "Когда отвечать": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When to answer"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qachon javob bersin"
+          }
+        }
+      }
+    },
+    "Команды → Автоматизация → Bluetooth → ваши очки → «Выйти на связь»: надели очки — он позвонил.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shortcuts → Automation → Bluetooth → your glasses → “Get on the line”: put on your glasses and it calls you."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buyruqlar → Avtomatlashtirish → Bluetooth → koʻzoynagingiz → “Aloqaga chiqish”: koʻzoynakni taqishingiz bilan u qoʻngʻiroq qiladi."
+          }
+        }
+      }
+    },
+    "Коротко": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brief"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qisqa"
+          }
+        }
+      }
+    },
+    "Линия свободна": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line is clear"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liniya boʻsh"
+          }
+        }
+      }
+    },
+    "Лучший баланс: живой разговор и хороший узбекский": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best balance: natural conversation and good Uzbek"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oltin oʻrtalik: jonli suhbat va yaxshi oʻzbek tili"
+          }
+        }
+      }
+    },
+    "Люди": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "People"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odamlar"
+          }
+        }
+      }
+    },
+    "Манера": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Style"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uslub"
+          }
+        }
+      }
+    },
+    "Микрофон выключен — аудио нужно перезапустить.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone is off — audio needs to be restarted."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon oʻchiq — audioni qayta ishga tushirish kerak."
+          }
+        }
+      }
+    },
+    "Микрофон запрещён. Разрешите его: Настройки iPhone → это приложение → Микрофон.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone access is denied. To allow it, go to iPhone Settings → this app → Microphone."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofonga ruxsat berilmagan. Ruxsat bering: iPhone sozlamalari → shu ilova → Mikrofon."
+          }
+        }
+      }
+    },
+    "Микрофон и очки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone and glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon va koʻzoynak"
+          }
+        }
+      }
+    },
+    "Микрофон и речь": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone and speech"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon va nutq"
+          }
+        }
+      }
+    },
+    "Микрофон у переводчика": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translator has the microphone"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon tarjimonda"
+          }
+        }
+      }
+    },
+    "Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Голоса носителей узбекского помечены «узб.»; другие добавляются из библиотеки голосов в «My Voices» на сайте ElevenLabs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "v4 models speak Uzbek, Russian, and English in a single voice; audio streams and starts while the answer is still being written. Voices of native Uzbek speakers are marked “Uzb.”; you can add others from the Voice Library to “My Voices” on the ElevenLabs website."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "v4 modellari oʻzbek, rus va ingliz tillarida bitta ovozda gapiradi; ovoz oqim tarzida keladi va javob hali yozilayotgan paytdayoq boshlanadi. Ona tili oʻzbekcha boʻlgan soʻzlovchilar ovozlari “oʻzb.” deb belgilangan; boshqalari ElevenLabs saytidagi ovozlar kutubxonasidan “My Voices” boʻlimiga qoʻshiladi."
+          }
+        }
+      }
+    },
+    "Модель": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Model"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Model"
+          }
+        }
+      }
+    },
+    "На «вы»": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Formal"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sizlab"
+          }
+        }
+      }
+    },
+    "На «ты»": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informal"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senlab"
+          }
+        }
+      }
+    },
+    "На каждую фразу": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every phrase"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Har bir gapga"
+          }
+        }
+      }
+    },
+    "На линии": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line open"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liniyada"
+          }
+        }
+      }
+    },
+    "На связи": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On the line"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aloqada"
+          }
+        }
+      }
+    },
+    "На связи · слушаю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On the line · listening"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aloqada · eshityapman"
+          }
+        }
+      }
+    },
+    "На связи и фон": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On the line and background"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aloqada va fon"
+          }
+        }
+      }
+    },
+    "На удержании": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On hold"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kutishda"
+          }
+        }
+      }
+    },
+    "На этом языке ассистент слушает и отвечает по умолчанию. Заговорите на другом из трёх — ответит на нём.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The assistant listens and answers in this language by default. Speak another of the three and it answers in that language."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yordamchi odatda shu tilda eshitadi va javob beradi. Qolgan ikki tildan birida gapirsangiz — oʻsha tilda javob beradi."
+          }
+        }
+      }
+    },
+    "Нажмите свою кнопку и скажите фразу — перевод прозвучит и появится крупно. Потом кнопку нажимает собеседник.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap your button and say a phrase — the translation is spoken and shown in large text. Then the other person taps their button."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻz tugmangizni bosib, gapingizni ayting — tarjima yangraydi va yirik harflarda koʻrinadi. Keyin tugmani suhbatdoshingiz bosadi."
+          }
+        }
+      }
+    },
+    "Назад": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orqaga"
+          }
+        }
+      }
+    },
+    "Название": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Title"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nomi"
+          }
+        }
+      }
+    },
+    "Написать о себе": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write about yourself"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻzingiz haqingizda yozish"
+          }
+        }
+      }
+    },
+    "Напоминания": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminders"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslatmalar"
+          }
+        }
+      }
+    },
+    "Напомни через час позвонить маме": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind me to call Mom in an hour"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir soatdan keyin onamga qoʻngʻiroq qilishni eslatib qoʻy"
+          }
+        }
+      }
+    },
+    "Например, Обо мне": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For example, About me"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masalan, Men haqimda"
+          }
+        }
+      }
+    },
+    "Например: спокойный, говорит как старый друг, немного философ": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For example: calm, talks like an old friend, a bit of a philosopher"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masalan: xotirjam, eski qadrdon doʻstdek gapiradi, biroz faylasuf"
+          }
+        }
+      }
+    },
+    "Настройки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sozlamalar"
+          }
+        }
+      }
+    },
+    "Начать": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boshlash"
+          }
+        }
+      }
+    },
+    "Начать разговор": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start conversation"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suhbatni boshlash"
+          }
+        }
+      }
+    },
+    "Не выбран": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not selected"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanlanmagan"
+          }
+        }
+      }
+    },
+    "Не удалось включить микрофон: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t turn on the microphone: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofonni yoqib boʻlmadi: %@"
+          }
+        }
+      }
+    },
+    "Не удалось выйти на связь: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t get on the line: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aloqaga chiqib boʻlmadi: %@"
+          }
+        }
+      }
+    },
+    "Не удалось подключиться к очкам: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t connect to the glasses: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynakka ulanib boʻlmadi: %@"
+          }
+        }
+      }
+    },
+    "Не удалось сделать снимок: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t take a photo: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suratga olib boʻlmadi: %@"
+          }
+        }
+      }
+    },
+    "Необязательно": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ixtiyoriy"
+          }
+        }
+      }
+    },
+    "Нет доступного микрофона.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No microphone available."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foydalanish mumkin boʻlgan mikrofon yoʻq."
+          }
+        }
+      }
+    },
+    "Нет разрешения на камеру очков. Откройте приложение и нажмите «Разрешить камеру».": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No permission for the glasses camera. Open the app and tap “Allow camera.”"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak kamerasiga ruxsat yoʻq. Ilovani ochib, “Kameraga ruxsat berish” tugmasini bosing."
+          }
+        }
+      }
+    },
+    "Новая заметка": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New note"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yangi qayd"
+          }
+        }
+      }
+    },
+    "Новый разговор": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New conversation"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yangi suhbat"
+          }
+        }
+      }
+    },
+    "Нужен Meta AI с включённым режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requires Meta AI with Developer Mode turned on: Meta AI → Settings → your glasses → Developer Mode."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dasturchi rejimi yoqilgan Meta AI kerak: Meta AI → Sozlamalar → koʻzoynagingiz → Developer Mode."
+          }
+        }
+      }
+    },
+    "Нужен доступ к микрофону (Настройки iOS → Конфиденциальность → Микрофон).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone access is required (Settings → Privacy & Security → Microphone)."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofonga ruxsat kerak (iOS sozlamalari → Maxfiylik → Mikrofon)."
+          }
+        }
+      }
+    },
+    "Нужен не обычный пароль, а «пароль приложения»: Gmail — Аккаунт Google → Безопасность → Пароли приложений (нужна двухэтапная проверка); Яндекс — Яндекс ID → Безопасность → Пароли приложений → Почта; Mail.ru — Настройки → Безопасность → Пароли для внешних приложений; iCloud — appleid.apple.com → Пароли приложений. Сервер для этих почт определяется сам. Письма только читаются и не помечаются прочитанными.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You need an “app password,” not your regular password: Gmail — Google Account → Security → App passwords (requires 2-Step Verification); Yandex — Yandex ID → Security → App passwords → Mail; Mail.ru — Settings → Security → Passwords for external apps; iCloud — appleid.apple.com → App-Specific Passwords. The server for these providers is detected automatically. Mail is only read and is never marked as read."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oddiy parol emas, “ilova paroli” kerak: Gmail — Google hisobi → Xavfsizlik → Ilova parollari (ikki bosqichli tekshiruv kerak); Yandex — Yandex ID → Xavfsizlik → Ilova parollari → Pochta; Mail.ru — Sozlamalar → Xavfsizlik → Tashqi ilovalar uchun parollar; iCloud — appleid.apple.com → Ilova parollari. Bu pochta xizmatlari uchun server oʻzi aniqlanadi. Xatlar faqat oʻqiladi va oʻqilgan deb belgilanmaydi."
+          }
+        }
+      }
+    },
+    "Обновить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yangilash"
+          }
+        }
+      }
+    },
+    "Обновить список голосов": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh voice list"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovozlar roʻyxatini yangilash"
+          }
+        }
+      }
+    },
+    "Обращение": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Formality"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Murojaat"
+          }
+        }
+      }
+    },
+    "Обычно": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odatiy"
+          }
+        }
+      }
+    },
+    "Озвучивать перевод": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speak translations"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjimani ovozlashtirish"
+          }
+        }
+      }
+    },
+    "Опишите характер": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Describe the character"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xarakterini tasvirlang"
+          }
+        }
+      }
+    },
+    "Опишите характер своими словами": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Describe the character in your own words"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xarakterini oʻz soʻzlaringiz bilan tasvirlang"
+          }
+        }
+      }
+    },
+    "Определяю, где мы": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finding where we are"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turgan joyimizni aniqlayapman"
+          }
+        }
+      }
+    },
+    "Остановить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toʻxtatish"
+          }
+        }
+      }
+    },
+    "Остановить ответ": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop answer"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Javobni toʻxtatish"
+          }
+        }
+      }
+    },
+    "Остроумный: шутит к месту, но дело делает всерьёз": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quick-witted: jokes when it fits, but takes the work seriously"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hozirjavob: oʻrnida hazillashadi, ammo ishni jiddiy bajaradi"
+          }
+        }
+      }
+    },
+    "Отбой": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hang up"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tugatish"
+          }
+        }
+      }
+    },
+    "Ответ обрезан по лимиту длины.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The answer was cut off at the length limit."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Javob uzunlik cheklovi sababli kesildi."
+          }
+        }
+      }
+    },
+    "Ответ продолжила модель %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The answer was continued by model %@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Javobni %@ modeli davom ettirdi."
+          }
+        }
+      }
+    },
+    "Ответы": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answers"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Javoblar"
+          }
+        }
+      }
+    },
+    "Отвечает на всё, что слышит. Для тихого места, где вы один.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answers everything it hears. For a quiet place where you’re alone."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eshitgan hamma narsasiga javob beradi. Yolgʻiz oʻzingiz boʻlgan sokin joy uchun."
+          }
+        }
+      }
+    },
+    "Отвечает, когда фраза обращена к нему, и молчит, когда вы говорите с другими. Имя не обязательно.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answers when a phrase is meant for it and stays quiet when you’re talking to others. The name isn’t required."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gap oʻziga qaratilganda javob beradi, boshqalar bilan gaplashayotganingizda esa jim turadi. Ismini aytish shart emas."
+          }
+        }
+      }
+    },
+    "Отвечает, только если фраза начинается с имени.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answers only if the phrase starts with its name."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gap ismi bilan boshlangandagina javob beradi."
+          }
+        }
+      }
+    },
+    "Отвечать сразу": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answer right away"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darhol javob berish"
+          }
+        }
+      }
+    },
+    "Отвечаю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answering"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Javob beryapman"
+          }
+        }
+      }
+    },
+    "Отключить приложение от очков": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnect app from glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ilovani koʻzoynakdan uzish"
+          }
+        }
+      }
+    },
+    "Открываю страницу": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opening the page"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahifani ochyapman"
+          }
+        }
+      }
+    },
+    "Отладка": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Debug"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nosozliklarni tuzatish"
+          }
+        }
+      }
+    },
+    "Отмена": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bekor qilish"
+          }
+        }
+      }
+    },
+    "Отправить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yuborish"
+          }
+        }
+      }
+    },
+    "Очистить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tozalash"
+          }
+        }
+      }
+    },
+    "Очистить журнал?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear the log?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jurnal tozalansinmi?"
+          }
+        }
+      }
+    },
+    "Очки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak"
+          }
+        }
+      }
+    },
+    "Очки Ray-Ban": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ray-Ban glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ray-Ban koʻzoynagi"
+          }
+        }
+      }
+    },
+    "Очки на связи": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses on the line"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak aloqada"
+          }
+        }
+      }
+    },
+    "Очки не найдены. Разложите дужки и проверьте Bluetooth.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses not found. Unfold the temples and check Bluetooth."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak topilmadi. Bandlarini oching va Bluetooth aloqasini tekshiring."
+          }
+        }
+      }
+    },
+    "Очки не ответили вовремя.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The glasses didn’t respond in time."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak vaqtida javob bermadi."
+          }
+        }
+      }
+    },
+    "Очки не подключены": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses not connected"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak ulanmagan"
+          }
+        }
+      }
+    },
+    "Очки не рядом": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glasses not nearby"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak uzoqda"
+          }
+        }
+      }
+    },
+    "Ошибка": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xatolik"
+          }
+        }
+      }
+    },
+    "Память": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memory"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xotira"
+          }
+        }
+      }
+    },
+    "Память, ключи и разговоры сохранятся.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memory, keys, and conversations will be kept."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xotira, kalitlar va suhbatlar saqlanib qoladi."
+          }
+        }
+      }
+    },
+    "Папка %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folder %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ jildi"
+          }
+        }
+      }
+    },
+    "Пароль приложения": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App password"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ilova paroli"
+          }
+        }
+      }
+    },
+    "Перевод": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translation"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjima"
+          }
+        }
+      }
+    },
+    "Перевод слов собеседника звучит у вас в очках. Перевод ваших слов — из динамика телефона, чтобы его услышал собеседник. Без озвучки переводчик не делает пауз и показывает перевод на экране, пока человек ещё говорит.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The translation of the other person’s words plays in your glasses. The translation of your words plays from the phone speaker so the other person can hear it. With speech off, the translator doesn’t pause and shows the translation on screen while the person is still speaking."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suhbatdoshingiz soʻzlarining tarjimasi koʻzoynagingizda eshitiladi. Sizning soʻzlaringiz tarjimasi esa suhbatdoshingiz eshitishi uchun telefon dinamigidan yangraydi. Ovozlashtirish oʻchirilganda tarjimon pauza qilmaydi va odam hali gapirayotgan paytdayoq tarjimani ekranda koʻrsatadi."
+          }
+        }
+      }
+    },
+    "Переводчик": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translator"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjimon"
+          }
+        }
+      }
+    },
+    "Переводчик сам понимает, кто говорит. Вашу речь он переводит собеседнику, его речь — вам в очки, и показывает перевод, пока человек ещё говорит.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The translator works out who’s speaking on its own. It translates your speech for the other person and theirs into your glasses, and shows the translation while the person is still speaking."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjimon kim gapirayotganini oʻzi tushunadi. Sizning gapingizni suhbatdoshingizga, uning gapini esa sizga — koʻzoynakka tarjima qiladi va odam hali gapirayotgan paytdayoq tarjimani koʻrsatadi."
+          }
+        }
+      }
+    },
+    "Переводчик слушает собеседника и переводит вам в очки. Чтобы он понимал обоих, добавьте ключ ElevenLabs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The translator listens to the other person and translates into your glasses. To have it understand both of you, add an ElevenLabs key."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarjimon suhbatdoshingizni eshitadi va gapini sizga koʻzoynak orqali tarjima qilib beradi. U ikkalangizni ham tushunishi uchun ElevenLabs kalitini qoʻshing."
+          }
+        }
+      }
+    },
+    "Перестать слушать": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop listening"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eshitishni toʻxtatish"
+          }
+        }
+      }
+    },
+    "По очереди": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take turns"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navbat bilan"
+          }
+        }
+      }
+    },
+    "По этому имени он будет откликаться в режиме «Без рук».": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It will respond to this name in “Hands-free” mode."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Qoʻlsiz” rejimida u shu ism bilan chaqirilganda javob beradi."
+          }
+        }
+      }
+    },
+    "Поделиться журналом": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share log"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jurnalni ulashish"
+          }
+        }
+      }
+    },
+    "Подключение через Meta AI": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting through Meta AI"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta AI orqali ulanish"
+          }
+        }
+      }
+    },
+    "Подключено. Непрочитанных писем нет.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected. No unread mail."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulandi. Oʻqilmagan xatlar yoʻq."
+          }
+        }
+      }
+    },
+    "Подключено. Непрочитанных: %@%@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected. Unread: %@%@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulandi. Oʻqilmaganlar: %@%@."
+          }
+        }
+      }
+    },
+    "Подключены": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulangan"
+          }
+        }
+      }
+    },
+    "Подключить виртуальные очки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect virtual glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Virtual koʻzoynakni ulash"
+          }
+        }
+      }
+    },
+    "Подключить через Meta AI": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect through Meta AI"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta AI orqali ulash"
+          }
+        }
+      }
+    },
+    "Подробно": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detailed"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batafsil"
+          }
+        }
+      }
+    },
+    "Поиск": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qidiruv"
+          }
+        }
+      }
+    },
+    "Поиск в интернете": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web search"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internetda qidiruv"
+          }
+        }
+      }
+    },
+    "Пока идёт такой звонок, звук в очках телефонного качества, музыка на паузе, очки расходуют заряд как при разговоре. Чтобы закончить, скажите «Отбой» или завершите вызов.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "During this kind of call, audio in the glasses is phone quality, music is paused, and the glasses use battery as they would on a call. To finish, say “Hang up” or end the call."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bunday qoʻngʻiroq davomida koʻzoynakdagi ovoz sifati telefondagidek boʻladi, musiqa pauzaga qoʻyiladi, koʻzoynak esa quvvatni telefonda gaplashayotgandagidek sarflaydi. Tugatish uchun “Xayr” deng yoki qoʻngʻiroqni yakunlang."
+          }
+        }
+      }
+    },
+    "Показать собеседнику": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show to other person"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suhbatdoshga koʻrsatish"
+          }
+        }
+      }
+    },
+    "Поменять языки местами": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swap languages"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillar oʻrnini almashtirish"
+          }
+        }
+      }
+    },
+    "Почта": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mail"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pochta"
+          }
+        }
+      }
+    },
+    "Править": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahrirlash"
+          }
+        }
+      }
+    },
+    "Прежние модели озвучивают ответ фразу за фразой, с заметной паузой. Для быстрого ответа и узбекского выберите v4 Turbo.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earlier models speak the answer phrase by phrase, with a noticeable pause. For fast answers and Uzbek, choose v4 Turbo."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvalgi modellar javobni jumlama-jumla, sezilarli pauza bilan ovozlashtiradi. Tez javob va oʻzbek tili uchun v4 Turbo modelini tanlang."
+          }
+        }
+      }
+    },
+    "Приложение не подключено к очкам через Meta AI.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app isn’t connected to the glasses through Meta AI."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ilova koʻzoynakka Meta AI orqali ulanmagan."
+          }
+        }
+      }
+    },
+    "Проверить голос": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test voice"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovozni sinab koʻrish"
+          }
+        }
+      }
+    },
+    "Проверить подключение": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test connection"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulanishni tekshirish"
+          }
+        }
+      }
+    },
+    "Проверяю почту": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking mail"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pochtani tekshiryapman"
+          }
+        }
+      }
+    },
+    "Продолжение без имени": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follow-up without name"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ismsiz davom etish"
+          }
+        }
+      }
+    },
+    "Пройти первую настройку заново": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run setup again"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dastlabki sozlashni qaytadan oʻtish"
+          }
+        }
+      }
+    },
+    "Пройти первую настройку заново?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run setup again?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dastlabki sozlashni qaytadan oʻtasizmi?"
+          }
+        }
+      }
+    },
+    "Пропустить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻtkazib yuborish"
+          }
+        }
+      }
+    },
+    "Разговор": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversation"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suhbat"
+          }
+        }
+      }
+    },
+    "Разговор продолжается с заблокированным телефоном": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The conversation continues with the phone locked"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefon qulflangan boʻlsa ham suhbat davom etadi"
+          }
+        }
+      }
+    },
+    "Разрешено": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruxsat berilgan"
+          }
+        }
+      }
+    },
+    "Разрешите приложению доступ в Meta AI.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow the app access in Meta AI."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta AI ilovasida bu ilovaga ruxsat bering."
+          }
+        }
+      }
+    },
+    "Разрешить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruxsat berish"
+          }
+        }
+      }
+    },
+    "Разрешить камеру в Meta AI": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow camera in Meta AI"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meta AI ilovasida kameraga ruxsat berish"
+          }
+        }
+      }
+    },
+    "Распознавание": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recognition"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutqni aniqlash"
+          }
+        }
+      }
+    },
+    "Распознавание ElevenLabs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs recognition"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs orqali aniqlash"
+          }
+        }
+      }
+    },
+    "Распознавание ElevenLabs: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs recognition: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs orqali nutqni aniqlash: %@"
+          }
+        }
+      }
+    },
+    "Распознавание речи не работает: %@. Проверьте, что диктовка включена (Настройки → Основные → Клавиатура).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech recognition isn’t working: %@. Check that Dictation is turned on (Settings → General → Keyboard)."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutqni aniqlash ishlamayapti: %@. Diktovka yoqilganini tekshiring (Sozlamalar → Asosiy → Klaviatura)."
+          }
+        }
+      }
+    },
+    "Распознавание речи недоступно.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech recognition is unavailable."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutqni aniqlashdan foydalanib boʻlmaydi."
+          }
+        }
+      }
+    },
+    "Распознавание речи сейчас недоступно для выбранного языка.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech recognition isn’t currently available for the selected language."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanlangan til uchun nutqni aniqlashdan hozir foydalanib boʻlmaydi."
+          }
+        }
+      }
+    },
+    "Распознаю…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recognizing…"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniqlayapman…"
+          }
+        }
+      }
+    },
+    "Расскажите о себе": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About you"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻzingiz haqingizda soʻzlab bering"
+          }
+        }
+      }
+    },
+    "Режим": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mode"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rejim"
+          }
+        }
+      }
+    },
+    "Речь распознаётся потоком: быстрее, точнее и с узбекским. «Смешанная речь» понимает узбекский и русский вперемешку в одной фразе, но может ошибаться на очень коротких репликах.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech is recognized as a stream: faster, more accurate, and with Uzbek. “Mixed speech” understands Uzbek and Russian mixed in one phrase, but can make mistakes on very short ones."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutq oqim tarzida aniqlanadi: tezroq, aniqroq va oʻzbek tilida ham. “Aralash nutq” bitta gapda aralashib kelgan oʻzbekcha va ruschani tushunadi, lekin juda qisqa gaplarda adashishi mumkin."
+          }
+        }
+      }
+    },
+    "Русский": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский"
+          }
+        }
+      }
+    },
+    "Русский и английский распознаёт Apple на самом iPhone, узбекский — ElevenLabs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Russian and English are recognized by Apple on the iPhone itself, Uzbek by ElevenLabs."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rus va ingliz tillarini Apple bevosita iPhone qurilmasining oʻzida aniqlaydi, oʻzbek tilini esa — ElevenLabs."
+          }
+        }
+      }
+    },
+    "С иронией": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Witty"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazilkash"
+          }
+        }
+      }
+    },
+    "Сам понимает": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻzi tushunadi"
+          }
+        }
+      }
+    },
+    "Самый быстрый и в двадцать раз дешевле Sonnet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fastest, and twenty times cheaper than Sonnet"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eng tezkori va Sonnet modelidan yigirma baravar arzon"
+          }
+        }
+      }
+    },
+    "Свой": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻzingizniki"
+          }
+        }
+      }
+    },
+    "Сейчас речь распознаёт Apple на самом iPhone: русский и английский. Для узбекского и для работы в фоне добавьте ключ ElevenLabs в разделе «Голос».": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech is currently recognized by Apple on the iPhone itself: Russian and English. For Uzbek and for background use, add an ElevenLabs key in the “Voice” section."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hozir nutqni Apple bevosita iPhone qurilmasining oʻzida aniqlayapti: rus va ingliz tillarida. Oʻzbek tili va fonda ishlash uchun “Ovoz” boʻlimida ElevenLabs kalitini qoʻshing."
+          }
+        }
+      }
+    },
+    "Сервер IMAP (необязательно)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IMAP server (optional)"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IMAP serveri (ixtiyoriy)"
+          }
+        }
+      }
+    },
+    "Серьёзно": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serious"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jiddiy"
+          }
+        }
+      }
+    },
+    "Скажите, например: «Запомни, что я не ем острое» или «Мою сестру зовут Анна». Заметки — обычные файлы Markdown: их можно читать, править и перенести в Obsidian.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say, for example, “Remember that I don’t eat spicy food” or “My sister’s name is Anna.” Notes are plain Markdown files: you can read them, edit them, and move them to Obsidian."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masalan, shunday deng: “Eslab qol, men achchiq yemayman” yoki “Singlimning ismi Anna”. Qaydlar — oddiy Markdown fayllari: ularni oʻqish, tahrirlash va Obsidian ilovasiga koʻchirish mumkin."
+          }
+        }
+      }
+    },
+    "Слушать без звонка": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen without a call"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qoʻngʻiroqsiz eshitish"
+          }
+        }
+      }
+    },
+    "Слушаю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listening"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eshityapman"
+          }
+        }
+      }
+    },
+    "Слушаю без звонка": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listening without a call"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qoʻngʻiroqsiz eshityapman"
+          }
+        }
+      }
+    },
+    "Слышит вас через очки Ray-Ban Meta и отвечает голосом. Видит их камерой, помнит вас, ведёт календарь и почту, переводит разговор. Сначала придумайте, каким он будет.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hears you through your Ray-Ban Meta glasses and answers by voice. Sees through their camera, remembers you, manages your calendar and mail, and translates conversations. First, decide what it will be like."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sizni Ray-Ban Meta koʻzoynagi orqali eshitadi va ovoz bilan javob beradi. Koʻzoynak kamerasi orqali koʻradi, sizni eslab qoladi, taqvim va pochtangizni yuritadi, suhbatni tarjima qiladi. Avval uning qanday boʻlishini oʻylab toping."
+          }
+        }
+      }
+    },
+    "Смешанная речь": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixed speech"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aralash nutq"
+          }
+        }
+      }
+    },
+    "Смотрю календарь": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking calendar"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taqvimga qarayapman"
+          }
+        }
+      }
+    },
+    "Смотрю через очки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Looking through the glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak orqali qarayapman"
+          }
+        }
+      }
+    },
+    "Снимок не пришёл с очков вовремя.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The photo didn’t arrive from the glasses in time."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surat koʻzoynakdan vaqtida kelmadi."
+          }
+        }
+      }
+    },
+    "Снимок с камеры очков": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo from glasses camera"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koʻzoynak kamerasidan olingan surat"
+          }
+        }
+      }
+    },
+    "Собеседник": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other person"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suhbatdosh"
+          }
+        }
+      }
+    },
+    "Собеседнику — из динамика телефона": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For the other person — phone speaker"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suhbatdoshga — telefon dinamigidan"
+          }
+        }
+      }
+    },
+    "Собранный и точный: говорит по делу, без лишних эмоций": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Composed and precise: speaks to the point, without extra emotion"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vazmin va aniq: loʻnda gapiradi, ortiqcha his-hayajonsiz"
+          }
+        }
+      }
+    },
+    "События появятся, как только вы начнёте разговор.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Events appear as soon as you start a conversation."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hodisalar suhbatni boshlashingiz bilan paydo boʻladi."
+          }
+        }
+      }
+    },
+    "Соединяю": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulayapman"
+          }
+        }
+      }
+    },
+    "Создать ассистента": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create assistant"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yordamchi yaratish"
+          }
+        }
+      }
+    },
+    "Создаю напоминание": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating a reminder"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eslatma yaratyapman"
+          }
+        }
+      }
+    },
+    "Сохранить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saqlash"
+          }
+        }
+      }
+    },
+    "Сохранить копию в Файлы": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save a copy to Files"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nusxasini Fayllar ilovasiga saqlash"
+          }
+        }
+      }
+    },
+    "Спокойный": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calm"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xotirjam"
+          }
+        }
+      }
+    },
+    "Спросите голосом или выберите, с чего начать.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask by voice or choose where to start."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovoz bilan soʻrang yoki nimadan boshlashni tanlang."
+          }
+        }
+      }
+    },
+    "Спросить текстом": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type to ask"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matn bilan soʻrash"
+          }
+        }
+      }
+    },
+    "Ставлю таймер": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setting a timer"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taymer qoʻyyapman"
+          }
+        }
+      }
+    },
+    "Стерео в режиме кнопки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo in button mode"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tugma rejimida stereo"
+          }
+        }
+      }
+    },
+    "Стерео: когда вы спрашиваете по кнопке, ответ идёт в очки как музыка, а не в телефонном качестве гарнитуры.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo: when you ask using the button, the answer plays in the glasses like music instead of in headset phone quality."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo: tugma orqali soʻraganingizda javob koʻzoynakka garnituraning telefon sifati bilan emas, musiqa kabi uzatiladi."
+          }
+        }
+      }
+    },
+    "Столько секунд после ответа ассистент слушает уточняющий вопрос без обращения по имени.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For this many seconds after an answer, the assistant listens for a follow-up question without needing its name."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Javobdan keyin yordamchi shuncha soniya davomida qoʻshimcha savolingizni ismini aytmasangiz ham eshitadi."
+          }
+        }
+      }
+    },
+    "Строю маршрут": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting directions"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marshrut tuzyapman"
+          }
+        }
+      }
+    },
+    "Схема: разговор, перевод и почта, память, календарь и напоминания сходятся на станции %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Map: conversation, translation and mail, memory, calendar, and reminders meet at %@ station"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sxema: suhbat, tarjima va pochta, xotira, taqvim va eslatmalar %@ bekatida tutashadi"
+          }
+        }
+      }
+    },
+    "Текстом": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matn bilan"
+          }
+        }
+      }
+    },
+    "Только по имени": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By name only"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faqat ismi aytilganda"
+          }
+        }
+      }
+    },
+    "Ты синхронный переводчик живой речи. Переведи реплику с языка «%@» на язык «%@». Если реплика уже на языке «%@», переведи её на «%@». Выведи только перевод — без кавычек, пояснений и вариантов. Сохраняй смысл, тон и вежливость, имена и числа. Пиши так, как говорят вслух. Реплика получена распознаванием речи и может содержать ошибки — переводи по смыслу.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are a simultaneous interpreter of live speech. Translate the utterance from “%@” into “%@”. If the utterance is already in “%@”, translate it into “%@”. Output only the translation — no quotation marks, explanations, or alternatives. Preserve the meaning, tone and politeness, names and numbers. Write the way people speak aloud. The utterance comes from speech recognition and may contain errors — translate by meaning."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sen jonli nutqning sinxron tarjimonisan. Gapni “%@” tilidan “%@” tiliga tarjima qil. Agar gap allaqachon “%@” tilida boʻlsa, uni “%@” tiliga tarjima qil. Faqat tarjimaning oʻzini chiqar — qoʻshtirnoqsiz, izohlarsiz va variantlarsiz. Maʼno, ohang va xushmuomalalikni, ismlar va sonlarni saqla. Odamlar ogʻzaki nutqda qanday gapirsa, shunday yoz. Gap nutqni aniqlash orqali olingan va unda xatolar boʻlishi mumkin — maʼnosiga qarab tarjima qil."
+          }
+        }
+      }
+    },
+    "Тёплый": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warm"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iliq"
+          }
+        }
+      }
+    },
+    "Убрать виртуальные очки": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove virtual glasses"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Virtual koʻzoynakni olib tashlash"
+          }
+        }
+      }
+    },
+    "Узбекскую речь распознаёт и озвучивает ElevenLabs — добавьте его ключ в настройках.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uzbek speech is recognized and spoken by ElevenLabs — add its key in Settings."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻzbekcha nutqni ElevenLabs aniqlaydi va ovozlashtiradi — sozlamalarda uning kalitini qoʻshing."
+          }
+        }
+      }
+    },
+    "Умнее в сложных задачах, медленнее и дороже": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smarter on complex tasks, slower and more expensive"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Murakkab vazifalarda aqlliroq, lekin sekinroq va qimmatroq"
+          }
+        }
+      }
+    },
+    "Фокусирование: разрешите уведомления и звонки от этого приложения, иначе режим «Не беспокоить» заглушит вызов.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus: allow notifications and calls from this app, or “Do Not Disturb” will silence the call."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus: bu ilovadan keladigan bildirishnoma va qoʻngʻiroqlarga ruxsat bering, aks holda “Bezovta qilinmasin” rejimi qoʻngʻiroq ovozini oʻchirib qoʻyadi."
+          }
+        }
+      }
+    },
+    "Характер": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Character"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xarakter"
+          }
+        }
+      }
+    },
+    "Чем занимаетесь, где живёте, что важно помнить: «Живу в Ташкенте, работаю дизайнером, не ем острое, у жены день рождения 3 мая»": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What you do, where you live, what’s important to remember: “I live in Tashkent, work as a designer, don’t eat spicy food, and my wife’s birthday is May 3”"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nima ish qilasiz, qayerda yashaysiz, nimani eslab qolish muhim: “Toshkentda yashayman, dizayner boʻlib ishlayman, achchiq yemayman, turmush oʻrtogʻimning tugʻilgan kuni 3-may”"
+          }
+        }
+      }
+    },
+    "Читаю письмо": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading the email"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xatni oʻqiyapman"
+          }
+        }
+      }
+    },
+    "Что передо мной?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What’s in front of me?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oldimda nima bor?"
+          }
+        }
+      }
+    },
+    "Шаг %@ из %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Step %@ of %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-qadam, jami %@ ta"
+          }
+        }
+      }
+    },
+    "Шутливо": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playful"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazilomuz"
+          }
+        }
+      }
+    },
+    "Экономить на длинных разговорах": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save on long conversations"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uzoq suhbatlarda tejash"
+          }
+        }
+      }
+    },
+    "Эксперимент": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experimental"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tajriba"
+          }
+        }
+      }
+    },
+    "Это определяет, как %@ говорит и шутит. Можно поменять в настройках.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This shapes how %@ talks and jokes. You can change it in Settings."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ qanday gapirishi va hazillashishi shunga bogʻliq. Buni sozlamalarda oʻzgartirish mumkin."
+          }
+        }
+      }
+    },
+    "Эту фразу перевести не получилось.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t translate this phrase."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu gapni tarjima qilib boʻlmadi."
+          }
+        }
+      }
+    },
+    "Юмор": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Humor"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazil"
+          }
+        }
+      }
+    },
+    "Я": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Men"
+          }
+        }
+      }
+    },
+    "Язык": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Til"
+          }
+        }
+      }
+    },
+    "Язык управления — на нём %@ слушает. Заговорите на другом из трёх — ответит на нём.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The control language is the one %@ listens in. Speak another of the three and it answers in that language."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boshqaruv tili — %@ shu tilda eshitadi. Qolgan ikki tildan birida gapirsangiz — oʻsha tilda javob beradi."
+          }
+        }
+      }
+    },
+    "выбранный голос не найден — выберите другой в настройках.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "the selected voice wasn’t found — choose another in Settings."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tanlangan ovoz topilmadi — sozlamalarda boshqasini tanlang."
+          }
+        }
+      }
+    },
+    "выкл.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "off"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "oʻchiq"
+          }
+        }
+      }
+    },
+    "выключено": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "off"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "oʻchirilgan"
+          }
+        }
+      }
+    },
+    "голос iOS": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS voice"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ovozi"
+          }
+        }
+      }
+    },
+    "закончился лимит символов ElevenLabs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "the ElevenLabs character limit has been reached."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs belgilar limiti tugadi."
+          }
+        }
+      }
+    },
+    "ключ ElevenLabs не подошёл%@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "the ElevenLabs key wasn’t accepted%@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs kaliti qabul qilinmadi%@."
+          }
+        }
+      }
+    },
+    "микрофон: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "microphone: %@"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mikrofon: %@"
+          }
+        }
+      }
+    },
+    "на «вы»": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "formal"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sizlab"
+          }
+        }
+      }
+    },
+    "на «ты»": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "informal"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "senlab"
+          }
+        }
+      }
+    },
+    "на связи": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "on the line"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aloqada"
+          }
+        }
+      }
+    },
+    "нажмите, чтобы перебить": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tap to interrupt"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gapini boʻlish uchun bosing"
+          }
+        }
+      }
+    },
+    "не подключена": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "not connected"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ulanmagan"
+          }
+        }
+      }
+    },
+    "не подключены": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "not connected"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ulanmagan"
+          }
+        }
+      }
+    },
+    "не рядом": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "not nearby"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "uzoqda"
+          }
+        }
+      }
+    },
+    "не удалось декодировать JPEG": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "couldn’t decode JPEG"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG faylini dekodlab boʻlmadi"
+          }
+        }
+      }
+    },
+    "не удалось сжать изображение": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "couldn’t compress the image"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "rasmni siqib boʻlmadi"
+          }
+        }
+      }
+    },
+    "неизвестная ошибка": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "unknown error"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nomaʼlum xatolik"
+          }
+        }
+      }
+    },
+    "нет": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "none"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yoʻq"
+          }
+        }
+      }
+    },
+    "нет голосов": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "no voices"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ovozlar yoʻq"
+          }
+        }
+      }
+    },
+    "нет звука 4 секунды": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "no audio for 4 seconds"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 soniyadan beri ovoz yoʻq"
+          }
+        }
+      }
+    },
+    "нет ключа": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "no key"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kalit yoʻq"
+          }
+        }
+      }
+    },
+    "нужен платный тариф ElevenLabs%@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a paid ElevenLabs plan is required%@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs pullik tarifi kerak%@."
+          }
+        }
+      }
+    },
+    "отвечает на «%@»": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "answers to “%@”"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ismiga javob beradi"
+          }
+        }
+      }
+    },
+    "отвечает на каждую фразу": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "answers every phrase"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "har bir gapga javob beradi"
+          }
+        }
+      }
+    },
+    "очки (%@)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "glasses (%@)"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "koʻzoynak (%@)"
+          }
+        }
+      }
+    },
+    "ошибка ElevenLabs (HTTP %@)%@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs error (HTTP %@)%@."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs xatoligi (HTTP %@)%@."
+          }
+        }
+      }
+    },
+    "плеер не запустился": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "player didn’t start"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pleyer ishga tushmadi"
+          }
+        }
+      }
+    },
+    "поймёт, когда обращаются к нему": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "knows when it’s being spoken to"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "oʻziga murojaat qilinganini tushunadi"
+          }
+        }
+      }
+    },
+    "сбой": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "fault"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nosozlik"
+          }
+        }
+      }
+    },
+    "сервер закрыл сеанс без звука": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "server closed the session without audio"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "server seansni ovoz yubormasdan yopdi"
+          }
+        }
+      }
+    },
+    "сервер не завершил фразу": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "server didn’t finish the phrase"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "server jumlani yakunlamadi"
+          }
+        }
+      }
+    },
+    "сессия ещё не запущена": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "session hasn’t started yet"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "seans hali boshlanmagan"
+          }
+        }
+      }
+    },
+    "сессия остановлена": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "session stopped"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "seans toʻxtatilgan"
+          }
+        }
+      }
+    },
+    "слушает": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "listening"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "eshityapti"
+          }
+        }
+      }
+    },
+    "телефон": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "phone"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "telefon"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

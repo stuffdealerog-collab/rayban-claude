@@ -10,12 +10,12 @@ struct MockGlassesSection: View {
     var body: some View {
         Section {
             if isEnabled {
-                Button("Убрать виртуальные очки", role: .destructive) {
+                Button(L("Убрать виртуальные очки"), role: .destructive) {
                     MockDeviceKit.shared.disable()
                     isEnabled = false
                 }
             } else {
-                Button("Подключить виртуальные очки") {
+                Button(L("Подключить виртуальные очки")) {
                     pair()
                 }
             }
@@ -23,10 +23,10 @@ struct MockGlassesSection: View {
                 Text(error).font(.caption).foregroundStyle(.red)
             }
         } header: {
-            Text("Отладка")
+            Text(L("Отладка"))
                 .foregroundStyle(Theme.textSecondary)
         } footer: {
-            Text("MockDeviceKit имитирует Ray-Ban Meta: регистрация и разрешения выдаются сразу. На iPhone «камерой очков» служит задняя камера телефона, в симуляторе — тестовый ролик и фото.")
+            Text(L("MockDeviceKit имитирует Ray-Ban Meta: регистрация и разрешения выдаются сразу. На iPhone «камерой очков» служит задняя камера телефона, в симуляторе — тестовый ролик и фото."))
                 .foregroundStyle(Theme.textMuted)
         }
         .listRowBackground(Theme.surface)

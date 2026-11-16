@@ -1,0 +1,13 @@
+{
+ "NSBluetoothAlwaysUsageDescription": "Ray-Ban Meta koʻzoynagi bilan aloqa uchun kerak.",
+ "NSBluetoothPeripheralUsageDescription": "Ray-Ban Meta koʻzoynagi bilan aloqa uchun kerak.",
+ "NSLocalNetworkUsageDescription": "Telefonga koʻzoynakni topish va u bilan Wi-Fi orqali maʼlumot almashish imkonini beradi.",
+ "NSMicrophoneUsageDescription": "Koʻzoynak mikrofoni yordamchiga bergan savollaringizni eshitish uchun kerak.",
+ "NSSpeechRecognitionUsageDescription": "Nutqni aniqlash savollaringizni Claude uchun matnga aylantiradi.",
+ "NSCameraUsageDescription": "Telefon kamerasi faqat nosozliklarni tuzatish rejimida koʻzoynak kamerasi oʻrnida ishlatiladi.",
+ "NSLocationWhenInUseUsageDescription": "“Men qayerdaman” va “yaqin atrofda nima bor” kabi savollarga javob berish uchun.",
+ "NSCalendarsFullAccessUsageDescription": "Rejalaringiz haqida aytib berish va ovozli soʻrovingiz boʻyicha tadbirlar qoʻshish uchun.",
+ "NSCalendarsUsageDescription": "Rejalaringiz haqida aytib berish va ovozli soʻrovingiz boʻyicha tadbirlar qoʻshish uchun.",
+ "NSContactsUsageDescription": "Siz xat yozish yoki qoʻngʻiroq qilishni soʻragan odamning raqami yoki pochtasini topish uchun.",
+ "NSRemindersFullAccessUsageDescription": "Ovozli soʻrovingiz boʻyicha eslatmalar yaratish uchun."
+}

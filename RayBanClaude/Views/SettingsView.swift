@@ -20,7 +20,7 @@ struct SettingsView: View {
                         SettingsRow(symbol: "person.crop.circle", tone: .assistant, title: settings.persona.displayName, value: characterSummary)
                     }
                 } footer: {
-                    Text("Имя, характер и манера общения.")
+                    Text(L("Имя, характер и манера общения."))
                         .foregroundStyle(Theme.textMuted)
                 }
                 .listRowBackground(Theme.surface)
@@ -29,17 +29,17 @@ struct SettingsView: View {
                     NavigationLink {
                         ConversationSettingsView()
                     } label: {
-                        SettingsRow(symbol: "bubble.left.and.text.bubble.right", tone: .assistant, title: "Разговор", value: settings.language.title)
+                        SettingsRow(symbol: "bubble.left.and.text.bubble.right", tone: .assistant, title: L("Разговор"), value: settings.language.title)
                     }
                     NavigationLink {
                         VoiceSettingsView()
                     } label: {
-                        SettingsRow(symbol: "waveform", tone: .assistant, title: "Голос", value: voiceSummary)
+                        SettingsRow(symbol: "waveform", tone: .assistant, title: L("Голос"), value: voiceSummary)
                     }
                     NavigationLink {
                         ClaudeSettingsView()
                     } label: {
-                        SettingsRow(symbol: "sparkles", tone: .assistant, title: "Claude", value: settings.trimmedAPIKey.isEmpty ? "нет ключа" : settings.model.shortTitle)
+                        SettingsRow(symbol: "sparkles", tone: .assistant, title: "Claude", value: settings.trimmedAPIKey.isEmpty ? L("нет ключа") : settings.model.shortTitle)
                     }
                 }
                 .listRowBackground(Theme.surface)
@@ -48,23 +48,23 @@ struct SettingsView: View {
                     NavigationLink {
                         BackgroundSettingsView()
                     } label: {
-                        SettingsRow(symbol: "phone.arrow.down.left", tone: .assistant, title: "На связи и фон", value: nil)
+                        SettingsRow(symbol: "phone.arrow.down.left", tone: .assistant, title: L("На связи и фон"), value: nil)
                     }
                     Button {
                         showGlasses = true
                     } label: {
-                        SettingsRow(symbol: "eyeglasses", tone: .system, title: "Очки", value: glassesSummary)
+                        SettingsRow(symbol: "eyeglasses", tone: .system, title: L("Очки"), value: glassesSummary)
                     }
                     .foregroundStyle(Theme.textPrimary)
                     NavigationLink {
                         MailSettingsView()
                     } label: {
-                        SettingsRow(symbol: "envelope", tone: .translator, title: "Почта", value: settings.mailAccount == nil ? "не подключена" : settings.mailAddress)
+                        SettingsRow(symbol: "envelope", tone: .translator, title: L("Почта"), value: settings.mailAccount == nil ? L("не подключена") : settings.mailAddress)
                     }
                     NavigationLink {
                         TranslatorSettingsView()
                     } label: {
-                        SettingsRow(symbol: "character.bubble", tone: .translator, title: "Переводчик", value: nil)
+                        SettingsRow(symbol: "character.bubble", tone: .translator, title: L("Переводчик"), value: nil)
                     }
                 }
                 .listRowBackground(Theme.surface)
@@ -73,14 +73,14 @@ struct SettingsView: View {
                     NavigationLink {
                         JournalView()
                     } label: {
-                        SettingsRow(symbol: "list.bullet.rectangle", tone: .system, title: "Журнал", value: nil)
+                        SettingsRow(symbol: "list.bullet.rectangle", tone: .system, title: L("Журнал"), value: nil)
                     }
-                    Button("Пройти первую настройку заново") { confirmReset = true }
+                    Button(L("Пройти первую настройку заново")) { confirmReset = true }
                 } header: {
-                    Text("Данные")
+                    Text(L("Данные"))
                         .foregroundStyle(Theme.textSecondary)
                 } footer: {
-                    Text("Заметки памяти — файлы Markdown: Файлы → На iPhone → это приложение. Ключи и пароль почты хранятся только в Keychain этого iPhone.")
+                    Text(L("Заметки памяти — файлы Markdown: Файлы → На iPhone → это приложение. Ключи и пароль почты хранятся только в Keychain этого iPhone."))
                         .foregroundStyle(Theme.textMuted)
                 }
                 .listRowBackground(Theme.surface)
@@ -89,13 +89,13 @@ struct SettingsView: View {
                 MockGlassesSection()
                 #endif
             }
-            .navigationTitle("Настройки")
+            .navigationTitle(L("Настройки"))
             .toolbarTitleDisplayMode(.inlineLarge)
             .scrollContentBackground(.hidden)
             .background(Theme.background)
             .sheet(isPresented: $showGlasses) { GlassesSheet() }
-            .confirmationDialog("Пройти первую настройку заново?", isPresented: $confirmReset, titleVisibility: .visible) {
-                Button("Начать") {
+            .confirmationDialog(L("Пройти первую настройку заново?"), isPresented: $confirmReset, titleVisibility: .visible) {
+                Button(L("Начать")) {
                     Task {
                         await assistant.setHandsFree(false)
                         assistant.interrupt()
@@ -103,25 +103,25 @@ struct SettingsView: View {
                     }
                 }
             } message: {
-                Text("Память, ключи и разговоры сохранятся.")
+                Text(L("Память, ключи и разговоры сохранятся."))
             }
         }
     }
 
     private var characterSummary: String {
         let persona = settings.persona
-        return "\(persona.character.title), \(persona.address == .informal ? "на «ты»" : "на «вы»")"
+        return "\(persona.character.title), \(persona.address == .informal ? L("на «ты»") : L("на «вы»"))"
     }
 
     private var voiceSummary: String {
-        if settings.trimmedElevenLabsKey.isEmpty { return "голос iOS" }
+        if settings.trimmedElevenLabsKey.isEmpty { return L("голос iOS") }
         return settings.elevenLabsVoiceName.isEmpty ? "ElevenLabs" : settings.elevenLabsVoiceName
     }
 
     private var glassesSummary: String {
-        guard glasses.isRegistered else { return "не подключены" }
-        guard glasses.hasActiveDevice else { return "не рядом" }
-        return glasses.batteryLevel.map { "\($0)%" } ?? "на связи"
+        guard glasses.isRegistered else { return L("не подключены") }
+        guard glasses.hasActiveDevice else { return L("не рядом") }
+        return glasses.batteryLevel.map { "\($0)%" } ?? L("на связи")
     }
 }
 
@@ -160,41 +160,41 @@ struct ConversationSettingsView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                Picker("Язык", selection: $settings.language) {
+                Picker(L("Язык"), selection: $settings.language) {
                     ForEach(AssistantLanguage.allCases) { Text($0.title).tag($0) }
                 }
             } footer: {
-                Text("На этом языке ассистент слушает и отвечает по умолчанию. Заговорите на другом из трёх — ответит на нём.")
+                Text(L("На этом языке ассистент слушает и отвечает по умолчанию. Заговорите на другом из трёх — ответит на нём."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
 
             Section {
-                Picker("Когда отвечать", selection: $settings.addressing) {
+                Picker(L("Когда отвечать"), selection: $settings.addressing) {
                     ForEach(AddressingMode.allCases) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
                 if settings.addressing != .always {
-                    TextField("Имя для обращения: \(settings.persona.displayName)", text: $settings.wakeWord)
+                    TextField(L("Имя для обращения: %@", settings.persona.displayName), text: $settings.wakeWord)
                 }
             } header: {
-                Text("Когда отвечать")
+                Text(L("Когда отвечать"))
                     .foregroundStyle(Theme.textSecondary)
             } footer: {
-                Text("\(settings.addressing.detail) Действует в режимах «Без рук» и «На связи». Сразу после ответа можно продолжать без имени.")
+                Text(L("%@ Действует в режимах «Без рук» и «На связи». Сразу после ответа можно продолжать без имени.", settings.addressing.detail))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
 
             Section {
-                Toggle("Распознавание ElevenLabs", isOn: $settings.liveRecognition)
+                Toggle(L("Распознавание ElevenLabs"), isOn: $settings.liveRecognition)
                     .disabled(settings.trimmedElevenLabsKey.isEmpty)
                 if settings.usesLiveRecognition {
-                    Toggle("Смешанная речь", isOn: $settings.mixedSpeech)
+                    Toggle(L("Смешанная речь"), isOn: $settings.mixedSpeech)
                 }
             } header: {
-                Text("Распознавание")
+                Text(L("Распознавание"))
                     .foregroundStyle(Theme.textSecondary)
             } footer: {
                 Text(recognitionFooter)
@@ -202,7 +202,7 @@ struct ConversationSettingsView: View {
             }
             .listRowBackground(Theme.surface)
         }
-        .navigationTitle("Разговор")
+        .navigationTitle(L("Разговор"))
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
         .background(Theme.background)
@@ -210,12 +210,12 @@ struct ConversationSettingsView: View {
 
     private var recognitionFooter: String {
         if settings.trimmedElevenLabsKey.isEmpty {
-            return "Сейчас речь распознаёт Apple на самом iPhone: русский и английский. Для узбекского и для работы в фоне добавьте ключ ElevenLabs в разделе «Голос»."
+            return L("Сейчас речь распознаёт Apple на самом iPhone: русский и английский. Для узбекского и для работы в фоне добавьте ключ ElevenLabs в разделе «Голос».")
         }
         if settings.usesLiveRecognition {
-            return "Речь распознаётся потоком: быстрее, точнее и с узбекским. «Смешанная речь» понимает узбекский и русский вперемешку в одной фразе, но может ошибаться на очень коротких репликах."
+            return L("Речь распознаётся потоком: быстрее, точнее и с узбекским. «Смешанная речь» понимает узбекский и русский вперемешку в одной фразе, но может ошибаться на очень коротких репликах.")
         }
-        return "Русский и английский распознаёт Apple на самом iPhone, узбекский — ElevenLabs."
+        return L("Русский и английский распознаёт Apple на самом iPhone, узбекский — ElevenLabs.")
     }
 }
 
@@ -233,11 +233,11 @@ struct VoiceSettingsView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                SecureField("Ключ ElevenLabs", text: $settings.elevenLabsAPIKey)
+                SecureField(L("Ключ ElevenLabs"), text: $settings.elevenLabsAPIKey)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             } footer: {
-                Text("elevenlabs.io → Developers → API Keys. С ключом ассистент говорит живым голосом и понимает узбекский. Без ключа звучит голос iOS.")
+                Text(L("elevenlabs.io → Developers → API Keys. С ключом ассистент говорит живым голосом и понимает узбекский. Без ключа звучит голос iOS."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
@@ -245,18 +245,18 @@ struct VoiceSettingsView: View {
             if !settings.trimmedElevenLabsKey.isEmpty {
                 Section {
                     if voices.isEmpty {
-                        LabeledContent("Голос") {
+                        LabeledContent(L("Голос")) {
                             if loadingVoices {
                                 ProgressView()
                             } else {
-                                Text(voicesError ?? (settings.elevenLabsVoiceName.isEmpty ? "нет голосов" : settings.elevenLabsVoiceName))
+                                Text(voicesError ?? (settings.elevenLabsVoiceName.isEmpty ? L("нет голосов") : settings.elevenLabsVoiceName))
                                     .foregroundStyle(voicesError == nil ? Theme.textSecondary : Theme.negative)
                             }
                         }
                     } else {
-                        Picker("Голос", selection: $settings.elevenLabsVoiceID) {
+                        Picker(L("Голос"), selection: $settings.elevenLabsVoiceID) {
                             if !voices.contains(where: { $0.voiceID == settings.elevenLabsVoiceID }) {
-                                Text(settings.elevenLabsVoiceName.isEmpty ? "Не выбран" : settings.elevenLabsVoiceName)
+                                Text(settings.elevenLabsVoiceName.isEmpty ? L("Не выбран") : settings.elevenLabsVoiceName)
                                     .tag(settings.elevenLabsVoiceID)
                             }
                             ForEach(voices) { voice in
@@ -264,10 +264,10 @@ struct VoiceSettingsView: View {
                             }
                         }
                     }
-                    Picker("Модель", selection: $settings.elevenLabsModel) {
+                    Picker(L("Модель"), selection: $settings.elevenLabsModel) {
                         ForEach(ElevenLabsModel.allCases) { Text($0.title).tag($0) }
                     }
-                    Button("Обновить список голосов") {
+                    Button(L("Обновить список голосов")) {
                         Task { await loadVoices() }
                     }
                     .disabled(loadingVoices)
@@ -279,18 +279,18 @@ struct VoiceSettingsView: View {
             }
 
             Section {
-                Toggle("Стерео в режиме кнопки", isOn: $settings.stereoAnswers)
-                Button("Проверить голос") {
+                Toggle(L("Стерео в режиме кнопки"), isOn: $settings.stereoAnswers)
+                Button(L("Проверить голос")) {
                     Task { await assistant.say(assistant.greeting) }
                 }
                 .disabled(assistant.phase != .idle || assistant.translatorActive)
             } footer: {
-                Text("Стерео: когда вы спрашиваете по кнопке, ответ идёт в очки как музыка, а не в телефонном качестве гарнитуры.")
+                Text(L("Стерео: когда вы спрашиваете по кнопке, ответ идёт в очки как музыка, а не в телефонном качестве гарнитуры."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
         }
-        .navigationTitle("Голос")
+        .navigationTitle(L("Голос"))
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
         .background(Theme.background)
@@ -309,9 +309,9 @@ struct VoiceSettingsView: View {
 
     private var modelFooter: String {
         if settings.elevenLabsModel.streams {
-            return "Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Голоса носителей узбекского помечены «узб.»; другие добавляются из библиотеки голосов в «My Voices» на сайте ElevenLabs."
+            return L("Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Голоса носителей узбекского помечены «узб.»; другие добавляются из библиотеки голосов в «My Voices» на сайте ElevenLabs.")
         }
-        return "Прежние модели озвучивают ответ фразу за фразой, с заметной паузой. Для быстрого ответа и узбекского выберите v4 Turbo."
+        return L("Прежние модели озвучивают ответ фразу за фразой, с заметной паузой. Для быстрого ответа и узбекского выберите v4 Turbo.")
     }
 
     private func loadVoices() async {
@@ -351,17 +351,17 @@ struct ClaudeSettingsView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                SecureField("API-ключ Anthropic", text: $settings.apiKey)
+                SecureField(L("API-ключ Anthropic"), text: $settings.apiKey)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             } footer: {
-                Text("platform.claude.com → API Keys. Оплата — за использование.")
+                Text(L("platform.claude.com → API Keys. Оплата — за использование."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
 
             Section {
-                Picker("Модель", selection: $settings.model) {
+                Picker(L("Модель"), selection: $settings.model) {
                     ForEach(ClaudeModel.allCases) { model in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(model.title)
@@ -373,18 +373,18 @@ struct ClaudeSettingsView: View {
                 .pickerStyle(.inline)
                 .labelsHidden()
             } header: {
-                Text("Модель")
+                Text(L("Модель"))
                     .foregroundStyle(Theme.textSecondary)
             }
             .listRowBackground(Theme.surface)
 
             Section {
-                Toggle("Отвечать сразу", isOn: $settings.instantAnswers)
+                Toggle(L("Отвечать сразу"), isOn: $settings.instantAnswers)
                     .disabled(settings.model.instantThinking == nil)
-                Toggle("Поиск в интернете", isOn: $settings.webSearchEnabled)
-                Toggle("Экономить на длинных разговорах", isOn: $settings.saveTokens)
+                Toggle(L("Поиск в интернете"), isOn: $settings.webSearchEnabled)
+                Toggle(L("Экономить на длинных разговорах"), isOn: $settings.saveTokens)
             } footer: {
-                Text("«Отвечать сразу»: модель не размышляет перед ответом, первая фраза звучит раньше. Для сложных вопросов выключите. Экономия: из длинного разговора сервер убирает старые снимки и результаты поиска.")
+                Text(L("«Отвечать сразу»: модель не размышляет перед ответом, первая фраза звучит раньше. Для сложных вопросов выключите. Экономия: из длинного разговора сервер убирает старые снимки и результаты поиска."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
@@ -406,54 +406,54 @@ struct BackgroundSettingsView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                Text("iOS не даёт приложению включить микрофон, когда оно уже свёрнуто. Исключение — звонки. Поэтому разговор с заблокированным телефоном идёт как звонок: нажмите «На связи» на главном экране, заблокируйте телефон и уберите его в карман.")
+                Text(L("iOS не даёт приложению включить микрофон, когда оно уже свёрнуто. Исключение — звонки. Поэтому разговор с заблокированным телефоном идёт как звонок: нажмите «На связи» на главном экране, заблокируйте телефон и уберите его в карман."))
                     .font(.callout)
                     .foregroundStyle(Theme.textSecondary)
             } header: {
-                Text("Как это работает")
+                Text(L("Как это работает"))
                     .foregroundStyle(Theme.textSecondary)
             } footer: {
-                Text("Пока идёт такой звонок, звук в очках телефонного качества, музыка на паузе, очки расходуют заряд как при разговоре. Чтобы закончить, скажите «Отбой» или завершите вызов.")
+                Text(L("Пока идёт такой звонок, звук в очках телефонного качества, музыка на паузе, очки расходуют заряд как при разговоре. Чтобы закончить, скажите «Отбой» или завершите вызов."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
 
             Section {
-                GuideRow(number: 1, text: "Siri: «\(settings.persona.displayName), на связь» — ассистент позвонит в очки, даже если телефон заблокирован.")
-                GuideRow(number: 2, text: "Команды → Автоматизация → Bluetooth → ваши очки → «Выйти на связь»: надели очки — он позвонил.")
-                GuideRow(number: 3, text: "Фокусирование: разрешите уведомления и звонки от этого приложения, иначе режим «Не беспокоить» заглушит вызов.")
+                GuideRow(number: 1, text: L("Siri: «%@, на связь» — ассистент позвонит в очки, даже если телефон заблокирован.", settings.persona.displayName))
+                GuideRow(number: 2, text: L("Команды → Автоматизация → Bluetooth → ваши очки → «Выйти на связь»: надели очки — он позвонил."))
+                GuideRow(number: 3, text: L("Фокусирование: разрешите уведомления и звонки от этого приложения, иначе режим «Не беспокоить» заглушит вызов."))
             } header: {
-                Text("Ассистент звонит сам")
+                Text(L("Ассистент звонит сам"))
                     .foregroundStyle(Theme.textSecondary)
             } footer: {
-                Text("Из фона ассистент может только позвонить вам — принять вызов нужно касанием очков или на экране.")
+                Text(L("Из фона ассистент может только позвонить вам — принять вызов нужно касанием очков или на экране."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
 
             Section {
                 Stepper(value: $settings.followUpSeconds, in: 0...20, step: 2) {
-                    LabeledContent("Продолжение без имени", value: settings.followUpSeconds == 0 ? "выкл." : "\(Int(settings.followUpSeconds)) с")
+                    LabeledContent(L("Продолжение без имени"), value: settings.followUpSeconds == 0 ? L("выкл.") : L("%@ с", Int(settings.followUpSeconds)))
                 }
             } footer: {
-                Text("Столько секунд после ответа ассистент слушает уточняющий вопрос без обращения по имени.")
+                Text(L("Столько секунд после ответа ассистент слушает уточняющий вопрос без обращения по имени."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
 
             Section {
-                Toggle("Жесты очков", isOn: $settings.glassesGestures)
+                Toggle(L("Жесты очков"), isOn: $settings.glassesGestures)
                     .onChange(of: settings.glassesGestures) { _, _ in assistant.applyGlassesGestures() }
             } header: {
-                Text("Эксперимент")
+                Text(L("Эксперимент"))
                     .foregroundStyle(Theme.textSecondary)
             } footer: {
-                Text("Двойное касание дужки или кнопка камеры вызывают ассистента и перебивают ответ. Это пробная возможность очков: что именно приходит с ваших очков, видно в журнале. Одиночное касание и удержание очки оставляют себе.")
+                Text(L("Двойное касание дужки или кнопка камеры вызывают ассистента и перебивают ответ. Это пробная возможность очков: что именно приходит с ваших очков, видно в журнале. Одиночное касание и удержание очки оставляют себе."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
         }
-        .navigationTitle("На связи и фон")
+        .navigationTitle(L("На связи и фон"))
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
         .background(Theme.background)
@@ -488,16 +488,16 @@ struct TranslatorSettingsView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                Toggle("Озвучивать перевод", isOn: $settings.translatorSpeaks)
-                Toggle("Собеседнику — из динамика телефона", isOn: $settings.translatorPartnerSpeaker)
+                Toggle(L("Озвучивать перевод"), isOn: $settings.translatorSpeaks)
+                Toggle(L("Собеседнику — из динамика телефона"), isOn: $settings.translatorPartnerSpeaker)
                     .disabled(!settings.translatorSpeaks)
             } footer: {
-                Text("Перевод слов собеседника звучит у вас в очках. Перевод ваших слов — из динамика телефона, чтобы его услышал собеседник. Без озвучки переводчик не делает пауз и показывает перевод на экране, пока человек ещё говорит.")
+                Text(L("Перевод слов собеседника звучит у вас в очках. Перевод ваших слов — из динамика телефона, чтобы его услышал собеседник. Без озвучки переводчик не делает пауз и показывает перевод на экране, пока человек ещё говорит."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
         }
-        .navigationTitle("Переводчик")
+        .navigationTitle(L("Переводчик"))
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
         .background(Theme.background)
@@ -512,22 +512,22 @@ struct PersonaEditorView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                TextField("Джарвис", text: $settings.persona.assistantName)
+                TextField(L("Джарвис"), text: $settings.persona.assistantName)
                     .font(.title3)
             } header: {
-                Text("Имя ассистента")
+                Text(L("Имя ассистента"))
                     .foregroundStyle(Theme.textSecondary)
             }
             .listRowBackground(Theme.surface)
             Section {
-                TextField("Ваше имя", text: $settings.persona.userName)
+                TextField(L("Ваше имя"), text: $settings.persona.userName)
             } header: {
-                Text("Как вас зовут")
+                Text(L("Как вас зовут"))
                     .foregroundStyle(Theme.textSecondary)
             }
             .listRowBackground(Theme.surface)
             Section {
-                Picker("Характер", selection: $settings.persona.character) {
+                Picker(L("Характер"), selection: $settings.persona.character) {
                     ForEach(PersonaCharacter.allCases) { character in
                         VStack(alignment: .leading) {
                             Text(character.title)
@@ -539,27 +539,27 @@ struct PersonaEditorView: View {
                 .pickerStyle(.inline)
                 .labelsHidden()
                 if settings.persona.character == .custom {
-                    TextField("Опишите характер", text: $settings.persona.customCharacter, axis: .vertical)
+                    TextField(L("Опишите характер"), text: $settings.persona.customCharacter, axis: .vertical)
                         .lineLimit(3...6)
                 }
             } header: {
-                Text("Характер")
+                Text(L("Характер"))
                     .foregroundStyle(Theme.textSecondary)
             }
             .listRowBackground(Theme.surface)
             Section {
-                Picker("Обращение", selection: $settings.persona.address) {
+                Picker(L("Обращение"), selection: $settings.persona.address) {
                     ForEach(AddressForm.allCases) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
-                Picker("Ответы", selection: $settings.persona.length) {
+                Picker(L("Ответы"), selection: $settings.persona.length) {
                     ForEach(AnswerLength.allCases) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 VStack(alignment: .leading, spacing: Theme.Space.xs) {
-                    Text("Юмор")
+                    Text(L("Юмор"))
                     Slider(value: $settings.persona.humor, in: 0...1) {
-                        Text("Юмор")
+                        Text(L("Юмор"))
                     } minimumValueLabel: {
                         Image(systemName: "face.dashed")
                     } maximumValueLabel: {
@@ -567,12 +567,12 @@ struct PersonaEditorView: View {
                     }
                 }
             } header: {
-                Text("Манера")
+                Text(L("Манера"))
                     .foregroundStyle(Theme.textSecondary)
             }
             .listRowBackground(Theme.surface)
         }
-        .navigationTitle("Ассистент")
+        .navigationTitle(L("Ассистент"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -587,20 +587,16 @@ struct MailSettingsView: View {
         @Bindable var settings = settings
         Form {
             Section {
-                TextField("Адрес, например you@gmail.com", text: $settings.mailAddress)
+                TextField(L("Адрес, например you@gmail.com"), text: $settings.mailAddress)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                SecureField("Пароль приложения", text: $settings.mailPassword)
-                TextField("Сервер IMAP (необязательно)", text: $settings.mailHost)
+                SecureField(L("Пароль приложения"), text: $settings.mailPassword)
+                TextField(L("Сервер IMAP (необязательно)"), text: $settings.mailHost)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             } footer: {
-                Text("""
-                Нужен не обычный пароль, а «пароль приложения»: Gmail — Аккаунт Google → Безопасность → Пароли приложений (нужна двухэтапная проверка); \
-                Яндекс — Яндекс ID → Безопасность → Пароли приложений → Почта; Mail.ru — Настройки → Безопасность → Пароли для внешних приложений; \
-                iCloud — appleid.apple.com → Пароли приложений. Сервер для этих почт определяется сам. Письма только читаются и не помечаются прочитанными.
-                """)
+                Text(L("Нужен не обычный пароль, а «пароль приложения»: Gmail — Аккаунт Google → Безопасность → Пароли приложений (нужна двухэтапная проверка); Яндекс — Яндекс ID → Безопасность → Пароли приложений → Почта; Mail.ru — Настройки → Безопасность → Пароли для внешних приложений; iCloud — appleid.apple.com → Пароли приложений. Сервер для этих почт определяется сам. Письма только читаются и не помечаются прочитанными."))
                     .foregroundStyle(Theme.textMuted)
             }
             .listRowBackground(Theme.surface)
@@ -609,7 +605,7 @@ struct MailSettingsView: View {
                     Task { await check() }
                 } label: {
                     HStack {
-                        Text("Проверить подключение")
+                        Text(L("Проверить подключение"))
                         Spacer()
                         if checking { ProgressView() }
                     }
@@ -623,13 +619,13 @@ struct MailSettingsView: View {
             }
             .listRowBackground(Theme.surface)
         }
-        .navigationTitle("Почта")
+        .navigationTitle(L("Почта"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private func check() async {
         guard let account = settings.mailAccount else {
-            result = "Для этого адреса нужен сервер IMAP."
+            result = L("Для этого адреса нужен сервер IMAP.")
             return
         }
         checking = true
@@ -637,7 +633,7 @@ struct MailSettingsView: View {
         let client = IMAPClient(account: account, password: settings.mailPassword)
         do {
             let unread = try await client.recentMessages(unreadOnly: true, limit: 15)
-            result = unread.isEmpty ? "Подключено. Непрочитанных писем нет." : "Подключено. Непрочитанных: \(unread.count)\(unread.count == 15 ? "+" : "")."
+            result = unread.isEmpty ? L("Подключено. Непрочитанных писем нет.") : L("Подключено. Непрочитанных: %@%@.", unread.count, unread.count == 15 ? "+" : "")
         } catch {
             result = error.localizedDescription
         }

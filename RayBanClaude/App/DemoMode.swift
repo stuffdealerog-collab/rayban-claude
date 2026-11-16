@@ -15,6 +15,13 @@ enum DemoMode {
 
     nonisolated static var isActive: Bool { screen != nil }
 
+    /// `-demoLanguage uz` — язык интерфейса для снимка.
+    nonisolated static let language: String? = {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let index = arguments.firstIndex(of: "-demoLanguage"), index + 1 < arguments.count else { return nil }
+        return arguments[index + 1]
+    }()
+
     /// `onboarding-3` → шаг 3.
     nonisolated static var onboardingStep: Int? {
         guard let screen, screen.hasPrefix("onboarding-") else { return nil }
@@ -28,7 +35,8 @@ enum DemoMode {
     static func prepare(settings: AppSettings, assistant: AssistantController, memory: MemoryStore) {
         guard let screen else { return }
         settings.onboardingCompleted = onboardingStep == nil
-        settings.persona.assistantName = "Джарвис"
+        settings.language = AssistantLanguage.allCases.first { $0.isoCode == language } ?? .russian
+        settings.persona.assistantName = settings.language == .russian ? "Джарвис" : "Jarvis"
         settings.persona.userName = "Тимур"
         settings.translatorMine = "ru-RU"
         settings.translatorTheirs = "uz-UZ"

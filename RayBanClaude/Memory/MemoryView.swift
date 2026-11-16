@@ -25,7 +25,7 @@ struct MemoryView: View {
                 }
             }
             .background(Theme.background)
-            .navigationTitle("Память")
+            .navigationTitle(L("Память"))
             .toolbarTitleDisplayMode(.inlineLarge)
             .navigationDestination(for: MemoryNote.self) { note in
                 NoteDetailView(note: note, memory: memory) { linked in
@@ -38,21 +38,21 @@ struct MemoryView: View {
                         Button {
                             showNewNote = true
                         } label: {
-                            Label("Новая заметка", systemImage: "square.and.pencil")
+                            Label(L("Новая заметка"), systemImage: "square.and.pencil")
                         }
                         Button {
                             export = ExportTarget(url: memory.root)
                         } label: {
-                            Label("Сохранить копию в Файлы", systemImage: "folder")
+                            Label(L("Сохранить копию в Файлы"), systemImage: "folder")
                         }
                         .disabled(notes.isEmpty)
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
-                    .accessibilityLabel("Действия с памятью")
+                    .accessibilityLabel(L("Действия с памятью"))
                 }
             }
-            .searchable(text: $query, prompt: "Поиск")
+            .searchable(text: $query, prompt: L("Поиск"))
             .sheet(isPresented: $showNewNote) {
                 NoteEditorView(title: "", text: "", memory: memory, isNew: true) { reload() }
             }
@@ -62,7 +62,7 @@ struct MemoryView: View {
             .onAppear {
                 reload()
                 #if DEBUG
-                if DemoMode.screen == "note", path.isEmpty, let note = memory.note(titled: "Анна") { path = [note] }
+                if DemoMode.screen == "note", path.isEmpty, let note = memory.note(titled: L("Анна")) { path = [note] }
                 #endif
             }
             .onReceive(NotificationCenter.default.publisher(for: .memoryDidChange)) { _ in reload() }
@@ -110,7 +110,7 @@ struct MemoryView: View {
                     }
                 } header: {
                     HStack(spacing: Theme.Space.s) {
-                        LinePill(text: group.folder.isEmpty ? "Главное" : group.folder, tone: .memory)
+                        LinePill(text: group.folder.isEmpty ? L("Главное") : group.folder, tone: .memory)
                         Text("\(group.notes.count)")
                             .font(.sign(.caption, weight: .semibold).monospacedDigit())
                             .foregroundStyle(Theme.textMuted)
@@ -130,10 +130,10 @@ struct MemoryView: View {
             VStack(alignment: .leading, spacing: 0) {
                 LineRow(stop: .interchange, tone: .memory, isFirst: true) {
                     VStack(alignment: .leading, spacing: Theme.Space.s) {
-                        Text("Здесь \(settings.persona.displayName) хранит то, что узнаёт о вас")
+                        Text(L("Здесь %@ хранит то, что узнаёт о вас", settings.persona.displayName))
                             .font(.sign(.title))
                             .foregroundStyle(Theme.textPrimary)
-                        Text("Скажите, например: «Запомни, что я не ем острое» или «Мою сестру зовут Анна». Заметки — обычные файлы Markdown: их можно читать, править и перенести в Obsidian.")
+                        Text(L("Скажите, например: «Запомни, что я не ем острое» или «Мою сестру зовут Анна». Заметки — обычные файлы Markdown: их можно читать, править и перенести в Obsidian."))
                             .font(.callout)
                             .foregroundStyle(Theme.textSecondary)
                     }
@@ -142,7 +142,7 @@ struct MemoryView: View {
                     Button {
                         showNewNote = true
                     } label: {
-                        Label("Написать о себе", systemImage: "square.and.pencil")
+                        Label(L("Написать о себе"), systemImage: "square.and.pencil")
                             .font(.body.weight(.medium))
                     }
                     .tint(Theme.Tone.memory.text)
@@ -209,11 +209,11 @@ private struct NoteDetailView: View {
         .toolbar {
             // В панели — ветка, на которой стоит заметка; её название и так крупно в тексте.
             ToolbarItem(placement: .principal) {
-                LinePill(text: note.folder.isEmpty ? "Главное" : note.folder, tone: .memory)
-                    .accessibilityLabel("Папка \(note.folder.isEmpty ? "Главное" : note.folder)")
+                LinePill(text: note.folder.isEmpty ? L("Главное") : note.folder, tone: .memory)
+                    .accessibilityLabel(L("Папка %@", note.folder.isEmpty ? L("Главное") : note.folder))
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Править") { editing = true }
+                Button(L("Править")) { editing = true }
             }
         }
         .environment(\.openURL, OpenURLAction { url in
@@ -251,9 +251,9 @@ private struct NoteEditorView: View {
             Form {
                 if isNew {
                     Section {
-                        TextField("Например, Обо мне", text: $title)
+                        TextField(L("Например, Обо мне"), text: $title)
                     } header: {
-                        Text("Название")
+                        Text(L("Название"))
                             .foregroundStyle(Theme.textSecondary)
                     }
                     .listRowBackground(Theme.surface)
@@ -263,7 +263,7 @@ private struct NoteEditorView: View {
                         .frame(minHeight: 280)
                         .font(.body)
                 } footer: {
-                    Text("Markdown: # заголовок, - список, [[Другая заметка]] — ссылка.")
+                    Text(L("Markdown: # заголовок, - список, [[Другая заметка]] — ссылка."))
                         .foregroundStyle(Theme.textMuted)
                 }
                 .listRowBackground(Theme.surface)
@@ -271,14 +271,14 @@ private struct NoteEditorView: View {
                     Text(error).foregroundStyle(Theme.negative)
                 }
             }
-            .navigationTitle(isNew ? "Новая заметка" : title)
+            .navigationTitle(isNew ? L("Новая заметка") : title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") { dismiss() }
+                    Button(L("Отмена")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Сохранить", action: save)
+                    Button(L("Сохранить"), action: save)
                         .disabled(isNew && title.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
@@ -289,7 +289,7 @@ private struct NoteEditorView: View {
         let name = title.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "/", with: "-")
         let path = relativePath ?? (name.hasSuffix(".md") ? name : name + ".md")
         if isNew, (try? memory.read(path)) != nil {
-            error = "Заметка «\(name)» уже есть — откройте её и допишите."
+            error = L("Заметка «%@» уже есть — откройте её и допишите.", name)
             return
         }
         do {

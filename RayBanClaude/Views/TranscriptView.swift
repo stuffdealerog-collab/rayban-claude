@@ -10,7 +10,7 @@ struct TranscriptView: View {
     let partial: String
     let assistantName: String
     /// Подпись живой станции, когда ассистент слушает без нажатия кнопки.
-    var listeningCaption = "Слушаю"
+    var listeningCaption = L("Слушаю")
     var emptyState: AnyView?
 
     private let tone = Theme.Tone.assistant
@@ -71,7 +71,7 @@ struct TranscriptView: View {
         case .user:
             LineRow(stop: .station, tone: tone, isFirst: isFirst, isLast: isLast) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Вы · \(Self.time(entry.date))").plateStyle()
+                    Text(L("Вы · %@", Self.time(entry.date))).plateStyle()
                     Text(entry.text)
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(Theme.textPrimary)
@@ -120,7 +120,7 @@ struct TranscriptView: View {
             LineRow(stop: .live(.listening), tone: tone, isFirst: isFirst, isLast: true) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(listeningCaption).plateStyle(tone.text)
-                    Text(partial.isEmpty ? "Говорите" : partial)
+                    Text(partial.isEmpty ? L("Говорите") : partial)
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(partial.isEmpty ? Theme.textMuted : Theme.textPrimary)
                         .contentTransition(.opacity)
@@ -129,7 +129,7 @@ struct TranscriptView: View {
             }
         case .thinking:
             LineRow(stop: .live(.thinking), tone: tone, isFirst: isFirst, isLast: true) {
-                Text("\(assistantName) думает")
+                Text(L("%@ думает", assistantName))
                     .plateStyle(tone.text)
                     .padding(.bottom, Theme.Space.xl)
             }
@@ -167,7 +167,7 @@ private struct ToolStop: View {
                 Spacer(minLength: Theme.Space.s)
                 // Правая колонка: сколько занял шаг — или что он не удался.
                 if entry.toolState == .failed {
-                    Text("сбой")
+                    Text(L("сбой"))
                         .font(.sign(.caption, weight: .bold))
                         .textCase(.uppercase)
                         .foregroundStyle(Theme.negative)
@@ -183,7 +183,7 @@ private struct ToolStop: View {
                     .scaledToFill()
                     .frame(maxWidth: 240, maxHeight: 170)
                     .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.control, style: .continuous))
-                    .accessibilityLabel("Снимок с камеры очков")
+                    .accessibilityLabel(L("Снимок с камеры очков"))
             }
         }
         .accessibilityElement(children: .combine)
@@ -196,7 +196,7 @@ extension ToolStop {
         let value = duration < 10
             ? duration.formatted(.number.precision(.fractionLength(1)))
             : duration.formatted(.number.precision(.fractionLength(0)))
-        return "\(value) с"
+        return L("%@ с", value)
     }
 }
 

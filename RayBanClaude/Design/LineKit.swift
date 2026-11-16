@@ -322,14 +322,14 @@ struct RouteMap: View {
                 // Красная — разговор: горизонталь через центр.
                 line([at(-4.6, 0), at(4.6, 0)], .assistant)
 
-                station(at(-3, 0), "Вопрос", .top)
-                station(at(3, 0), "Камера", .top)
-                station(at(-3.9, -2.8), "Перевод", .top)
-                station(at(3.9, 2.8), "Почта", .bottom)
-                station(at(-3.9, 2.8), "Заметки", .bottom)
-                station(at(3.9, -2.8), "Люди", .top)
-                station(at(0, -2.5), "Календарь", .trailing)
-                station(at(0, 2.5), "Напоминания", .trailing)
+                station(at(-3, 0), L("Вопрос"), .top)
+                station(at(3, 0), L("Камера"), .top)
+                station(at(-3.9, -2.8), L("Перевод"), .top)
+                station(at(3.9, 2.8), L("Почта"), .bottom)
+                station(at(-3.9, 2.8), L("Заметки"), .bottom)
+                station(at(3.9, -2.8), L("Люди"), .top)
+                station(at(0, -2.5), L("Календарь"), .trailing)
+                station(at(0, 2.5), L("Напоминания"), .trailing)
 
                 Circle()
                     .fill(Theme.porcelain)
@@ -348,7 +348,7 @@ struct RouteMap: View {
             }
         }
         .accessibilityElement()
-        .accessibilityLabel("Схема: разговор, перевод и почта, память, календарь и напоминания сходятся на станции \(hub)")
+        .accessibilityLabel(L("Схема: разговор, перевод и почта, память, календарь и напоминания сходятся на станции %@", hub))
     }
 
     private func line(_ points: [CGPoint], _ tone: Theme.Tone) -> some View {

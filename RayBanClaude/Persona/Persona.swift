@@ -12,21 +12,21 @@ enum PersonaCharacter: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .warm: return "Тёплый"
-        case .calm: return "Спокойный"
-        case .witty: return "С иронией"
-        case .business: return "Деловой"
-        case .custom: return "Свой"
+        case .warm: return L("Тёплый")
+        case .calm: return L("Спокойный")
+        case .witty: return L("С иронией")
+        case .business: return L("Деловой")
+        case .custom: return L("Свой")
         }
     }
 
     var summary: String {
         switch self {
-        case .warm: return "Заботливый друг: замечает настроение, поддержит и напомнит о важном"
-        case .calm: return "Собранный и точный: говорит по делу, без лишних эмоций"
-        case .witty: return "Остроумный: шутит к месту, но дело делает всерьёз"
-        case .business: return "Как личный секретарь: коротко, чётко, всё под контролем"
-        case .custom: return "Опишите характер своими словами"
+        case .warm: return L("Заботливый друг: замечает настроение, поддержит и напомнит о важном")
+        case .calm: return L("Собранный и точный: говорит по делу, без лишних эмоций")
+        case .witty: return L("Остроумный: шутит к месту, но дело делает всерьёз")
+        case .business: return L("Как личный секретарь: коротко, чётко, всё под контролем")
+        case .custom: return L("Опишите характер своими словами")
         }
     }
 
@@ -53,7 +53,7 @@ enum AddressForm: String, CaseIterable, Codable, Identifiable, Sendable {
     case formal
 
     var id: String { rawValue }
-    var title: String { self == .informal ? "На «ты»" : "На «вы»" }
+    var title: String { self == .informal ? L("На «ты»") : L("На «вы»") }
 }
 
 /// Длина ответов.
@@ -66,9 +66,9 @@ enum AnswerLength: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .brief: return "Коротко"
-        case .balanced: return "Обычно"
-        case .detailed: return "Подробно"
+        case .brief: return L("Коротко")
+        case .balanced: return L("Обычно")
+        case .detailed: return L("Подробно")
         }
     }
 
@@ -83,7 +83,7 @@ enum AnswerLength: String, CaseIterable, Codable, Identifiable, Sendable {
 
 /// Личность ассистента и то, что он знает о пользователе с первого дня.
 struct Persona: Codable, Equatable, Sendable {
-    var assistantName = "Джарвис"
+    var assistantName = L("Джарвис")
     var userName = ""
     var character: PersonaCharacter = .warm
     var customCharacter = ""
@@ -94,7 +94,7 @@ struct Persona: Codable, Equatable, Sendable {
 
     var displayName: String {
         let trimmed = assistantName.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "Джарвис" : trimmed
+        return trimmed.isEmpty ? L("Джарвис") : trimmed
     }
 
     var characterPrompt: String {
@@ -114,6 +114,13 @@ struct Persona: Codable, Equatable, Sendable {
         }
     }
 
-    /// Варианты имён на экране выбора.
-    static let suggestedNames = ["Джарвис", "Пятница", "Клод", "Лола", "Тимур", "Ева"]
+    /// Варианты имён на экране выбора — в написании языка интерфейса.
+    static var suggestedNames: [String] {
+        L10n.code == "ru"
+            ? ["Джарвис", "Пятница", "Клод", "Лола", "Тимур", "Ева"]
+            : ["Jarvis", "Friday", "Claude", "Lola", "Timur", "Eva"]
+    }
+
+    /// Имя по умолчанию на каждом языке: при смене языка до конца первой настройки оно меняется вместе с ним.
+    static let defaultNames: Set<String> = ["Джарвис", "Jarvis"]
 }

@@ -59,14 +59,19 @@ struct OnboardingView: View {
         switch step {
         case .welcome:
             VStack(alignment: .leading, spacing: Theme.Space.xl) {
-                Spacer(minLength: Theme.Space.l)
+                // Язык выбирается первым: на нём и интерфейс, и разговор с ассистентом.
+                Picker("Til · Язык · Language", selection: $settings.language) {
+                    ForEach(AssistantLanguage.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .padding(.top, Theme.Space.m)
                 RouteMap(hub: settings.persona.displayName)
                     .frame(height: 300)
                 VStack(alignment: .leading, spacing: Theme.Space.m) {
-                    Text("Ассистент в ваших очках")
+                    Text(L("Ассистент в ваших очках"))
                         .font(.sign(.largeTitle))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("Слышит вас через очки Ray-Ban Meta и отвечает голосом. Видит их камерой, помнит вас, ведёт календарь и почту, переводит разговор. Сначала придумайте, каким он будет.")
+                    Text(L("Слышит вас через очки Ray-Ban Meta и отвечает голосом. Видит их камерой, помнит вас, ведёт календарь и почту, переводит разговор. Сначала придумайте, каким он будет."))
                         .font(.body)
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -75,8 +80,8 @@ struct OnboardingView: View {
             .padding(.horizontal, Theme.Space.xl)
 
         case .name:
-            StepPage(title: "Как его зовут", subtitle: "По этому имени он будет откликаться в режиме «Без рук».") {
-                TextField("Имя", text: $settings.persona.assistantName)
+            StepPage(title: L("Как его зовут"), subtitle: L("По этому имени он будет откликаться в режиме «Без рук».")) {
+                TextField(L("Имя"), text: $settings.persona.assistantName)
                     .font(.sign(.largeTitle))
                     .foregroundStyle(Theme.textPrimary)
                     .textInputAutocapitalization(.words)
@@ -89,7 +94,7 @@ struct OnboardingView: View {
             }
 
         case .character:
-            StepPage(title: "Какой у него характер", subtitle: "Это определяет, как \(settings.persona.displayName) говорит и шутит. Можно поменять в настройках.") {
+            StepPage(title: L("Какой у него характер"), subtitle: L("Это определяет, как %@ говорит и шутит. Можно поменять в настройках.", settings.persona.displayName)) {
                 VStack(alignment: .leading, spacing: 0) {
                     // Характеры — станции одной линии: выбранная становится пересадкой.
                     let characters = PersonaCharacter.allCases
@@ -105,7 +110,7 @@ struct OnboardingView: View {
                         }
                     }
                     if settings.persona.character == .custom {
-                        TextField("Например: спокойный, говорит как старый друг, немного философ", text: $settings.persona.customCharacter, axis: .vertical)
+                        TextField(L("Например: спокойный, говорит как старый друг, немного философ"), text: $settings.persona.customCharacter, axis: .vertical)
                             .lineLimit(3...5)
                             .padding(Theme.Space.m)
                             .padding(.top, Theme.Space.s)
@@ -116,47 +121,47 @@ struct OnboardingView: View {
             }
 
         case .manner:
-            StepPage(title: "Как ему с вами говорить", subtitle: "Язык управления — на нём \(settings.persona.displayName) слушает. Заговорите на другом из трёх — ответит на нём.") {
+            StepPage(title: L("Как ему с вами говорить"), subtitle: L("Язык управления — на нём %@ слушает. Заговорите на другом из трёх — ответит на нём.", settings.persona.displayName)) {
                 VStack(alignment: .leading, spacing: Theme.Space.xl) {
-                    LabeledControl(title: "Язык") {
-                        Picker("Язык", selection: $settings.language) {
+                    LabeledControl(title: L("Язык")) {
+                        Picker(L("Язык"), selection: $settings.language) {
                             ForEach(AssistantLanguage.allCases) { Text($0.title).tag($0) }
                         }
                         .pickerStyle(.segmented)
                     }
-                    LabeledControl(title: "Обращение") {
-                        Picker("Обращение", selection: $settings.persona.address) {
+                    LabeledControl(title: L("Обращение")) {
+                        Picker(L("Обращение"), selection: $settings.persona.address) {
                             ForEach(AddressForm.allCases) { Text($0.title).tag($0) }
                         }
                         .pickerStyle(.segmented)
                     }
-                    LabeledControl(title: "Ответы") {
-                        Picker("Ответы", selection: $settings.persona.length) {
+                    LabeledControl(title: L("Ответы")) {
+                        Picker(L("Ответы"), selection: $settings.persona.length) {
                             ForEach(AnswerLength.allCases) { Text($0.title).tag($0) }
                         }
                         .pickerStyle(.segmented)
                     }
-                    LabeledControl(title: "Юмор") {
+                    LabeledControl(title: L("Юмор")) {
                         Slider(value: $settings.persona.humor, in: 0...1) {
-                            Text("Юмор")
+                            Text(L("Юмор"))
                         } minimumValueLabel: {
-                            Text("Серьёзно").font(.caption).foregroundStyle(Theme.textMuted)
+                            Text(L("Серьёзно")).font(.caption).foregroundStyle(Theme.textMuted)
                         } maximumValueLabel: {
-                            Text("Шутливо").font(.caption).foregroundStyle(Theme.textMuted)
+                            Text(L("Шутливо")).font(.caption).foregroundStyle(Theme.textMuted)
                         }
                     }
                 }
             }
 
         case .about:
-            StepPage(title: "Расскажите о себе", subtitle: "\(settings.persona.displayName) запишет это в память и будет учитывать. Можно пропустить — он узнает вас в разговоре.") {
+            StepPage(title: L("Расскажите о себе"), subtitle: L("%@ запишет это в память и будет учитывать. Можно пропустить — он узнает вас в разговоре.", settings.persona.displayName)) {
                 VStack(spacing: Theme.Space.m) {
-                    TextField("Ваше имя", text: $settings.persona.userName)
+                    TextField(L("Ваше имя"), text: $settings.persona.userName)
                         .textInputAutocapitalization(.words)
                         .padding(Theme.Space.m)
                         .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous).strokeBorder(Theme.hairline))
-                    TextField("Чем занимаетесь, где живёте, что важно помнить: «Живу в Ташкенте, работаю дизайнером, не ем острое, у жены день рождения 3 мая»", text: $aboutText, axis: .vertical)
+                    TextField(L("Чем занимаетесь, где живёте, что важно помнить: «Живу в Ташкенте, работаю дизайнером, не ем острое, у жены день рождения 3 мая»"), text: $aboutText, axis: .vertical)
                         .lineLimit(5...10)
                         .padding(Theme.Space.m)
                         .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous))
@@ -165,44 +170,44 @@ struct OnboardingView: View {
             }
 
         case .keys:
-            StepPage(title: "Ключи", subtitle: "Ключи хранятся только в Keychain этого iPhone.") {
+            StepPage(title: L("Ключи"), subtitle: L("Ключи хранятся только в Keychain этого iPhone.")) {
                 VStack(alignment: .leading, spacing: Theme.Space.xl) {
                     KeyField(
-                        title: "Claude — обязательно",
-                        detail: "platform.claude.com → API Keys. Это «мозг» ассистента; оплата — за использование.",
+                        title: L("Claude — обязательно"),
+                        detail: L("platform.claude.com → API Keys. Это «мозг» ассистента; оплата — за использование."),
                         placeholder: "sk-ant-…",
                         text: $settings.apiKey
                     )
                     KeyField(
-                        title: "ElevenLabs — живой голос",
-                        detail: "elevenlabs.io → Developers → API Keys. Есть бесплатный тариф. Нужен для узбекского языка.",
-                        placeholder: "Необязательно",
+                        title: L("ElevenLabs — живой голос"),
+                        detail: L("elevenlabs.io → Developers → API Keys. Есть бесплатный тариф. Нужен для узбекского языка."),
+                        placeholder: L("Необязательно"),
                         text: $settings.elevenLabsAPIKey
                     )
                 }
             }
 
         case .access:
-            StepPage(title: "Микрофон и очки", subtitle: "Календарь, контакты и геолокацию \(settings.persona.displayName) попросит, когда они впервые понадобятся.") {
+            StepPage(title: L("Микрофон и очки"), subtitle: L("Календарь, контакты и геолокацию %@ попросит, когда они впервые понадобятся.", settings.persona.displayName)) {
                 VStack(spacing: Theme.Space.s) {
                     AccessRow(
                         symbol: "mic",
-                        title: "Микрофон и речь",
-                        state: micGranted == true ? "Разрешено" : nil
+                        title: L("Микрофон и речь"),
+                        state: micGranted == true ? L("Разрешено") : nil
                     ) {
                         Task { micGranted = await SpeechListener.requestPermissions() }
                     }
                     if micGranted == false {
-                        ServiceNotice(text: "Микрофон запрещён. Разрешите его: Настройки iPhone → это приложение → Микрофон.")
+                        ServiceNotice(text: L("Микрофон запрещён. Разрешите его: Настройки iPhone → это приложение → Микрофон."))
                     }
                     AccessRow(
                         symbol: "eyeglasses",
-                        title: "Очки Ray-Ban",
-                        state: glasses.isRegistered ? "Подключены" : nil
+                        title: L("Очки Ray-Ban"),
+                        state: glasses.isRegistered ? L("Подключены") : nil
                     ) {
                         Task { await glasses.connect() }
                     }
-                    Text("Для очков нужен Meta AI с режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode. Подключить можно и позже.")
+                    Text(L("Для очков нужен Meta AI с режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode. Подключить можно и позже."))
                         .font(.footnote)
                         .foregroundStyle(Theme.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -233,7 +238,7 @@ struct OnboardingView: View {
         .frame(height: 20)
         .animation(Theme.ease(0.4), value: step)
         .accessibilityElement()
-        .accessibilityLabel("Шаг \(step.rawValue) из \(Step.allCases.count - 1)")
+        .accessibilityLabel(L("Шаг %@ из %@", step.rawValue, Step.allCases.count - 1))
     }
 
     private var footer: some View {
@@ -249,7 +254,7 @@ struct OnboardingView: View {
                         .overlay(Circle().strokeBorder(Theme.hairline))
                         .foregroundStyle(Theme.textPrimary)
                 }
-                .accessibilityLabel("Назад")
+                .accessibilityLabel(L("Назад"))
             }
             Button {
                 if step == .access { finish() } else { move(by: 1) }
@@ -271,11 +276,11 @@ struct OnboardingView: View {
 
     private var primaryTitle: String {
         switch step {
-        case .welcome: return "Создать ассистента"
-        case .about: return aboutText.isEmpty && settings.persona.userName.isEmpty ? "Пропустить" : "Дальше"
-        case .keys: return settings.trimmedAPIKey.isEmpty ? "Добавлю позже" : "Дальше"
-        case .access: return "Готово"
-        default: return "Дальше"
+        case .welcome: return L("Создать ассистента")
+        case .about: return aboutText.isEmpty && settings.persona.userName.isEmpty ? L("Пропустить") : L("Дальше")
+        case .keys: return settings.trimmedAPIKey.isEmpty ? L("Добавлю позже") : L("Дальше")
+        case .access: return L("Готово")
+        default: return L("Дальше")
         }
     }
 
@@ -463,7 +468,7 @@ private struct AccessRow: View {
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Theme.positive)
                 } else {
-                    Text("Разрешить")
+                    Text(L("Разрешить"))
                         .font(.sign(.subheadline, weight: .semibold))
                         .foregroundStyle(Theme.Tone.assistant.text)
                 }

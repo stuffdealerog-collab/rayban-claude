@@ -10,10 +10,10 @@ enum SpeechListenerError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .noAudioInput: return "Нет доступного микрофона."
-        case .engineStopped: return "Микрофон выключен — аудио нужно перезапустить."
-        case .recognizerUnavailable: return "Распознавание речи сейчас недоступно для выбранного языка."
-        case .cloudRecognizerMissing: return "Apple не распознаёт этот язык (например, узбекский) или нет разрешения на распознавание речи. Добавьте ключ ElevenLabs в настройках — тогда речь распознает он."
+        case .noAudioInput: return L("Нет доступного микрофона.")
+        case .engineStopped: return L("Микрофон выключен — аудио нужно перезапустить.")
+        case .recognizerUnavailable: return L("Распознавание речи сейчас недоступно для выбранного языка.")
+        case .cloudRecognizerMissing: return L("Apple не распознаёт этот язык (например, узбекский) или нет разрешения на распознавание речи. Добавьте ключ ElevenLabs в настройках — тогда речь распознает он.")
         }
     }
 }
@@ -334,7 +334,7 @@ final class SpeechListener {
                         self.live?.commit()
                     }
                     if let committedLocally, Date().timeIntervalSince(committedLocally) > 2.5 {
-                        self.dropLive(reason: "сервер не завершил фразу")
+                        self.dropLive(reason: L("сервер не завершил фразу"))
                         self.finishCloudCapture(generation: current)
                         return
                     }
@@ -414,7 +414,7 @@ final class SpeechListener {
             if error.isPermanent {
                 cancelCapture()
                 onIdle?(ListenerIdleReason(
-                    error: "Распознавание ElevenLabs: \(error.localizedDescription)", isQuickFailure: false, isFatal: true
+                    error: L("Распознавание ElevenLabs: %@", error.localizedDescription), isQuickFailure: false, isFatal: true
                 ))
             } else {
                 dropLive(reason: error.localizedDescription)
@@ -437,7 +437,7 @@ final class SpeechListener {
             onIdle?(ListenerIdleReason(error: nil, isQuickFailure: false))
             return
         }
-        onPartial?("Распознаю…")
+        onPartial?(L("Распознаю…"))
         let language = languageCode
         Task { [weak self] in
             do {
@@ -454,7 +454,7 @@ final class SpeechListener {
                 guard let self, self.generation == current else { return }
                 self.cancelCapture()
                 let permanent = (error as? ElevenLabsError)?.isPermanent ?? false
-                let message = permanent ? "Распознавание ElevenLabs: \(error.localizedDescription)" : error.localizedDescription
+                let message = permanent ? L("Распознавание ElevenLabs: %@", error.localizedDescription) : error.localizedDescription
                 // Сетевой сбой — не поломка распознавателя: просто слушаем снова.
                 self.onIdle?(ListenerIdleReason(error: message, isQuickFailure: false, isFatal: permanent))
             }

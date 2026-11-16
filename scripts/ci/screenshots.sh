@@ -49,10 +49,25 @@ xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
 for appearance in dark light; do
   xcrun simctl ui "$UDID" appearance "$appearance"
   sleep 1
-  for screen in $SCREENS; do
-    xcrun simctl launch "$UDID" "$BUNDLE" -demo "$screen" -AppleLanguages "(ru)" -AppleLocale ru_RU >/dev/null
-    sleep 5
-    xcrun simctl io "$UDID" screenshot --type=png "$OUT/$screen-$appearance.png" >/dev/null 2>&1
+  for item in $SCREENS; do
+    # «экран@uz» — снимок на узбекском (или @en); без суффикса — на русском.
+    screen="${item%@*}"
+    language="ru"
+    [[ "$item" == *@* ]] && language="${item##*@}"
+    xcrun simctl launch "$UDID" "$BUNDLE" -demo "$screen" -demoLanguage "$language" -AppleLanguages "(ru)" -AppleLocale ru_RU >/dev/null
+    sleep 6
+    name="$screen-$appearance"
+    [[ "$language" != "ru" ]] && name="$screen-$language-$appearance"
+    xcrun simctl io "$UDID" screenshot --type=png "$OUT/$name.png" >/dev/null 2>&1
+    # Иногда приложение не успевает нарисоваться, и снимок выходит пустым: ждём и снимаем ещё раз.
+    if ! python3 -c "
+import sys, zlib, struct
+data = open(sys.argv[1], 'rb').read()
+# Пустой кадр сжимается почти в ничто: настоящий экран весит сотни килобайт.
+sys.exit(0 if len(data) > 60000 else 1)" "$OUT/$name.png"; then
+      sleep 6
+      xcrun simctl io "$UDID" screenshot --type=png "$OUT/$name.png" >/dev/null 2>&1
+    fi
     xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
   done
 done

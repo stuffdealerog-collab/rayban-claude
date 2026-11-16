@@ -17,8 +17,8 @@ enum ElevenLabsModel: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .v4Turbo: return "Быстрая (v4 Turbo)"
-        case .v4: return "Выразительная (v4)"
+        case .v4Turbo: return L("Быстрая (v4 Turbo)")
+        case .v4: return L("Выразительная (v4)")
         case .flash: return "Flash v2.5"
         case .multilingual: return "Multilingual v2"
         case .v3: return "v3"
@@ -87,7 +87,7 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
     var title: String {
         let details = ["gender", "accent", "age"].compactMap { labels[$0] }.filter { !$0.isEmpty }
         var name = self.name
-        if speaks("uz") { name += " · узб." } else if speaks("ru") { name += " · рус." }
+        if speaks("uz") { name += L(" · узб.") } else if speaks("ru") { name += L(" · рус.") }
         return details.isEmpty ? name : "\(name) — \(details.joined(separator: ", "))"
     }
 
@@ -125,21 +125,21 @@ enum ElevenLabsError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .unauthorized(let detail):
-            return "ключ ElevenLabs не подошёл\(Self.suffix(detail))."
+            return L("ключ ElevenLabs не подошёл%@.", Self.suffix(detail))
         case .quotaExceeded:
-            return "закончился лимит символов ElevenLabs."
+            return L("закончился лимит символов ElevenLabs.")
         case .paymentRequired(let detail):
-            return "нужен платный тариф ElevenLabs\(Self.suffix(detail))."
+            return L("нужен платный тариф ElevenLabs%@.", Self.suffix(detail))
         case .voiceNotFound:
-            return "выбранный голос не найден — выберите другой в настройках."
+            return L("выбранный голос не найден — выберите другой в настройках.")
         case .badRequest(let detail):
-            return "ElevenLabs отклонил запрос\(Self.suffix(detail))."
+            return L("ElevenLabs отклонил запрос%@.", Self.suffix(detail))
         case .busy(let status):
-            return "ElevenLabs перегружен (HTTP \(status))."
+            return L("ElevenLabs перегружен (HTTP %@).", status)
         case .server(let status, let detail):
-            return "ошибка ElevenLabs (HTTP \(status))\(Self.suffix(detail))."
+            return L("ошибка ElevenLabs (HTTP %@)%@.", status, Self.suffix(detail))
         case .emptyAudio:
-            return "ElevenLabs вернул пустой звук."
+            return L("ElevenLabs вернул пустой звук.")
         }
     }
 

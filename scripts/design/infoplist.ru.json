@@ -1,0 +1,13 @@
+{
+ "NSBluetoothAlwaysUsageDescription": "Нужен для связи с очками Ray-Ban Meta.",
+ "NSBluetoothPeripheralUsageDescription": "Нужен для связи с очками Ray-Ban Meta.",
+ "NSLocalNetworkUsageDescription": "Позволяет телефону находить очки и обмениваться с ними данными по Wi-Fi.",
+ "NSMicrophoneUsageDescription": "Микрофон очков нужен, чтобы слышать ваши вопросы ассистенту.",
+ "NSSpeechRecognitionUsageDescription": "Распознавание речи превращает ваши вопросы в текст для Claude.",
+ "NSCameraUsageDescription": "Камера телефона используется только в режиме отладки вместо камеры очков.",
+ "NSLocationWhenInUseUsageDescription": "Чтобы отвечать на вопросы «где я» и «что рядом».",
+ "NSCalendarsFullAccessUsageDescription": "Чтобы рассказывать о ваших планах и добавлять события по голосовой просьбе.",
+ "NSCalendarsUsageDescription": "Чтобы рассказывать о ваших планах и добавлять события по голосовой просьбе.",
+ "NSContactsUsageDescription": "Чтобы находить номер или почту человека, которому вы просите написать или позвонить.",
+ "NSRemindersFullAccessUsageDescription": "Чтобы создавать напоминания по голосовой просьбе."
+}

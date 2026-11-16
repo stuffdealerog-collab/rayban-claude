@@ -20,7 +20,7 @@ struct TranslatorView: View {
                     .padding(.horizontal, Theme.Space.l)
                     .padding(.top, Theme.Space.xs)
 
-                Picker("Режим", selection: $translator.mode) {
+                Picker(L("Режим"), selection: $translator.mode) {
                     ForEach(TranslatorController.Mode.allCases) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
@@ -32,26 +32,26 @@ struct TranslatorView: View {
                 controls
             }
             .background(Theme.background)
-            .navigationTitle("Переводчик")
+            .navigationTitle(L("Переводчик"))
             .toolbarTitleDisplayMode(.inlineLarge)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Toggle("Озвучивать перевод", isOn: $settings.translatorSpeaks)
-                        Button("Показать собеседнику", systemImage: "rectangle.portrait.rotate") { showToPartner = true }
+                        Toggle(L("Озвучивать перевод"), isOn: $settings.translatorSpeaks)
+                        Button(L("Показать собеседнику"), systemImage: "rectangle.portrait.rotate") { showToPartner = true }
                             .disabled(translator.latestTranslation == nil)
-                        Button("Очистить", systemImage: "trash", role: .destructive) { translator.clear() }
+                        Button(L("Очистить"), systemImage: "trash", role: .destructive) { translator.clear() }
                             .disabled(translator.entries.isEmpty)
                     } label: {
                         Image(systemName: "ellipsis")
                     }
-                    .accessibilityLabel("Действия переводчика")
+                    .accessibilityLabel(L("Действия переводчика"))
                 }
             }
             .fullScreenCover(isPresented: $showToPartner) {
                 PartnerView(entry: translator.latestTranslation) { showToPartner = false }
             }
-            .alert("Переводчик", isPresented: Binding(
+            .alert(L("Переводчик"), isPresented: Binding(
                 get: { translator.errorMessage != nil },
                 set: { if !$0 { translator.errorMessage = nil } }
             )) {
@@ -66,7 +66,7 @@ struct TranslatorView: View {
 
     private var route: some View {
         HStack(spacing: Theme.Space.s) {
-            languageMenu(title: "Вы", selection: translator.mine) { translator.mine = $0 }
+            languageMenu(title: L("Вы"), selection: translator.mine) { translator.mine = $0 }
             Button {
                 withAnimation(Theme.ease(0.3)) { translator.swapLanguages() }
             } label: {
@@ -75,8 +75,8 @@ struct TranslatorView: View {
                     .foregroundStyle(tone.text)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Поменять языки местами")
-            languageMenu(title: "Собеседник", selection: translator.theirs) { translator.theirs = $0 }
+            .accessibilityLabel(L("Поменять языки местами"))
+            languageMenu(title: L("Собеседник"), selection: translator.theirs) { translator.theirs = $0 }
         }
     }
 
@@ -167,8 +167,8 @@ struct TranslatorView: View {
         } else if assistant.isTranslationListening {
             LineRow(stop: .live(.listening), tone: tone, isFirst: translator.entries.isEmpty, isLast: true) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Слушаю").plateStyle(tone.text)
-                    Text(assistant.partialTranscript.isEmpty ? "Говорите" : assistant.partialTranscript)
+                    Text(L("Слушаю")).plateStyle(tone.text)
+                    Text(assistant.partialTranscript.isEmpty ? L("Говорите") : assistant.partialTranscript)
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(assistant.partialTranscript.isEmpty ? Theme.textMuted : Theme.textPrimary)
                 }
@@ -180,14 +180,14 @@ struct TranslatorView: View {
     private var emptyState: some View {
         LineRow(stop: .interchange, tone: tone, isFirst: true, isLast: true) {
             VStack(alignment: .leading, spacing: Theme.Space.s) {
-                Text(translator.mode == .dialog ? "Говорите по очереди" : "Говорите свободно")
+                Text(translator.mode == .dialog ? L("Говорите по очереди") : L("Говорите свободно"))
                     .font(.sign(.title))
                     .foregroundStyle(Theme.textPrimary)
                 Text(emptyHint)
                     .font(.callout)
                     .foregroundStyle(Theme.textSecondary)
                 if settings.trimmedElevenLabsKey.isEmpty, translator.mine.iso == "uz" || translator.theirs.iso == "uz" {
-                    ServiceNotice(text: "Узбекскую речь распознаёт и озвучивает ElevenLabs — добавьте его ключ в настройках.")
+                    ServiceNotice(text: L("Узбекскую речь распознаёт и озвучивает ElevenLabs — добавьте его ключ в настройках."))
                         .padding(.top, Theme.Space.xs)
                 }
             }
@@ -196,12 +196,12 @@ struct TranslatorView: View {
 
     private var emptyHint: String {
         if translator.mode == .dialog {
-            return "Нажмите свою кнопку и скажите фразу — перевод прозвучит и появится крупно. Потом кнопку нажимает собеседник."
+            return L("Нажмите свою кнопку и скажите фразу — перевод прозвучит и появится крупно. Потом кнопку нажимает собеседник.")
         }
         if translator.conversationDetectsLanguage {
-            return "Переводчик сам понимает, кто говорит. Вашу речь он переводит собеседнику, его речь — вам в очки, и показывает перевод, пока человек ещё говорит."
+            return L("Переводчик сам понимает, кто говорит. Вашу речь он переводит собеседнику, его речь — вам в очки, и показывает перевод, пока человек ещё говорит.")
         }
-        return "Переводчик слушает собеседника и переводит вам в очки. Чтобы он понимал обоих, добавьте ключ ElevenLabs."
+        return L("Переводчик слушает собеседника и переводит вам в очки. Чтобы он понимал обоих, добавьте ключ ElevenLabs.")
     }
 
     // MARK: - Кнопки
@@ -209,15 +209,15 @@ struct TranslatorView: View {
     private var controls: some View {
         HStack(spacing: Theme.Space.m) {
             if translator.mode == .dialog {
-                SpeakerButton(title: "Я", language: Text(translator.mine.name), isActive: translator.activeSide == .me, filled: true, tone: tone) {
+                SpeakerButton(title: L("Я"), language: Text(translator.mine.name), isActive: translator.activeSide == .me, filled: true, tone: tone) {
                     Task { await translator.toggle(.me) }
                 }
-                SpeakerButton(title: "Собеседник", language: Text(translator.theirs.name), isActive: translator.activeSide == .them, filled: false, tone: tone) {
+                SpeakerButton(title: L("Собеседник"), language: Text(translator.theirs.name), isActive: translator.activeSide == .them, filled: false, tone: tone) {
                     Task { await translator.toggle(.them) }
                 }
             } else {
                 SpeakerButton(
-                    title: translator.isRunning ? "Остановить" : "Начать разговор",
+                    title: translator.isRunning ? L("Остановить") : L("Начать разговор"),
                     language: Text("\(translator.mine.name) \(Image(systemName: "arrow.left.arrow.right")) \(translator.theirs.name)"),
                     isActive: translator.isRunning,
                     filled: true,
@@ -243,7 +243,7 @@ private struct TranslationStop: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text("\(entry.fromMe ? "Вы" : "Собеседник") · \(entry.sourceName) → \(entry.targetName)")
+            Text("\(entry.fromMe ? L("Вы") : L("Собеседник")) · \(entry.sourceName) → \(entry.targetName)")
                 .plateStyle(isLive ? tone.text : Theme.textMuted)
             Text(entry.original)
                 .font(.subheadline)
@@ -336,7 +336,7 @@ private struct PartnerView: View {
             }
             .foregroundStyle(Theme.textPrimary)
             .padding(Theme.Space.l)
-            .accessibilityLabel("Закрыть")
+            .accessibilityLabel(L("Закрыть"))
         }
     }
 }

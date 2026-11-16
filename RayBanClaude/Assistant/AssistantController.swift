@@ -263,7 +263,7 @@ final class AssistantController {
         do {
             try await call.startOutgoing(name: settings.persona.displayName)
         } catch {
-            errorMessage = "Не удалось выйти на связь: \(error.localizedDescription)"
+            errorMessage = L("Не удалось выйти на связь: %@", error.localizedDescription)
         }
     }
 
@@ -490,7 +490,7 @@ final class AssistantController {
     private func ensureAudioPermissions() async -> Bool {
         if audioPermissionsGranted { return true }
         guard await SpeechListener.requestPermissions() else {
-            errorMessage = "Нужен доступ к микрофону (Настройки iOS → Конфиденциальность → Микрофон)."
+            errorMessage = L("Нужен доступ к микрофону (Настройки iOS → Конфиденциальность → Микрофон).")
             return false
         }
         audioPermissionsGranted = true
@@ -518,7 +518,7 @@ final class AssistantController {
                     try audio.activate()
                 } catch {
                     journal("звук", "сессия не включилась: \(error.localizedDescription)")
-                    errorMessage = "Не удалось включить микрофон: \(error.localizedDescription)"
+                    errorMessage = L("Не удалось включить микрофон: %@", error.localizedDescription)
                     return false
                 }
                 await audio.waitForGlassesInput()
@@ -529,7 +529,7 @@ final class AssistantController {
                 try listener.startEngine()
             } catch {
                 journal("звук", "микрофон не запустился: \(error.localizedDescription)")
-                errorMessage = "Не удалось включить микрофон: \(error.localizedDescription)"
+                errorMessage = L("Не удалось включить микрофон: %@", error.localizedDescription)
                 return false
             }
             journal("звук", "микрофон включён: \(audio.inputDescription)")
@@ -729,7 +729,7 @@ final class AssistantController {
             consecutiveRecognizerFailures = 0
             handsFree = false
             translationContinuous = false
-            errorMessage = reason.error ?? "Распознавание речи недоступно."
+            errorMessage = reason.error ?? L("Распознавание речи недоступно.")
             if translatorActive { translationIdleHandler?() }
             releaseMicrophoneIfIdle()
             return
@@ -743,7 +743,7 @@ final class AssistantController {
                 consecutiveRecognizerFailures = 0
                 handsFree = false
                 translationContinuous = false
-                errorMessage = "Распознавание речи не работает: \(reason.error ?? "неизвестная ошибка"). Проверьте, что диктовка включена (Настройки → Основные → Клавиатура)."
+                errorMessage = L("Распознавание речи не работает: %@. Проверьте, что диктовка включена (Настройки → Основные → Клавиатура).", reason.error ?? L("неизвестная ошибка"))
                 if translatorActive { translationIdleHandler?() }
                 releaseMicrophoneIfIdle()
                 return
@@ -880,7 +880,7 @@ final class AssistantController {
 
     private func submit(_ text: String) {
         guard !settings.trimmedAPIKey.isEmpty else {
-            errorMessage = "Добавьте API-ключ Anthropic в настройках."
+            errorMessage = L("Добавьте API-ключ Anthropic в настройках.")
             phase = .idle
             return
         }
@@ -947,7 +947,7 @@ final class AssistantController {
                 entries.append(TranscriptEntry(role: .info, text: message + (category.map { " (\($0))" } ?? "")))
                 say(sentence: message)
             case .truncated:
-                entries.append(TranscriptEntry(role: .info, text: "Ответ обрезан по лимиту длины."))
+                entries.append(TranscriptEntry(role: .info, text: L("Ответ обрезан по лимиту длины.")))
             }
         } catch {
             guard !Task.isCancelled, !(error is CancellationError) else { return }
@@ -1010,7 +1010,7 @@ final class AssistantController {
             entries.append(TranscriptEntry(role: .tool, text: presentation.title, symbol: presentation.symbol, toolName: name, toolState: .done))
 
         case .fallback(_, let to):
-            entries.append(TranscriptEntry(role: .info, text: "Ответ продолжила модель \(to ?? "fallback")."))
+            entries.append(TranscriptEntry(role: .info, text: L("Ответ продолжила модель %@.", to ?? "fallback")))
         }
     }
 
@@ -1236,23 +1236,23 @@ enum HoldingPhrase {
 enum ToolPresentation {
     static func make(name: String, input: JSONValue?) -> (title: String, symbol: String) {
         switch name {
-        case "take_photo": return ("Смотрю через очки", "camera.viewfinder")
-        case "notes": return (input.map(NotesTool.activityTitle(for:)) ?? "Память", "books.vertical")
-        case "get_location": return ("Определяю, где мы", "location")
-        case "navigate": return ("Строю маршрут", "map")
-        case "list_events": return ("Смотрю календарь", "calendar")
-        case "create_event": return ("Добавляю в календарь", "calendar.badge.plus")
-        case "create_reminder": return ("Создаю напоминание", "checklist")
-        case "set_timer": return ("Ставлю таймер", "timer")
-        case "find_contact": return ("Ищу в контактах", "person.crop.circle")
-        case "send_message": return ("Готовлю сообщение", "message")
-        case "compose_email": return ("Готовлю письмо", "square.and.pencil")
-        case "call": return ("Звоню", "phone")
-        case "check_mail": return ("Проверяю почту", "tray")
-        case "read_mail": return ("Читаю письмо", "envelope.open")
-        case "run_shortcut": return ("Запускаю команду", "square.stack.3d.up")
-        case "web_search": return ("Ищу в интернете", "magnifyingglass")
-        case "web_fetch": return ("Открываю страницу", "doc.text.magnifyingglass")
+        case "take_photo": return (L("Смотрю через очки"), "camera.viewfinder")
+        case "notes": return (input.map(NotesTool.activityTitle(for:)) ?? L("Память"), "books.vertical")
+        case "get_location": return (L("Определяю, где мы"), "location")
+        case "navigate": return (L("Строю маршрут"), "map")
+        case "list_events": return (L("Смотрю календарь"), "calendar")
+        case "create_event": return (L("Добавляю в календарь"), "calendar.badge.plus")
+        case "create_reminder": return (L("Создаю напоминание"), "checklist")
+        case "set_timer": return (L("Ставлю таймер"), "timer")
+        case "find_contact": return (L("Ищу в контактах"), "person.crop.circle")
+        case "send_message": return (L("Готовлю сообщение"), "message")
+        case "compose_email": return (L("Готовлю письмо"), "square.and.pencil")
+        case "call": return (L("Звоню"), "phone")
+        case "check_mail": return (L("Проверяю почту"), "tray")
+        case "read_mail": return (L("Читаю письмо"), "envelope.open")
+        case "run_shortcut": return (L("Запускаю команду"), "square.stack.3d.up")
+        case "web_search": return (L("Ищу в интернете"), "magnifyingglass")
+        case "web_fetch": return (L("Открываю страницу"), "doc.text.magnifyingglass")
         default: return (name, "wrench.and.screwdriver")
         }
     }

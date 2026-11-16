@@ -1,0 +1,13 @@
+{
+ "NSBluetoothAlwaysUsageDescription": "Needed to connect to your Ray-Ban Meta glasses.",
+ "NSBluetoothPeripheralUsageDescription": "Needed to connect to your Ray-Ban Meta glasses.",
+ "NSLocalNetworkUsageDescription": "Lets your phone find the glasses and exchange data with them over Wi-Fi.",
+ "NSMicrophoneUsageDescription": "The glasses microphone is needed to hear your questions for the assistant.",
+ "NSSpeechRecognitionUsageDescription": "Speech recognition turns your questions into text for Claude.",
+ "NSCameraUsageDescription": "The phone camera is used only in debug mode, in place of the glasses camera.",
+ "NSLocationWhenInUseUsageDescription": "To answer questions like “where am I” and “what’s nearby.”",
+ "NSCalendarsFullAccessUsageDescription": "To tell you about your plans and add events when you ask by voice.",
+ "NSCalendarsUsageDescription": "To tell you about your plans and add events when you ask by voice.",
+ "NSContactsUsageDescription": "To find the number or email of the person you ask to message or call.",
+ "NSRemindersFullAccessUsageDescription": "To create reminders when you ask by voice."
+}

@@ -46,7 +46,7 @@ final class AppContainer {
     /// Папка памяти видна в приложении «Файлы» (На iPhone → это приложение → Память).
     private static var memoryFolder: URL {
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return documents.appendingPathComponent("Память", isDirectory: true)
+        return documents.appendingPathComponent(L("Память"), isDirectory: true)
     }
 }
 
@@ -58,6 +58,9 @@ struct RayBanClaudeApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                // Смена языка перестраивает интерфейс целиком: надписи берутся из каталога заново.
+                .id(container.settings.language)
+                .environment(\.locale, Locale(identifier: container.settings.language.rawValue))
                 .environment(container.settings)
                 .environment(container.glasses)
                 .environment(container.assistant)

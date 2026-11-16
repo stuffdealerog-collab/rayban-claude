@@ -206,7 +206,7 @@ final class SpeechSpeaker: NSObject {
                 try streamPlayer.append(pcm)
             } catch {
                 journal("голос", "поток: плеер не запустился — \(error.localizedDescription)")
-                streamFailed(permanent: false, reason: "плеер не запустился")
+                streamFailed(permanent: false, reason: L("плеер не запустился"))
             }
         case .finished:
             if streamGotAudio {
@@ -214,7 +214,7 @@ final class SpeechSpeaker: NSObject {
             } else if streamTexts.isEmpty {
                 streamPlaybackEnded()
             } else {
-                streamFailed(permanent: false, reason: "сервер закрыл сеанс без звука")
+                streamFailed(permanent: false, reason: L("сервер закрыл сеанс без звука"))
             }
         case .failed(let error):
             journal("голос", "поток: ошибка \(error.kind) — \(error.message)")
@@ -275,7 +275,7 @@ final class SpeechSpeaker: NSObject {
             try? await Task.sleep(nanoseconds: 4_000_000_000)
             guard !Task.isCancelled, let self, self.streamID == id, !self.streamGotAudio else { return }
             self.firstAudioTimer = nil
-            self.streamFailed(permanent: false, reason: "нет звука 4 секунды")
+            self.streamFailed(permanent: false, reason: L("нет звука 4 секунды"))
         }
     }
 
@@ -321,7 +321,7 @@ final class SpeechSpeaker: NSObject {
     private func neuralFailed(_ error: Error) {
         if let error = error as? ElevenLabsError, error.isPermanent {
             neuralBlocked = true
-            report("Голос ElevenLabs недоступен: \(error.localizedDescription) Пока говорю голосом iOS.")
+            report(L("Голос ElevenLabs недоступен: %@ Пока говорю голосом iOS.", error.localizedDescription))
             return
         }
         // Сеть или перегрузка: после двух сбоев подряд минуту не ждём ElevenLabs на каждой фразе.
@@ -329,7 +329,7 @@ final class SpeechSpeaker: NSObject {
         if consecutiveNeuralFailures >= 2 {
             consecutiveNeuralFailures = 0
             neuralPausedUntil = Date().addingTimeInterval(60)
-            report("ElevenLabs не отвечает (\(error.localizedDescription)). Минуту говорю голосом iOS.")
+            report(L("ElevenLabs не отвечает (%@). Минуту говорю голосом iOS.", error.localizedDescription))
         }
     }
 
