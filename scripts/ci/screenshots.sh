@@ -1,12 +1,14 @@
 #!/bin/bash
 # Снимает экраны приложения в симуляторе: запускает сборку с `-demo <экран>` (см. DemoMode.swift)
 # в светлой и тёмной теме и складывает PNG в папку.
-#   screenshots.sh <путь к .app> <папка для снимков> [экраны через пробел]
+#   screenshots.sh <путь к .app> <папка для снимков> [экраны через пробел] [темы: "dark light"]
 set -euo pipefail
 
 APP="$1"
 OUT="$2"
 SCREENS="${3:-}"
+APPEARANCES="${4:-}"
+[[ -z "$APPEARANCES" ]] && APPEARANCES="dark light"
 BUNDLE="com.example.raybanclaude"
 if [[ -z "$SCREENS" ]]; then
   SCREENS="assistant-empty assistant-chat assistant-listening assistant-speaking translator translator-chat translator-live memory note settings onboarding-0 onboarding-1 onboarding-2 onboarding-3 onboarding-5 onboarding-6"
@@ -46,7 +48,7 @@ xcrun simctl launch "$UDID" "$BUNDLE" -demo assistant-empty -AppleLanguages "(ru
 sleep 18
 xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
 
-for appearance in dark light; do
+for appearance in $APPEARANCES; do
   xcrun simctl ui "$UDID" appearance "$appearance"
   sleep 1
   for item in $SCREENS; do
@@ -77,6 +79,8 @@ sys.exit(0 if len(data) > 60000 else 1)" "$OUT/$name.png"; then
       xcrun simctl io "$UDID" screenshot --type=png "$OUT/$name.png" >/dev/null 2>&1
     fi
     xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
+    # Отметка в журнале сборки: видно, на каком экране прогон, если он затянулся.
+    echo "снят $name ($(date -u +%H:%M:%S))"
   done
 done
 

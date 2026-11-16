@@ -71,6 +71,8 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
     let category: String?
     let labels: [String: String]
     let languages: [String]
+    /// Голос создан в этом аккаунте (клон или Voice Design), а не добавлен из чужой библиотеки.
+    let isOwned: Bool
 
     var id: String { voiceID }
 
@@ -83,9 +85,13 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
             || labels["language"]?.lowercased().hasPrefix(iso) == true
     }
 
-    /// Стандартный голос ElevenLabs. Только такие работают через API на бесплатном тарифе:
-    /// голоса, добавленные из Voice Library, сервер отклоняет («Free users cannot use library voices»).
+    /// Стандартный голос ElevenLabs.
     var isPremade: Bool { category == "premade" }
+
+    /// Работает через API на бесплатном тарифе: стандартный или свой. Голоса, добавленные из
+    /// Voice Library (в том числе с категорией «generated»), сервер там отклоняет:
+    /// «Free users cannot use library voices via the API».
+    var worksOnFreePlan: Bool { isPremade || isOwned }
 
     /// Название для списка: «Имя · узб. — пол, акцент».
     var title: String {
@@ -98,6 +104,7 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
     private enum CodingKeys: String, CodingKey {
         case voiceID = "voice_id", name, category, labels
         case verifiedLanguages = "verified_languages"
+        case isOwner = "is_owner"
     }
 
     private struct VerifiedLanguage: Decodable {
@@ -113,12 +120,14 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
         labels = ((try? container.decode([String: String?].self, forKey: .labels)) ?? [:]).compactMapValues { $0 }
         let verified = (try? container.decode([VerifiedLanguage].self, forKey: .verifiedLanguages)) ?? []
         languages = verified.compactMap(\.language)
+        isOwned = (try? container.decode(Bool.self, forKey: .isOwner)) ?? false
     }
 }
 
 extension Array where Element == ElevenLabsVoice {
     /// Голос для автоматического выбора: носитель языка ассистента, иначе первый по порядку ElevenLabs.
-    /// На бесплатном тарифе — только из стандартных; `excluding` — голоса, которые сервер уже отклонил.
+    /// На бесплатном тарифе — только из стандартных: сам приложение выбирает лишь то, что заработает
+    /// наверняка. `excluding` — голоса, которые сервер уже отклонил.
     func preferred(language: String, freePlan: Bool, excluding: Set<String> = []) -> ElevenLabsVoice? {
         let candidates = filter { !excluding.contains($0.voiceID) && (!freePlan || $0.isPremade) }
         return candidates.first { $0.speaks(language) } ?? candidates.first
@@ -131,7 +140,7 @@ extension Array where Element == ElevenLabsVoice {
             voices.filter { $0.speaks(language) } + voices.filter { !$0.speaks(language) }
         }
         guard freePlan else { return nativeFirst(self) }
-        return nativeFirst(filter(\.isPremade)) + nativeFirst(filter { !$0.isPremade })
+        return nativeFirst(filter(\.worksOnFreePlan)) + nativeFirst(filter { !$0.worksOnFreePlan })
     }
 }
 

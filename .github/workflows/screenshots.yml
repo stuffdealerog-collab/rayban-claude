@@ -9,6 +9,10 @@ on:
         description: "Экраны через пробел (пусто — все)"
         required: false
         default: ""
+      appearances:
+        description: "Темы через пробел: dark light"
+        required: false
+        default: "dark light"
 
 concurrency:
   group: screenshots-${{ github.ref }}
@@ -43,10 +47,11 @@ jobs:
       - name: Снять экраны
         env:
           SCREENS: ${{ inputs.screens }}
+          APPEARANCES: ${{ inputs.appearances }}
         run: |
           scripts/ci/screenshots.sh \
             "$RUNNER_TEMP/DerivedData/Build/Products/Debug-iphonesimulator/RayBanClaude.app" \
-            "$RUNNER_TEMP/shots" "$SCREENS"
+            "$RUNNER_TEMP/shots" "$SCREENS" "$APPEARANCES"
 
       - uses: actions/upload-artifact@v4
         with:

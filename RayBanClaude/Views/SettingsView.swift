@@ -345,7 +345,7 @@ struct VoiceSettingsView: View {
 
     /// На бесплатном тарифе голоса из библиотеки помечены: выбрать можно, но сервер их отклонит.
     private func title(for voice: ElevenLabsVoice) -> String {
-        settings.elevenLabsFreePlan && !voice.isPremade ? voice.title + L(" · платный тариф") : voice.title
+        settings.elevenLabsFreePlan && !voice.worksOnFreePlan ? voice.title + L(" · платный тариф") : voice.title
     }
 
     private func loadVoices() async {
