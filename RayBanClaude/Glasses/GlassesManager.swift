@@ -1,6 +1,7 @@
 import Foundation
 import MWDATCamera
 import MWDATCore
+import MWDATInputs
 import Observation
 import UIKit
 
@@ -28,6 +29,15 @@ enum GlassesError: LocalizedError {
         case .busy: return "Камера занята предыдущим снимком."
         }
     }
+}
+
+/// Жест на очках (экспериментальный модуль Inputs из DAT).
+enum GlassesGesture: String, Sendable {
+    case doubleTap = "двойное касание дужки"
+    case capture = "кнопка камеры"
+    case captureHold = "удержание кнопки камеры"
+    case captureDouble = "двойное нажатие кнопки камеры"
+    case action = "кнопка действия"
 }
 
 /// Связь с очками через Meta Wearables Device Access Toolkit:
@@ -64,6 +74,16 @@ final class GlassesManager {
     @ObservationIgnored private var abandonedCaptures: [Date] = []
     @ObservationIgnored private var lastPermissionCheck = Date.distantPast
     @ObservationIgnored private var idleTask: Task<Void, Never>?
+
+    // Эксперимент: касания и кнопки очков
+    /// Жест с очков: двойное касание дужки, кнопка камеры.
+    @ObservationIgnored var onGesture: ((GlassesGesture) -> Void)?
+    private(set) var gesturesActive = false
+    @ObservationIgnored private var gesturesWanted = false
+    @ObservationIgnored private var inputs: Inputs?
+    @ObservationIgnored private var inputTask: Task<Void, Never>?
+    @ObservationIgnored private var inputRetry: Task<Void, Never>?
+    @ObservationIgnored private let inputTokens = ListenerTokenBag()
     @ObservationIgnored private var deviceStateToken: (any AnyListenerToken)?
     @ObservationIgnored private var observers: [Task<Void, Never>] = []
 
@@ -250,9 +270,104 @@ final class GlassesManager {
         }
     }
 
+    // MARK: - Жесты (эксперимент)
+
+    /// Слушать касания и кнопки очков. Пока включено, сеанс с очками не закрывается по простою.
+    /// Одиночное касание и удержание дужки очки оставляют себе (пауза и стоп сеанса).
+    func setGestures(_ enabled: Bool) async {
+        gesturesWanted = enabled
+        inputRetry?.cancel()
+        if enabled {
+            await attachInputs()
+        } else {
+            detachInputs()
+            if camera == nil { scheduleIdleShutdown() }
+        }
+    }
+
+    private func attachInputs() async {
+        guard gesturesWanted, inputs == nil, isRegistered else { return }
+        do {
+            let session = try await ensureSession()
+            idleTask?.cancel()
+            let configuration = InputsConfiguration(sources: [.captouch, .captureButton, .actionButton], consumeBack: false)
+            guard let inputs = try session.addInputs(configuration: configuration) else {
+                journal("очки", "жесты: эти очки о них не сообщают")
+                return
+            }
+            self.inputs = inputs
+            inputs.statePublisher.listen { [weak self] state in
+                journal("очки", "жесты: \(state)")
+                Task { @MainActor in self?.gesturesActive = state == .active }
+            }.store(in: inputTokens)
+            inputs.errorPublisher.listen { error in
+                journal("очки", "жесты: ошибка — \(error.description)")
+            }.store(in: inputTokens)
+            let events = inputs.events
+            inputTask = Task { [weak self] in
+                for await event in events { self?.handleInput(event) }
+                journal("очки", "жесты: поток событий закончился")
+            }
+        } catch {
+            journal("очки", "жесты не подключились: \(error.localizedDescription)")
+            retryInputsLater()
+        }
+    }
+
+    private func detachInputs() {
+        inputTask?.cancel()
+        inputTask = nil
+        inputTokens.clear()
+        if inputs != nil, let session, session.state == .started {
+            try? session.removeInputs()
+        }
+        inputs = nil
+        gesturesActive = false
+    }
+
+    /// Сеанс закрыли сами очки (сложили дужки, удержали касание) — пробуем вернуться.
+    private func retryInputsLater() {
+        guard gesturesWanted else { return }
+        inputRetry?.cancel()
+        inputRetry = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 15_000_000_000)
+            guard !Task.isCancelled else { return }
+            await self?.attachInputs()
+        }
+    }
+
+    private func handleInput(_ event: InputEvent) {
+        // В журнал идёт всё: какие жесты очки присылают на самом деле, известно только с устройства.
+        journal("очки", "жест: \(event)")
+        switch event {
+        case .select:
+            onGesture?(.doubleTap)
+        case .capture(let press, _, _):
+            switch press {
+            case .shortPress: onGesture?(.capture)
+            case .hold: onGesture?(.captureHold)
+            case .doublePress: onGesture?(.captureDouble)
+            }
+        case .button:
+            onGesture?(.action)
+        case .nav, .back, .drag:
+            break
+        @unknown default:
+            break
+        }
+    }
+
     /// Останавливает и забывает сессию вместе с камерой.
     private func dropSession() {
         stopCamera()
+        if inputs != nil {
+            inputTask?.cancel()
+            inputTask = nil
+            inputTokens.clear()
+            inputs = nil
+            gesturesActive = false
+            retryInputsLater()
+        }
         if let session, session.state != .stopped, session.state != .stopping {
             session.stop()
         }
@@ -396,7 +511,8 @@ final class GlassesManager {
         let timeout = idleTimeout
         idleTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: timeout * 1_000_000_000)
-            guard !Task.isCancelled else { return }
+            // Пока слушаем жесты, сеанс нужен постоянно.
+            guard !Task.isCancelled, self?.gesturesWanted != true else { return }
             self?.dropSession()
         }
     }

@@ -57,6 +57,8 @@ targets:
       - package: MetaWearablesDAT
         product: MWDATCamera
       - package: MetaWearablesDAT
+        product: MWDATInputs
+      - package: MetaWearablesDAT
         product: MWDATMockDevice
 
 schemes:

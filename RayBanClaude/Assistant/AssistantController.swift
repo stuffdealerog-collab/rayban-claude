@@ -10,6 +10,8 @@ struct TranscriptEntry: Identifiable, Equatable {
     enum ToolState: Equatable { case running, done, failed }
 
     let id = UUID()
+    /// Когда реплика появилась — для подписи на линии.
+    var date = Date()
     var role: Role
     var text: String
     var image: UIImage?
@@ -48,6 +50,7 @@ final class AssistantController {
     @ObservationIgnored private let listener = SpeechListener()
     @ObservationIgnored private let speaker = SpeechSpeaker()
     @ObservationIgnored private let call = CallSession()
+    @ObservationIgnored private let addresseeGate = AddresseeGate()
     /// Что ассистент скажет, как только звонок соединится.
     @ObservationIgnored private var callGreeting: String?
     @ObservationIgnored private let conversation = ClaudeConversation(maxToolIterations: 12)
@@ -142,6 +145,39 @@ final class AssistantController {
         call.onResumed = { [weak self] in
             self?.recoverCallAudio()
         }
+        glasses.onGesture = { [weak self] gesture in
+            self?.glassesGesture(gesture)
+        }
+        if settings.glassesGestures {
+            Task { await glasses.setGestures(true) }
+        }
+    }
+
+    /// Жест на очках (эксперимент): перебить ответ или начать слушать без обращения по имени.
+    private func glassesGesture(_ gesture: GlassesGesture) {
+        guard settings.glassesGestures, !translatorActive else { return }
+        journal("очки", "жест «\(gesture.rawValue)» → фаза \(phase)")
+        switch phase {
+        case .thinking, .speaking:
+            interrupt()
+        case .listening:
+            break
+        case .idle:
+            wakeArmedUntil = Date().addingTimeInterval(10)
+            if handsFree {
+                resumeListening()
+            } else if UIApplication.shared.applicationState == .active {
+                Task { await mainButtonTapped() }
+            } else {
+                // В фоне микрофон включить нельзя — ассистент перезванивает в очки.
+                Task { await ringUser() }
+            }
+        }
+    }
+
+    /// Включить или выключить жесты очков (настройка «Эксперименты»).
+    func applyGlassesGestures() {
+        Task { await glasses.setGestures(settings.glassesGestures) }
     }
 
     /// Порядок и состав инструментов постоянны: они входят в кэшируемый префикс запроса.
@@ -575,11 +611,16 @@ final class AssistantController {
         var query = text
         if handsFree && settings.wakeWordEnabled {
             if Date() < wakeArmedUntil {
-                // Обращение уже было («Джарвис» → «Да?») — эта фраза и есть вопрос.
+                // Обращение уже было («Джарвис» → «Да?») или разговор только что шёл — эта фраза и есть вопрос.
                 wakeArmedUntil = .distantPast
                 query = WakeWord.strip(settings.effectiveWakeWord, from: text) ?? text
             } else if let stripped = WakeWord.strip(settings.effectiveWakeWord, from: text) {
                 query = stripped
+            } else if settings.addressing == .smart, !settings.trimmedAPIKey.isEmpty {
+                // Имени не было: по смыслу фразы и ходу разговора решаем, к ассистенту ли она.
+                phase = .idle
+                decideIfAddressed(text)
+                return
             } else {
                 // Фраза не к ассистенту — продолжаем слушать.
                 phase = .idle
@@ -587,6 +628,44 @@ final class AssistantController {
                 return
             }
         }
+        accept(query)
+    }
+
+    /// Фраза без имени: спросить быстрый фильтр, обращена ли она к ассистенту.
+    private func decideIfAddressed(_ text: String) {
+        let lastQuestion = entries.last { $0.role == .user }?.text
+        let lastAnswer = entries.last { $0.role == .assistant }?.text
+        let sinceAnswer = Int(Date().timeIntervalSince(lastInteraction))
+        let recent = sinceAnswer < 180 && lastAnswer != nil
+        let context = AddresseeGate.Context(
+            assistantName: settings.persona.displayName,
+            userName: settings.persona.userName,
+            lastQuestion: recent ? lastQuestion : nil,
+            lastAnswer: recent ? lastAnswer : nil,
+            secondsSinceAnswer: recent ? sinceAnswer : nil
+        )
+        let key = settings.trimmedAPIKey
+        let started = Date()
+        beginBackgroundWork()
+        Task {
+            let addressed = await addresseeGate.isAddressed(text, context: context, apiKey: key)
+            journal("ход", "фильтр обращения: \(addressed ? "к ассистенту" : "мимо") за \(Int(Date().timeIntervalSince(started) * 1_000)) мс")
+            // Пока решали, пользователь мог нажать кнопку, выключить режим или начался другой ход.
+            guard handsFree, phase == .idle, !translatorActive else {
+                if phase == .idle { endBackgroundWork() }
+                return
+            }
+            if addressed {
+                accept(text)
+            } else {
+                endBackgroundWork()
+                resumeListening()
+            }
+        }
+    }
+
+    /// Фраза обращена к ассистенту: команда звонка, пустое обращение или вопрос.
+    private func accept(_ query: String) {
 
         if onCall, Self.isHangUp(query) {
             phase = .idle
@@ -902,7 +981,15 @@ final class AssistantController {
         }
     }
 
+    /// Ответ ассистента, когда реплика была не к нему: он молчит.
+    static let silenceMark = "[молчу]"
+
     private func say(sentence: String) {
+        // Реплика была не к ассистенту — он промолчал. Ни звука, ни записи в ленте.
+        if sentence.contains(Self.silenceMark) || sentence.contains("[silent]") {
+            removeSilentEntry()
+            return
+        }
         let language = LanguageGuess.iso(for: sentence, fallback: replyLanguage)
         replyLanguage = language
         if !spokeThisTurn {
@@ -931,6 +1018,18 @@ final class AssistantController {
         }
     }
 
+    /// Ассистент решил промолчать: убираем из ленты и его пометку, и услышанную фразу.
+    private func removeSilentEntry() {
+        if let id = currentAssistantEntry, let index = entries.firstIndex(where: { $0.id == id }) {
+            entries.remove(at: index)
+            currentAssistantEntry = nil
+        }
+        if let last = entries.indices.last, entries[last].role == .user {
+            entries.remove(at: last)
+        }
+        journal("ход", "ассистент промолчал: фраза не к нему")
+    }
+
     /// Текст после вызова инструмента пойдёт в новую запись — чтобы лента шла по порядку.
     private func closeAssistantEntry() {
         currentAssistantEntry = nil
@@ -953,6 +1052,7 @@ final class AssistantController {
         parts.append(glasses.isRegistered ? (glasses.hasActiveDevice ? "очки подключены" : "очки не на связи") : "очки не зарегистрированы")
         if let battery = glasses.batteryLevel { parts.append("заряд очков \(battery)%") }
         parts.append("микрофон: \(microphone)")
+        parts.append("режим: \(onCall ? "на связи" : (handsFree ? "без рук" : "кнопка"))")
         parts.append(settings.mailAccount == nil ? "почта не подключена" : "почта подключена")
         return "[контекст: \(parts.joined(separator: "; "))]"
     }

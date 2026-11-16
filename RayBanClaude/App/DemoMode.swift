@@ -45,8 +45,13 @@ enum DemoMode {
     }
 
     static func prepare(translator: TranslatorController) {
-        guard screen == "translator-chat" else { return }
-        translator.loadDemo(entries: [
+        guard screen == "translator-chat" || screen == "translator-live" else { return }
+        let live = screen == "translator-live"
+            ? TranslatorController.Entry(
+                original: "Narxini biroz tushirsangiz, ikkitasini olaman", translation: "Если немного сбросите цену, возьму",
+                fromMe: false, sourceName: "Oʻzbekcha", targetName: "Русский")
+            : nil
+        translator.loadDemo(live: live, running: live != nil, entries: [
             .init(original: "Сколько стоит этот ковёр?", translation: "Bu gilam qancha turadi?", fromMe: true,
                   sourceName: "Русский", targetName: "Oʻzbekcha", isFinished: true),
             .init(original: "Ikki million soʻm, lekin sizga arzonroq beraman.", translation: "Два миллиона сумов, но вам отдам дешевле.",

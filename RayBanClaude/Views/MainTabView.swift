@@ -10,6 +10,15 @@ struct MainTabView: View {
 
     @State private var tab: Tab = MainTabView.initialTab
 
+    private var tone: Theme.Tone {
+        switch tab {
+        case .assistant: return .assistant
+        case .translator: return .translator
+        case .memory: return .memory
+        case .settings: return .system
+        }
+    }
+
     private static var initialTab: Tab {
         #if DEBUG
         switch DemoMode.screen {
@@ -37,6 +46,8 @@ struct MainTabView: View {
                 .tabItem { Label("Настройки", systemImage: "gearshape") }
                 .tag(Tab.settings)
         }
+        // У каждой вкладки свой цвет линии.
+        .tint(tone.text)
         .onReceive(NotificationCenter.default.publisher(for: .openTranslator)) { _ in
             tab = .translator
         }

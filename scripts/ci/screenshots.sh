@@ -9,7 +9,7 @@ OUT="$2"
 SCREENS="${3:-}"
 BUNDLE="com.example.raybanclaude"
 if [[ -z "$SCREENS" ]]; then
-  SCREENS="onboarding-0 onboarding-1 onboarding-2 onboarding-3 onboarding-5 onboarding-6 assistant-empty assistant-chat assistant-listening translator translator-chat memory note settings"
+  SCREENS="assistant-empty assistant-chat assistant-listening assistant-speaking translator translator-chat translator-live memory note settings onboarding-0 onboarding-1 onboarding-2 onboarding-3 onboarding-5 onboarding-6"
 fi
 mkdir -p "$OUT"
 
@@ -41,13 +41,17 @@ xcrun simctl bootstatus "$UDID" -b
 xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
 xcrun simctl install "$UDID" "$APP"
 
-first=1
-for appearance in light dark; do
+# Прогрев: первый запуск после установки долгий, его снимок получался пустым.
+xcrun simctl launch "$UDID" "$BUNDLE" -demo assistant-empty -AppleLanguages "(ru)" -AppleLocale ru_RU >/dev/null
+sleep 18
+xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
+
+for appearance in dark light; do
   xcrun simctl ui "$UDID" appearance "$appearance"
+  sleep 1
   for screen in $SCREENS; do
     xcrun simctl launch "$UDID" "$BUNDLE" -demo "$screen" -AppleLanguages "(ru)" -AppleLocale ru_RU >/dev/null
-    # Первый запуск после установки дольше.
-    if [[ $first -eq 1 ]]; then sleep 14; first=0; else sleep 5; fi
+    sleep 5
     xcrun simctl io "$UDID" screenshot --type=png "$OUT/$screen-$appearance.png" >/dev/null 2>&1
     xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
   done

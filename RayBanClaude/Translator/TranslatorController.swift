@@ -185,7 +185,7 @@ final class TranslatorController {
     }
 
     #if DEBUG
-    func loadDemo(entries: [Entry], live: Entry? = nil, running: Bool = false) {
+    func loadDemo(live: Entry? = nil, running: Bool = false, entries: [Entry]) {
         self.entries = entries
         self.live = live
         isRunning = running

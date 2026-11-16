@@ -2,25 +2,32 @@
 version: 1
 slug: "raybanclaude-views-assistantview-swift"
 primary_target: "RayBanClaude/Views/AssistantView.swift"
-related_targets: ["RayBanClaude/Views/MainTabView.swift"]
+related_targets: []
 ---
 
-# Assistant screen (Operate)
+# Assistant home (and the app shell it sets)
 
-Scope: the app shell (tabs) and the Assistant tab; Translator, Memory, Settings and Onboarding inherit it. Mode: Operate. Audience: one person, glasses on, phone mostly in a pocket; glances at the screen for state, transcript, photos.
+Scope: `RayBanClaude/Views/AssistantView.swift` and every screen that inherits its world — translator, memory, settings, onboarding. Mode: Operate. Platform: iOS 17.2+, Liquid Glass on iOS 26.
 
-Unresolved: no simulator screenshots exist (no local Xcode); visual verification happens on the user's device.
+Audience and job: one person in Tashkent wearing Ray-Ban Meta, phone mostly in a pocket. They open the app to start or stop a conversation, to see what the assistant heard and did, and to set it up. Russian UI; Uzbek and English content appears in the transcript.
+
+Constraints: native navigation and controls; Dynamic Type; both appearances; Reduce Motion; no bundled fonts (SF Pro, including its condensed width).
 
 ## Direction contract
 
-THESIS: The assistant's state is light passing through a Tashkent-modernist sun-screen facade (brise-soleil of pointed-arch openings). Refuses the category default of a glowing purple orb on black.
+THESIS: A conversation is a journey on a metro line. The screen owns one idea: every turn is a station on a coloured line, every action of the assistant is a stop along the way. It refuses the category default of a glowing orb over chat bubbles.
 
-OWN-WORLD: Warm limestone neutrals (light #F7F4EE ground, dark #12110F), one cobalt accent from modernist mosaics (#2A4FBF / #7D9BF2) for actions and selection only, sun amber (#C9741F / #F2B45A) reserved for the lattice. System SF type at 400–500, native iOS controls, hairlines at 8% ink, 12–16 pt radii, one easing curve (0.22, 1, 0.36, 1).
+OWN-WORLD: Tashkent Metro diagram. Midnight enamel ground (#0B1230) by night, porcelain paper (#F7F6F2) by day. Four line inks, one per job: scarlet for the assistant, cobalt for the translator, green for memory, amber for settings and notices. Porcelain station rings, 6 pt line strokes, interchange pills. Display type is SF Pro Condensed Bold; labels are short condensed capitals like station plaques.
 
-STORY: Within a second the user knows if the assistant is idle, listening, thinking or speaking; taps or speaks; reads the transcript; tools appear as quiet lines (dashed while running, solid when done).
+STORY: The user sees at a glance whether the assistant is on the line and listening, reads the last exchange as stations, and knows where to press to talk or to stay connected with the phone locked.
 
-FIRST VIEWPORT: Large title = the assistant's chosen name, glasses chip (battery) and new-conversation in the toolbar. Below: the 9×5 lattice (220 pt, shrinks to 132 pt once the transcript has content), one state line under it, transcript, bottom bar with hands-free (left), 76 pt mic (centre, Liquid Glass on iOS 26), text input (right). Tab bar: Ассистент · Переводчик · Память · Настройки.
+FIRST VIEWPORT: Large condensed title with the assistant's name; under it a status strip (line swatch, state, microphone source). The transcript fills the middle with a scarlet line down the left edge: ring stations for the user, filled interchanges for answers, small ticks for tool steps, a live station at the end that pulses with the voice. A bottom cluster holds "На связи", the microphone disc with a scarlet ring, and the keyboard. Native tab bar, each tab tinted with its line colour.
 
-FORM: candidate 7 of 7 (Tashkent modernism brise-soleil), seed:25e38cfa43cf00c7. Raises kept from declined challengers: emission-line rail → tool state by line form (dashed pending, solid done); gate board → rows update in place; airport wayfinding → one state line, one message.
+FORM: challenger adopted by the user — midnight transit diagram; seed:8abd01cfa369c37b. Signature move: the conversation line with its live station. Motion grammar: things travel along the line; nothing bounces.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Unresolved
+
+- How the line reads on a real device at large Dynamic Type sizes.
+- Whether the tab tint change per tab feels right on iOS 26 glass.

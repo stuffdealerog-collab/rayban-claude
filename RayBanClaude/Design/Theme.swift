@@ -1,32 +1,81 @@
 import SwiftUI
 import UIKit
 
-/// Цвета, отступы и движение приложения.
+/// Цвета, шрифты, отступы и движение приложения.
 ///
-/// Мир — ташкентский модернизм: светлый камень фасадов, кобальт мозаик и тёплый свет,
-/// проходящий сквозь солнцезащитную решётку. Поверхности остаются нейтральными (чуть тёплыми),
-/// цвет живёт в одном акценте и в решётке на экране ассистента.
+/// Мир — схема ташкентского метро. Ночью — тёмно-синяя эмаль, днём — белая бумага схемы.
+/// Четыре цвета линий, у каждого своя работа: красная — ассистент, синяя — переводчик,
+/// зелёная — память, жёлтая — настройки и служебные сообщения. Разговор рисуется линией
+/// со станциями (см. `LineKit.swift`).
 enum Theme {
-    // MARK: Цвета
+    // MARK: Поверхности
 
-    /// Единственный акцент интерфейса: основное действие, выбор, ссылки.
-    static let accent = Color(light: 0x2A4FBF, dark: 0x7D9BF2)
-    /// Свет в решётке — только для неё.
-    static let sun = Color(light: 0xC9741F, dark: 0xF2B45A)
-    /// «Камень»: рамка ячеек решётки и линии.
-    static let stone = Color(light: 0x1F1B16, dark: 0xEFE9DE)
+    /// Фон экранов: эмаль ночью, бумага схемы днём.
+    static let background = Color(light: 0xF7F6F2, dark: 0x0B1230)
+    /// Карточки, поля ввода, строки списков.
+    static let surface = Color(light: 0xFFFFFF, dark: 0x131C47)
+    /// Реплики пользователя, второстепенные кнопки.
+    static let raised = Color(light: 0xE9E7E0, dark: 0x1C2759)
+    /// Белый фарфор станций и главной кнопки — одинаковый в обеих темах.
+    static let porcelain = Color(light: 0xFFFFFF, dark: 0xF7F6F2)
+    /// Тёмно-синяя эмаль: текст на фарфоре.
+    static let ink = Color(light: 0x0B1230, dark: 0x0B1230)
 
-    static let background = Color(light: 0xF7F4EE, dark: 0x12110F)
-    static let surface = Color(light: 0xFDFBF7, dark: 0x1C1A18)
-    static let raised = Color(light: 0xEFE9DF, dark: 0x262421)
+    // MARK: Текст
 
-    static let textPrimary = Color(light: 0x1F1B16, dark: 0xEFE9DE)
-    static let textSecondary = Color(light: 0x5E554A, dark: 0xAAA398)
-    static let textMuted = Color(light: 0x7B7266, dark: 0x8A847A)
-    static let hairline = Color(light: 0x1F1B16, dark: 0xEFE9DE).opacity(0.08)
+    static let textPrimary = Color(light: 0x0B1230, dark: 0xF7F6F2)
+    static let textSecondary = Color(light: 0x434D72, dark: 0xB7C0E0)
+    static let textMuted = Color(light: 0x68718F, dark: 0x8B96C2)
+    static let hairline = Color(light: 0x0B1230, dark: 0xF7F6F2).opacity(0.12)
 
-    static let positive = Color(light: 0x16A34A, dark: 0x4CC38A)
-    static let negative = Color(light: 0xDC2626, dark: 0xE5484D)
+    // MARK: Линии
+
+    /// Цвет линии: у каждой вкладки и каждого рода действий свой.
+    enum Tone: Sendable, CaseIterable {
+        /// Красная линия — разговор с ассистентом.
+        case assistant
+        /// Синяя — переводчик и всё, что идёт из сети.
+        case translator
+        /// Зелёная — память.
+        case memory
+        /// Жёлтая — настройки, календарь и служебные сообщения.
+        case system
+
+        /// Краска линии: заливки, кольца станций, плашки.
+        var color: Color {
+            switch self {
+            case .assistant: return Color(light: 0xDC1F2E, dark: 0xF0343F)
+            case .translator: return Color(light: 0x1E5BFF, dark: 0x4F82FF)
+            case .memory: return Color(light: 0x16994A, dark: 0x2CC561)
+            case .system: return Color(light: 0xF2B200, dark: 0xFFC20E)
+            }
+        }
+
+        /// Тот же цвет для текста и значков на фоне: достаточно контрастный в обеих темах.
+        var text: Color {
+            switch self {
+            case .assistant: return Color(light: 0xC0161F, dark: 0xFF7178)
+            case .translator: return Color(light: 0x1848D8, dark: 0x8FB0FF)
+            case .memory: return Color(light: 0x0F7A39, dark: 0x5BDD88)
+            case .system: return Color(light: 0x8A5A00, dark: 0xFFD257)
+            }
+        }
+
+        /// Цвет значка или текста поверх заливки этой линии.
+        var onColor: Color {
+            self == .system ? Theme.ink : .white
+        }
+    }
+
+    /// Главное действие приложения — красная линия.
+    static let accent = Tone.assistant.color
+    /// Значок на цветной плашке (для жёлтой — см. `Tone.onColor`).
+    static let onTone = Color.white
+
+    /// Готово, включено.
+    static let positive = Tone.memory.text
+    /// Сбой: как на схеме, сбои помечают жёлтым, а не красным — красный здесь цвет линии.
+    static let negative = Color(light: 0xA85400, dark: 0xFFB13D)
 
     // MARK: Отступы (сетка 4 pt)
 
@@ -40,15 +89,44 @@ enum Theme {
     }
 
     enum Radius {
-        static let control: CGFloat = 10
+        static let control: CGFloat = 12
         static let card: CGFloat = 16
-        static let panel: CGFloat = 20
+        static let panel: CGFloat = 22
     }
 
     // MARK: Движение — одна кривая на всё приложение
 
     static func ease(_ duration: Double = 0.3) -> Animation {
         .timingCurve(0.22, 1, 0.36, 1, duration: duration)
+    }
+
+    // MARK: Шрифты
+
+    /// Системная панель навигации: заголовки — узким жирным начертанием, как названия станций.
+    @MainActor
+    static func applyNavigationAppearance() {
+        let large = UIFont.systemFont(ofSize: 36, weight: .bold, width: .condensed)
+        let inline = UIFont.systemFont(ofSize: 18, weight: .semibold, width: .condensed)
+        let metrics = UIFontMetrics(forTextStyle: .largeTitle)
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font: metrics.scaledFont(for: large)]
+        UINavigationBar.appearance().titleTextAttributes = [.font: UIFontMetrics(forTextStyle: .headline).scaledFont(for: inline)]
+    }
+}
+
+extension Font {
+    /// Узкое жирное начертание SF — голос вывесок и названий станций.
+    static func sign(_ style: Font.TextStyle, weight: Font.Weight = .bold) -> Font {
+        .system(style).weight(weight).width(.condensed)
+    }
+}
+
+extension View {
+    /// Подпись-табличка: «ВЫ · 18:42», «ДЖАРВИС». Короткие узкие прописные, как на схеме.
+    func plateStyle(_ color: Color = Theme.textMuted) -> some View {
+        font(.sign(.caption, weight: .semibold))
+            .textCase(.uppercase)
+            .tracking(0.6)
+            .foregroundStyle(color)
     }
 }
 

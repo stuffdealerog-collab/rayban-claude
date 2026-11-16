@@ -19,6 +19,14 @@ enum ClaudeModel: String, CaseIterable, Identifiable {
         }
     }
 
+    var shortTitle: String {
+        switch self {
+        case .haiku55: return "Haiku 5.5"
+        case .sonnet55: return "Sonnet 5.5"
+        case .opus55: return "Opus 5.5"
+        }
+    }
+
     var subtitle: String {
         switch self {
         case .haiku55: return "Самый быстрый и в двадцать раз дешевле Sonnet"
@@ -137,10 +145,12 @@ final class AppSettings {
     var language: AssistantLanguage {
         didSet { defaults.set(language.rawValue, forKey: Keys.language) }
     }
-    /// В режиме «без рук» отвечать только на фразы, начинающиеся с обращения.
-    var wakeWordEnabled: Bool {
-        didSet { defaults.set(wakeWordEnabled, forKey: Keys.wakeWordEnabled) }
+    /// Когда отвечать на услышанное в режимах «Без рук» и «На связи».
+    var addressing: AddressingMode {
+        didSet { defaults.set(addressing.rawValue, forKey: Keys.addressing) }
     }
+    /// Ассистент отвечает не на всё подряд: по имени или когда сам понял, что обращаются к нему.
+    var wakeWordEnabled: Bool { addressing != .always }
     /// Пусто — обращение по имени ассистента.
     var wakeWord: String {
         didSet { defaults.set(wakeWord, forKey: Keys.wakeWord) }
@@ -148,6 +158,10 @@ final class AppSettings {
     var effectiveWakeWord: String {
         let custom = wakeWord.trimmingCharacters(in: .whitespacesAndNewlines)
         return custom.isEmpty ? persona.displayName : custom
+    }
+    /// Эксперимент: двойное касание дужки или кнопка камеры вызывают ассистента.
+    var glassesGestures: Bool {
+        didSet { defaults.set(glassesGestures, forKey: Keys.glassesGestures) }
     }
     /// Сколько секунд после ответа можно говорить без обращения по имени (0 — всегда с именем).
     var followUpSeconds: Double {
@@ -282,9 +296,15 @@ final class AppSettings {
         liveRecognition = defaults.object(forKey: Keys.liveRecognition) as? Bool ?? true
         mixedSpeech = defaults.object(forKey: Keys.mixedSpeech) as? Bool ?? false
         language = defaults.string(forKey: Keys.language).flatMap(AssistantLanguage.init(rawValue:)) ?? .russian
-        wakeWordEnabled = defaults.object(forKey: Keys.wakeWordEnabled) as? Bool ?? true
+        if let saved = defaults.string(forKey: Keys.addressing).flatMap(AddressingMode.init(rawValue:)) {
+            addressing = saved
+        } else {
+            // Прежняя настройка «Обращение по имени»: выключенная означала «отвечать на всё».
+            addressing = defaults.object(forKey: Keys.wakeWordEnabled) as? Bool == false ? .always : .smart
+        }
         wakeWord = defaults.string(forKey: Keys.wakeWord) ?? ""
         followUpSeconds = defaults.object(forKey: Keys.followUpSeconds) as? Double ?? 8
+        glassesGestures = defaults.bool(forKey: Keys.glassesGestures)
         elevenLabsAPIKey = KeychainStore.read(account: Keys.elevenLabsKey) ?? ""
         elevenLabsVoiceID = defaults.string(forKey: Keys.elevenLabsVoiceID) ?? ""
         elevenLabsVoiceName = defaults.string(forKey: Keys.elevenLabsVoiceName) ?? ""
@@ -311,8 +331,10 @@ final class AppSettings {
         static let mixedSpeech = "mixedSpeech"
         static let language = "language"
         static let wakeWordEnabled = "wakeWordEnabled"
+        static let addressing = "addressing"
         static let wakeWord = "wakeWord.v2"
         static let followUpSeconds = "followUpSeconds"
+        static let glassesGestures = "glassesGestures"
         static let elevenLabsKey = "elevenlabs-api-key"
         static let elevenLabsVoiceID = "elevenLabsVoiceID"
         static let elevenLabsVoiceName = "elevenLabsVoiceName"

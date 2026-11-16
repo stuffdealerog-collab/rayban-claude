@@ -84,19 +84,38 @@ struct MemoryView: View {
             .map { ($0, groups[$0] ?? []) }
     }
 
+    /// Заметки на зелёной линии: папка — ветка, заметка — станция.
     private var list: some View {
         List {
             ForEach(grouped, id: \.folder) { group in
-                Section(group.folder.isEmpty ? "Главное" : group.folder) {
-                    ForEach(group.notes) { note in
+                Section {
+                    ForEach(Array(group.notes.enumerated()), id: \.element.id) { index, note in
                         NavigationLink(value: note) {
-                            NoteRow(note: note, preview: preview(of: note))
+                            LineRow(
+                                stop: .station, tone: .memory,
+                                isFirst: index == 0, isLast: index == group.notes.count - 1
+                            ) {
+                                NoteRow(note: note, preview: preview(of: note))
+                            }
+                            .padding(.top, index == 0 ? Theme.Space.m : 0)
                         }
+                        .listRowInsets(EdgeInsets(top: 0, leading: Theme.Space.m, bottom: 0, trailing: Theme.Space.l))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Theme.surface)
                     }
                     .onDelete { offsets in
                         for index in offsets { try? memory.remove(group.notes[index].relativePath) }
                         reload()
                     }
+                } header: {
+                    HStack(spacing: Theme.Space.s) {
+                        LinePill(text: group.folder.isEmpty ? "Главное" : group.folder, tone: .memory)
+                        Text("\(group.notes.count)")
+                            .font(.sign(.caption, weight: .semibold).monospacedDigit())
+                            .foregroundStyle(Theme.textMuted)
+                    }
+                    .textCase(nil)
+                    .padding(.bottom, Theme.Space.xs)
                 }
             }
         }
@@ -105,22 +124,32 @@ struct MemoryView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: Theme.Space.l) {
-            Image(systemName: "books.vertical")
-                .font(.system(size: 40, weight: .light))
-                .foregroundStyle(Theme.textMuted)
-            Text("Здесь \(settings.persona.displayName) хранит то, что узнаёт о вас")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-            Text("Скажите, например: «Запомни, что я не ем острое» или «Мою сестру зовут Анна». Заметки — обычные файлы Markdown: их можно читать, править и перенести в Obsidian.")
-                .font(.callout)
-                .foregroundStyle(Theme.textSecondary)
-                .multilineTextAlignment(.center)
-            Button("Написать о себе") { showNewNote = true }
-                .buttonStyle(.bordered)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                LineRow(stop: .interchange, tone: .memory, isFirst: true) {
+                    VStack(alignment: .leading, spacing: Theme.Space.s) {
+                        Text("Память").plateStyle(Theme.Tone.memory.text)
+                        Text("Здесь \(settings.persona.displayName) хранит то, что узнаёт о вас")
+                            .font(.sign(.title))
+                            .foregroundStyle(Theme.textPrimary)
+                        Text("Скажите, например: «Запомни, что я не ем острое» или «Мою сестру зовут Анна». Заметки — обычные файлы Markdown: их можно читать, править и перенести в Obsidian.")
+                            .font(.callout)
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                }
+                LineRow(stop: .station, tone: .memory, isLast: true, planned: true) {
+                    Button {
+                        showNewNote = true
+                    } label: {
+                        Label("Написать о себе", systemImage: "square.and.pencil")
+                            .font(.body.weight(.medium))
+                    }
+                    .tint(Theme.Tone.memory.text)
+                }
+            }
+            .padding(.horizontal, Theme.Space.l)
+            .padding(.top, Theme.Space.l)
         }
-        .padding(Theme.Space.xxl)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func preview(of note: MemoryNote) -> String {
@@ -141,24 +170,20 @@ private struct NoteRow: View {
     let preview: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Space.xs) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(note.title)
-                    .font(.body)
-                    .foregroundStyle(Theme.textPrimary)
-                Spacer()
-                Text(note.modified, format: .relative(presentation: .named))
-                    .font(.caption)
-                    .foregroundStyle(Theme.textMuted)
-            }
+        VStack(alignment: .leading, spacing: 2) {
+            Text(note.title)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Theme.textPrimary)
             if !preview.isEmpty {
                 Text(preview)
-                    .font(.footnote)
+                    .font(.subheadline)
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(1)
             }
+            Text(note.modified, format: .relative(presentation: .named))
+                .plateStyle()
+                .padding(.top, 1)
         }
-        .padding(.vertical, 2)
     }
 }
 
@@ -173,9 +198,14 @@ private struct NoteDetailView: View {
 
     var body: some View {
         ScrollView {
-            MarkdownBlocks(text: text)
-                .padding(Theme.Space.l)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: Theme.Space.l) {
+                if !note.folder.isEmpty {
+                    LinePill(text: note.folder, tone: .memory)
+                }
+                MarkdownBlocks(text: text)
+            }
+            .padding(Theme.Space.l)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Theme.background)
         .navigationTitle(note.title)
@@ -276,12 +306,12 @@ private struct MarkdownBlocks: View {
                 switch block {
                 case .heading(let level, let content):
                     Text(inline(content))
-                        .font(level == 1 ? .title2 : (level == 2 ? .title3 : .headline))
+                        .font(level == 1 ? .sign(.largeTitle) : (level == 2 ? .sign(.title2) : .headline))
                         .foregroundStyle(Theme.textPrimary)
                         .padding(.top, level == 1 ? 0 : Theme.Space.s)
                 case .bullet(let content):
                     HStack(alignment: .firstTextBaseline, spacing: Theme.Space.s) {
-                        Circle().fill(Theme.textMuted).frame(width: 5, height: 5).offset(y: -3)
+                        Circle().fill(Theme.Tone.memory.color).frame(width: 7, height: 7).offset(y: -2)
                         Text(inline(content)).foregroundStyle(Theme.textPrimary)
                     }
                 case .paragraph(let content):
@@ -290,7 +320,7 @@ private struct MarkdownBlocks: View {
             }
         }
         .font(.body)
-        .tint(Theme.accent)
+        .tint(Theme.Tone.memory.text)
         .textSelection(.enabled)
     }
 

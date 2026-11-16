@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Главный экран: решётка-состояние, лента разговора, кнопка микрофона.
+/// Главный экран: имя ассистента, состояние линии, разговор-линия и кнопки внизу.
 struct AssistantView: View {
     @Environment(AssistantController.self) private var assistant
     @Environment(GlassesManager.self) private var glasses
@@ -12,15 +12,32 @@ struct AssistantView: View {
     @State private var typedText = ""
     @FocusState private var fieldFocused: Bool
 
+    private let tone = Theme.Tone.assistant
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                header
+                LineStatus(tone: tone, text: stateLine, detail: stateDetail, active: assistant.phase != .idle || assistant.onCall)
+                    .padding(.horizontal, Theme.Space.l + 4)
+                    .padding(.top, Theme.Space.xs)
+                    .padding(.bottom, Theme.Space.s)
+
                 TranscriptView(
                     entries: assistant.entries,
-                    partial: assistant.phase == .listening && !assistant.translatorActive ? assistant.partialTranscript : "",
-                    emptyState: AnyView(suggestions)
+                    phase: assistant.translatorActive ? .idle : assistant.phase,
+                    partial: assistant.translatorActive ? "" : assistant.partialTranscript,
+                    assistantName: settings.persona.displayName,
+                    listeningCaption: listeningCaption,
+                    emptyState: AnyView(emptyState)
                 )
+                .mask(
+                    // Лента мягко уходит под кнопки, а не обрывается линией.
+                    LinearGradient(
+                        stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.93), .init(color: .clear, location: 1)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+
                 controls
             }
             .background(Theme.background)
@@ -49,91 +66,108 @@ struct AssistantView: View {
         }
     }
 
-    // MARK: - Решётка и состояние
-
-    private var header: some View {
-        VStack(spacing: Theme.Space.m) {
-            LatticeView(mode: latticeMode)
-                .frame(height: assistant.entries.isEmpty ? 220 : 132)
-                .padding(.horizontal, Theme.Space.l)
-                .animation(Theme.ease(0.45), value: assistant.entries.isEmpty)
-            Text(stateLine)
-                .font(.subheadline)
-                .foregroundStyle(Theme.textSecondary)
-                .contentTransition(.opacity)
-                .animation(Theme.ease(0.2), value: stateLine)
-                .lineLimit(1)
-                .padding(.horizontal, Theme.Space.l)
-        }
-        .padding(.top, Theme.Space.s)
-        .padding(.bottom, Theme.Space.s)
-    }
-
-    private var latticeMode: LatticeMode {
-        if assistant.translatorActive { return .idle }
-        switch assistant.phase {
-        case .idle: return .idle
-        case .listening: return .listening
-        case .thinking: return .thinking
-        case .speaking: return .speaking
-        }
-    }
+    // MARK: - Состояние
 
     private var stateLine: String {
+        if assistant.translatorActive { return "Микрофон у переводчика" }
+        switch assistant.callState {
+        case .ringing: return "Звоню вам"
+        case .connecting: return "Соединяю"
+        case .held: return "На удержании"
+        case .active, .idle: break
+        }
         switch assistant.phase {
         case .idle:
-            if assistant.translatorActive { return "Микрофон у переводчика" }
-            if assistant.handsFree {
-                return settings.wakeWordEnabled ? "Жду обращения «\(settings.effectiveWakeWord)»" : "Слушаю всё подряд"
-            }
-            return "Нажмите и говорите"
-        case .listening: return "Слушаю · \(assistant.microphone)"
+            if assistant.onCall { return "На связи" }
+            return assistant.handsFree ? "Слушаю без звонка" : "Линия свободна"
+        case .listening: return assistant.onCall ? "На связи · слушаю" : "Слушаю"
         case .thinking: return "Думаю"
-        case .speaking: return "Отвечаю · нажмите, чтобы перебить"
+        case .speaking: return "Отвечаю"
         }
+    }
+
+    private var stateDetail: String? {
+        guard !assistant.translatorActive else { return nil }
+        switch assistant.phase {
+        case .listening: return "микрофон: \(assistant.microphone)"
+        case .speaking, .thinking: return "нажмите, чтобы перебить"
+        case .idle: return assistant.onCall || assistant.handsFree ? addressingHint : nil
+        }
+    }
+
+    private var addressingHint: String {
+        switch settings.addressing {
+        case .smart: return "поймёт, когда обращаются к нему"
+        case .name: return "отвечает на «\(settings.effectiveWakeWord)»"
+        case .always: return "отвечает на каждую фразу"
+        }
+    }
+
+    private var listeningCaption: String {
+        (assistant.handsFree || assistant.onCall) && assistant.partialTranscript.isEmpty ? "На линии" : "Слушаю"
     }
 
     // MARK: - Пустое состояние
 
-    private var suggestions: some View {
-        VStack(alignment: .leading, spacing: Theme.Space.s) {
-            Text("Например")
-                .font(.footnote)
-                .foregroundStyle(Theme.textMuted)
-                .padding(.bottom, Theme.Space.xs)
-            ForEach(Self.examples, id: \.self) { example in
-                Button {
-                    assistant.submitTyped(example)
-                } label: {
-                    HStack {
-                        Text(example)
-                            .font(.callout)
-                            .foregroundStyle(Theme.textPrimary)
-                            .multilineTextAlignment(.leading)
-                        Spacer()
-                        Image(systemName: "arrow.up.right")
-                            .font(.footnote)
-                            .foregroundStyle(Theme.textMuted)
-                    }
-                    .padding(.horizontal, Theme.Space.m)
-                    .padding(.vertical, Theme.Space.m)
-                    .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous)
-                            .strokeBorder(Theme.hairline)
-                    )
+    /// Разговора ещё нет: первая станция — приветствие, дальше — куда можно поехать.
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            LineRow(stop: .interchange, tone: tone, isFirst: true) {
+                VStack(alignment: .leading, spacing: Theme.Space.xs) {
+                    Text(settings.persona.displayName).plateStyle(tone.text)
+                    Text(greeting)
+                        .font(.sign(.title))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Спросите голосом или выберите, с чего начать.")
+                        .font(.callout)
+                        .foregroundStyle(Theme.textSecondary)
                 }
-                .buttonStyle(PressScaleStyle())
+                .padding(.bottom, Theme.Space.s)
+            }
+            ForEach(Array(Self.examples.enumerated()), id: \.offset) { index, example in
+                LineRow(stop: .station, tone: tone, isLast: index == Self.examples.count - 1, planned: true) {
+                    Button {
+                        assistant.submitTyped(example.text)
+                    } label: {
+                        HStack(spacing: Theme.Space.s) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(example.plate).plateStyle()
+                                Text(example.text)
+                                    .font(.body.weight(.medium))
+                                    .foregroundStyle(Theme.textPrimary)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            Spacer(minLength: Theme.Space.s)
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(Theme.textMuted)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(PressScaleStyle())
+                }
             }
         }
-        .padding(.top, Theme.Space.s)
     }
 
-    private static let examples = [
-        "Что передо мной?",
-        "Какие у меня планы на завтра?",
-        "Есть новые письма?",
-        "Напомни через час позвонить маме",
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let hello: String
+        switch hour {
+        case 5..<12: hello = "Доброе утро"
+        case 12..<18: hello = "Добрый день"
+        case 18..<23: hello = "Добрый вечер"
+        default: hello = "Доброй ночи"
+        }
+        let user = settings.persona.userName.trimmingCharacters(in: .whitespaces)
+        return user.isEmpty ? hello : "\(hello), \(user)"
+    }
+
+    private static let examples: [(plate: String, text: String)] = [
+        ("Камера очков", "Что передо мной?"),
+        ("Календарь", "Какие у меня планы на завтра?"),
+        ("Почта", "Есть новые письма?"),
+        ("Напоминания", "Напомни через час позвонить маме"),
     ]
 
     // MARK: - Управление
@@ -147,18 +181,14 @@ struct AssistantView: View {
                         .focused($fieldFocused)
                         .submitLabel(.send)
                         .onSubmit(sendTyped)
-                        .padding(.horizontal, Theme.Space.m)
-                        .padding(.vertical, Theme.Space.s + 2)
-                        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.control + 4, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Theme.Radius.control + 4, style: .continuous)
-                                .strokeBorder(Theme.hairline)
-                        )
+                        .padding(.horizontal, Theme.Space.l)
+                        .padding(.vertical, Theme.Space.m)
+                        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.panel, style: .continuous))
                     Button(action: sendTyped) {
                         Image(systemName: "arrow.up")
-                            .font(.body.weight(.semibold))
-                            .frame(width: 40, height: 40)
-                            .background(Theme.accent, in: Circle())
+                            .font(.body.weight(.bold))
+                            .frame(width: 44, height: 44)
+                            .background(tone.color, in: Circle())
                             .foregroundStyle(.white)
                     }
                     .disabled(typedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -167,42 +197,67 @@ struct AssistantView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            HStack(alignment: .center) {
-                SideButton(
-                    symbol: assistant.handsFree ? "ear.fill" : "ear",
-                    label: "Без рук",
-                    isOn: assistant.handsFree
+            HStack(alignment: .center, spacing: 0) {
+                SideControl(
+                    symbol: assistant.onCall ? "phone.down.fill" : "phone.arrow.up.right.fill",
+                    label: lineButtonLabel,
+                    isOn: assistant.onCall || assistant.handsFree,
+                    tone: tone
                 ) {
-                    Task { await assistant.setHandsFree(!assistant.handsFree) }
+                    Task {
+                        if assistant.handsFree && !assistant.onCall {
+                            await assistant.setHandsFree(false)
+                        } else {
+                            await assistant.toggleCall()
+                        }
+                    }
                 }
-                .accessibilityValue(assistant.handsFree ? "включено" : "выключено")
+                .contextMenu {
+                    if !assistant.onCall {
+                        Button {
+                            Task { await assistant.setHandsFree(!assistant.handsFree) }
+                        } label: {
+                            Label(assistant.handsFree ? "Перестать слушать" : "Слушать без звонка", systemImage: "ear")
+                        }
+                    }
+                }
+                .disabled(assistant.translatorActive)
+                .accessibilityValue(assistant.onCall ? "на связи" : (assistant.handsFree ? "слушает" : "выключено"))
+                .accessibilityHint("Разговор продолжается с заблокированным телефоном")
 
-                Spacer()
+                Spacer(minLength: Theme.Space.s)
 
                 MicButton(phase: assistant.translatorActive ? .idle : assistant.phase) {
                     Task { await assistant.mainButtonTapped() }
                 }
                 .disabled(assistant.translatorActive)
 
-                Spacer()
+                Spacer(minLength: Theme.Space.s)
 
-                SideButton(symbol: showKeyboard ? "keyboard.chevron.compact.down" : "keyboard", label: "Текстом", isOn: showKeyboard) {
+                SideControl(
+                    symbol: showKeyboard ? "keyboard.chevron.compact.down" : "keyboard",
+                    label: "Текстом",
+                    isOn: showKeyboard,
+                    tone: tone
+                ) {
                     withAnimation(Theme.ease(0.3)) { showKeyboard.toggle() }
                     fieldFocused = showKeyboard
                 }
             }
-            .padding(.horizontal, Theme.Space.xl)
         }
         .padding(.horizontal, Theme.Space.l)
-        .padding(.top, Theme.Space.m)
-        .padding(.bottom, Theme.Space.s)
-        .background(alignment: .top) {
-            Rectangle().fill(Theme.hairline).frame(height: 1)
-        }
+        .padding(.top, Theme.Space.xs)
+        .padding(.bottom, Theme.Space.m)
         .sensoryFeedback(.impact(weight: .light), trigger: assistant.phase) { _, new in
             // Только когда слушать начали по кнопке, а не на каждом перезапуске «без рук».
             new == .listening && !assistant.handsFree
         }
+        .sensoryFeedback(.success, trigger: assistant.onCall)
+    }
+
+    private var lineButtonLabel: String {
+        if assistant.onCall { return "Отбой" }
+        return assistant.handsFree ? "Слушаю" : "На связи"
     }
 
     private func sendTyped() {
@@ -211,46 +266,37 @@ struct AssistantView: View {
     }
 }
 
-/// Кнопка микрофона. На iOS 26 — «жидкое стекло» системы.
+/// Главная кнопка — станция ассистента: фарфоровый диск в кольце цвета линии.
 struct MicButton: View {
     let phase: AssistantController.Phase
+    var tone = Theme.Tone.assistant
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 28, weight: .medium))
-                .foregroundStyle(phase == .idle ? Color.white : Theme.textPrimary)
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(phase == .idle ? Theme.ink : .white)
                 .contentTransition(.symbolEffect(.replace))
                 .symbolEffect(.variableColor.iterative, options: .repeating, isActive: phase == .listening)
-                .frame(width: 76, height: 76)
-                .background(background)
+                .frame(width: 80, height: 80)
+                .background(
+                    Circle()
+                        .fill(phase == .idle ? Theme.porcelain : tone.color)
+                        .overlay(Circle().strokeBorder(phase == .idle ? tone.color : Theme.porcelain, lineWidth: 6))
+                        .shadow(color: Color.black.opacity(0.22), radius: 14, x: 0, y: 8)
+                )
         }
         .buttonStyle(PressScaleStyle())
         .accessibilityLabel(accessibilityTitle)
         .animation(Theme.ease(0.25), value: phase)
     }
 
-    @ViewBuilder
-    private var background: some View {
-        if #available(iOS 26.0, *) {
-            Circle()
-                .fill(.clear)
-                .glassEffect(.regular.tint(phase == .idle ? Theme.accent : Theme.raised.opacity(0.6)).interactive(), in: .circle)
-        } else {
-            Circle()
-                .fill(phase == .idle ? Theme.accent : Theme.raised)
-                .overlay(Circle().strokeBorder(Theme.hairline))
-                .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
-        }
-    }
-
     private var symbol: String {
         switch phase {
         case .idle: return "mic.fill"
         case .listening: return "waveform"
-        case .thinking: return "stop.fill"
-        case .speaking: return "stop.fill"
+        case .thinking, .speaking: return "stop.fill"
         }
     }
 
@@ -263,28 +309,43 @@ struct MicButton: View {
     }
 }
 
-private struct SideButton: View {
+/// Боковая кнопка: значок и подпись в капсуле. Включённая заливается цветом линии.
+struct SideControl: View {
     let symbol: String
     let label: String
     let isOn: Bool
+    let tone: Theme.Tone
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: Theme.Space.xs) {
+            HStack(spacing: 6) {
                 Image(systemName: symbol)
-                    .font(.title3)
-                    .frame(width: 48, height: 48)
-                    .background(isOn ? Theme.accent.opacity(0.14) : Theme.surface, in: Circle())
-                    .overlay(Circle().strokeBorder(Theme.hairline))
-                    .foregroundStyle(isOn ? Theme.accent : Theme.textSecondary)
+                    .font(.subheadline.weight(.semibold))
+                    .contentTransition(.symbolEffect(.replace))
                 Text(label)
-                    .font(.caption2)
-                    .foregroundStyle(Theme.textMuted)
+                    .font(.sign(.subheadline, weight: .semibold))
+                    .lineLimit(1)
+                    .contentTransition(.opacity)
             }
+            .foregroundStyle(isOn ? tone.onColor : Theme.textPrimary)
+            .frame(width: 112, height: 50)
+            .background(background)
         }
         .buttonStyle(PressScaleStyle())
+        .animation(Theme.ease(0.25), value: isOn)
         .accessibilityLabel(label)
+    }
+
+    @ViewBuilder
+    private var background: some View {
+        if isOn {
+            Capsule().fill(tone.color)
+        } else if #available(iOS 26.0, *) {
+            Capsule().fill(.clear).glassEffect(.regular.interactive(), in: .capsule)
+        } else {
+            Capsule().fill(Theme.surface).overlay(Capsule().strokeBorder(Theme.hairline))
+        }
     }
 }
 
@@ -292,8 +353,8 @@ private struct SideButton: View {
 struct PressScaleStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .opacity(configuration.isPressed ? 0.9 : 1)
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
+            .opacity(configuration.isPressed ? 0.88 : 1)
             .animation(Theme.ease(0.15), value: configuration.isPressed)
     }
 }
@@ -309,7 +370,7 @@ private struct GlassesChip: View {
                 Image(systemName: connected ? "eyeglasses" : "eyeglasses.slash")
                 if let battery = glasses.batteryLevel, connected {
                     Text("\(battery)%")
-                        .font(.footnote.monospacedDigit())
+                        .font(.sign(.subheadline, weight: .semibold).monospacedDigit())
                 }
             }
             .foregroundStyle(connected ? Theme.textPrimary : Theme.textMuted)

@@ -23,6 +23,7 @@ final class AppContainer {
         } catch {
             NSLog("[RayBanClaude] Wearables.configure failed: \(error)")
         }
+        Theme.applyNavigationAppearance()
         // Таймеры звучат и при открытом приложении.
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
         settings = AppSettings()
@@ -105,6 +106,5 @@ struct RootView: View {
             }
         }
         .animation(Theme.ease(0.5), value: settings.onboardingCompleted)
-        .tint(Theme.accent)
     }
 }

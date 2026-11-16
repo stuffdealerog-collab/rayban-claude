@@ -46,8 +46,10 @@ struct OnboardingView: View {
                 .padding(.bottom, Theme.Space.l)
         }
         .background(Theme.background.ignoresSafeArea())
-        .tint(Theme.accent)
+        .tint(tone.text)
     }
+
+    private let tone = Theme.Tone.assistant
 
     // MARK: - Шаги
 
@@ -57,14 +59,14 @@ struct OnboardingView: View {
         switch step {
         case .welcome:
             VStack(alignment: .leading, spacing: Theme.Space.xl) {
-                Spacer(minLength: Theme.Space.xxl)
-                LatticeView(mode: .thinking)
-                    .frame(height: 240)
+                Spacer(minLength: Theme.Space.l)
+                RouteMap(hub: settings.persona.displayName)
+                    .frame(height: 300)
                 VStack(alignment: .leading, spacing: Theme.Space.m) {
                     Text("Ассистент в ваших очках")
-                        .font(.largeTitle.weight(.medium))
+                        .font(.sign(.largeTitle))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("Видит камерой Ray-Ban Meta, слышит и отвечает голосом, помнит вас, ведёт календарь, почту и сообщения, переводит разговор. Сначала придумайте, каким он будет.")
+                    Text("Слышит вас через очки Ray-Ban Meta и отвечает голосом. Видит их камерой, помнит вас, ведёт календарь и почту, переводит разговор. Сначала придумайте, каким он будет.")
                         .font(.body)
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -75,11 +77,11 @@ struct OnboardingView: View {
         case .name:
             StepPage(title: "Как его зовут", subtitle: "По этому имени он будет откликаться в режиме «Без рук».") {
                 TextField("Имя", text: $settings.persona.assistantName)
-                    .font(.system(size: 34, weight: .medium))
+                    .font(.sign(.largeTitle))
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .padding(.vertical, Theme.Space.s)
-                    .overlay(alignment: .bottom) { Rectangle().fill(Theme.hairline).frame(height: 1) }
+                    .overlay(alignment: .bottom) { Capsule().fill(tone.color).frame(height: 6) }
                 FlowChips(options: Persona.suggestedNames, selected: settings.persona.assistantName) {
                     settings.persona.assistantName = $0
                 }
@@ -196,19 +198,28 @@ struct OnboardingView: View {
         }
     }
 
+    /// Путь настройки — линия со станциями: пройденные залиты, текущая — кольцо.
     private var progress: some View {
-        let total = Double(Step.allCases.count - 1)
-        return GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule().fill(Theme.hairline)
-                Capsule()
-                    .fill(Theme.accent)
-                    .frame(width: proxy.size.width * Double(step.rawValue) / total)
-                    .animation(Theme.ease(0.4), value: step)
+        let steps = Step.allCases.dropFirst()
+        return HStack(spacing: 0) {
+            ForEach(Array(steps.enumerated()), id: \.element) { index, item in
+                if index > 0 {
+                    Rectangle()
+                        .fill(item.rawValue <= step.rawValue ? tone.color : Theme.hairline)
+                        .frame(height: 6)
+                }
+                Circle()
+                    .fill(item.rawValue < step.rawValue ? tone.color : Theme.porcelain)
+                    .overlay(
+                        Circle().strokeBorder(item.rawValue <= step.rawValue ? tone.color : Theme.textMuted.opacity(0.5), lineWidth: 4)
+                    )
+                    .frame(width: item == step ? 20 : 14, height: item == step ? 20 : 14)
             }
         }
-        .frame(height: 3)
-        .accessibilityLabel("Шаг \(step.rawValue) из \(Int(total))")
+        .frame(height: 20)
+        .animation(Theme.ease(0.4), value: step)
+        .accessibilityElement()
+        .accessibilityLabel("Шаг \(step.rawValue) из \(Step.allCases.count - 1)")
     }
 
     private var footer: some View {
@@ -219,7 +230,7 @@ struct OnboardingView: View {
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.body.weight(.semibold))
-                        .frame(width: 52, height: 52)
+                        .frame(width: 56, height: 56)
                         .background(Theme.surface, in: Circle())
                         .overlay(Circle().strokeBorder(Theme.hairline))
                         .foregroundStyle(Theme.textPrimary)
@@ -229,11 +240,13 @@ struct OnboardingView: View {
             Button {
                 if step == .access { finish() } else { move(by: 1) }
             } label: {
-                Text(primaryTitle)
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(Theme.accent, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
-                    .foregroundStyle(.white)
+                HStack(spacing: Theme.Space.s) {
+                    Text(primaryTitle).font(.sign(.title3))
+                    Image(systemName: "arrow.right").font(.body.weight(.bold))
+                }
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .background(tone.color, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+                .foregroundStyle(.white)
             }
             .buttonStyle(PressScaleStyle())
             .disabled(!canContinue)
@@ -308,7 +321,7 @@ private struct StepPage<Content: View>: View {
             VStack(alignment: .leading, spacing: Theme.Space.xl) {
                 VStack(alignment: .leading, spacing: Theme.Space.s) {
                     Text(title)
-                        .font(.title.weight(.medium))
+                        .font(.sign(.largeTitle))
                         .foregroundStyle(Theme.textPrimary)
                     Text(subtitle)
                         .font(.callout)
@@ -330,29 +343,32 @@ private struct ChoiceRow: View {
     let isSelected: Bool
     let action: () -> Void
 
+    private let tone = Theme.Tone.assistant
+
     var body: some View {
         Button(action: action) {
             HStack(alignment: .center, spacing: Theme.Space.m) {
+                // Выбранный вариант — станция в кольце линии.
+                Circle()
+                    .fill(isSelected ? Theme.porcelain : Theme.background)
+                    .overlay(Circle().strokeBorder(isSelected ? tone.color : Theme.textMuted.opacity(0.6), lineWidth: isSelected ? 6 : 3))
+                    .frame(width: 24, height: 24)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.body.weight(.medium))
+                        .font(.sign(.title3))
                         .foregroundStyle(Theme.textPrimary)
                     Text(detail)
                         .font(.footnote)
                         .foregroundStyle(Theme.textSecondary)
                         .multilineTextAlignment(.leading)
                 }
-                Spacer()
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(isSelected ? Theme.accent : Theme.textMuted)
-                    .contentTransition(.symbolEffect(.replace))
+                Spacer(minLength: 0)
             }
-            .padding(Theme.Space.m)
+            .padding(Theme.Space.m + 2)
             .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous)
-                    .strokeBorder(isSelected ? Theme.accent : Theme.hairline, lineWidth: isSelected ? 1.5 : 1)
+                    .strokeBorder(isSelected ? tone.color : Theme.hairline, lineWidth: isSelected ? 3 : 1)
             )
         }
         .buttonStyle(PressScaleStyle())
@@ -372,15 +388,11 @@ private struct FlowChips: View {
                     pick(option)
                 } label: {
                     Text(option)
-                        .font(.callout)
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(option == selected ? Theme.accent.opacity(0.12) : Theme.surface,
-                                    in: RoundedRectangle(cornerRadius: Theme.Radius.control, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Theme.Radius.control, style: .continuous)
-                                .strokeBorder(option == selected ? Theme.accent : Theme.hairline)
-                        )
-                        .foregroundStyle(option == selected ? Theme.accent : Theme.textPrimary)
+                        .font(.sign(.body, weight: .semibold))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background(option == selected ? Theme.accent : Theme.surface, in: Capsule())
+                        .overlay(Capsule().strokeBorder(option == selected ? Color.clear : Theme.hairline))
+                        .foregroundStyle(option == selected ? Color.white : Theme.textPrimary)
                 }
                 .buttonStyle(PressScaleStyle())
             }
@@ -394,9 +406,7 @@ private struct LabeledControl<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Space.s) {
-            Text(title)
-                .font(.footnote)
-                .foregroundStyle(Theme.textMuted)
+            Text(title).plateStyle()
             content
         }
     }
@@ -411,7 +421,7 @@ private struct KeyField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Space.s) {
             Text(title)
-                .font(.body.weight(.medium))
+                .font(.sign(.title3))
             SecureField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
