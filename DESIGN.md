@@ -49,7 +49,7 @@ San Francisco only, through system text styles (Dynamic Type).
 `LineRow` puts a 6 pt line in a 30 pt rail on the left of every row; rails join into one continuous line.
 - **Station** — hollow ring in the text colour: something the user said.
 - **Interchange** — porcelain disc in a line-coloured ring: an answer.
-- **Transfer** — a short branch to a small station in another line's ink: a tool step (calendar branches to amber, notes to green, mail and web to cobalt, the camera stays scarlet). The branch station blinks while the step runs and turns amber on a fault; the row's right column shows how long the step took in tabular digits.
+- **Transfer** — a short branch to a small station in another line's ink: a tool step that leaves the assistant's line (calendar branches to amber, notes to green, mail and web to cobalt). A step on the assistant's own line (the glasses camera) is a plain tick. The branch station blinks while the step runs and turns amber on a fault; the row's right column shows how long the step took in tabular digits.
 - **Tick** — short bar beside the line for service notices.
 - **Live station** — at the end of the line. It breathes with the microphone level while listening, carries a travelling arc while thinking, and fills with the line colour and pulses with the voice while speaking.
 - **Planned track** — dotted line and hollow stations for suggestions that have not happened yet.
@@ -58,11 +58,11 @@ The same vocabulary carries the other screens: the translator's language pair is
 
 ## Motion
 
-One curve everywhere: `timingCurve(0.22, 1, 0.36, 1)`. Things travel along the line or fade; nothing bounces. A new turn fades in while its segment of line draws down to the new station. Press: 0.96 scale. Live motion only where something is live: the live station, the running transfer, the listening waveform symbol. Reduce Motion draws lines at once, freezes the live station at a steady size and stops every blink.
+One curve everywhere: `timingCurve(0.22, 1, 0.36, 1)`. Things travel along the line or fade; nothing bounces. A new turn fades in while the line travels from the previous station down to the new one (`RailLine` animates both its first draw and its extension when a row stops being the last). Press: 0.96 scale. Live motion only where something is live: the live station, the running transfer, the listening waveform symbol. Reduce Motion draws lines at once, freezes the live station at a steady size and stops every blink.
 
 ## Components
 
-- Titles: the system navigation bar on all four tabs with `toolbarTitleDisplayMode(.inlineLarge)` — one large condensed title in `textPrimary` that never collapses, toolbar items on the right.
+- Titles: one large condensed title in `textPrimary` at the leading edge of the system navigation bar on all four tabs, toolbar items on the right. Memory and Settings use `toolbarTitleDisplayMode(.inlineLarge)` and collapse when their lists scroll, as any iOS list does. The two screens with a conversation line (assistant, translator) use `FixedTitle`, a leading toolbar item that does not collapse: their transcript is always scrolled to its end, and the assistant's name must stay large.
 - `LineStatus` — line swatch, state in plain words, optional detail on the right.
 - `MicButton` — 80 pt porcelain disc in a 6 pt scarlet ring; inverts to scarlet while busy.
 - `SideControl` — capsule with icon and label; glass on iOS 26; filled with the line colour when on.

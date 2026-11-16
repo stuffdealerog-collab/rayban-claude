@@ -32,9 +32,10 @@ struct TranslatorView: View {
                 controls
             }
             .background(Theme.background)
-            .navigationTitle(L("Переводчик"))
-            .toolbarTitleDisplayMode(.inlineLarge)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                FixedTitle(title: L("Переводчик"))
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Toggle(L("Озвучивать перевод"), isOn: $settings.translatorSpeaks)

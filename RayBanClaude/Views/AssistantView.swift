@@ -44,10 +44,11 @@ struct AssistantView: View {
                 controls
             }
             .background(Theme.background)
-            .navigationTitle(settings.persona.displayName)
-            // Крупное название остаётся в панели и не сворачивается: имя ассистента видно всегда.
-            .toolbarTitleDisplayMode(.inlineLarge)
+            // Имя ассистента крупно и всегда на месте: лента под ним прокручивается, заголовок — нет.
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                FixedTitle(title: settings.persona.displayName)
                 ToolbarItem(placement: .topBarTrailing) {
                     GlassesChip { showGlasses = true }
                 }
@@ -327,25 +328,32 @@ struct SideControl: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: symbol)
-                    .font(.subheadline.weight(.semibold))
-                    .contentTransition(.symbolEffect(.replace))
-                Text(label)
-                    .font(.sign(.subheadline, weight: .semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-                    .contentTransition(.opacity)
+            // При очень крупном шрифте подпись не сжимается и не обрезается: остаётся значок,
+            // а название читает VoiceOver.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 6) {
+                    icon
+                    Text(label)
+                        .font(.sign(.subheadline, weight: .semibold))
+                        .lineLimit(1)
+                        .contentTransition(.opacity)
+                }
+                icon
             }
             .foregroundStyle(isOn ? tone.onColor : Theme.textPrimary)
             .padding(.horizontal, Theme.Space.m)
-            // Растёт вместе с размером текста, но не вытесняет микрофон.
-            .frame(minWidth: 104, maxWidth: 132, minHeight: 50)
+            .frame(minWidth: 56, minHeight: 50)
             .background(background)
         }
         .buttonStyle(PressScaleStyle())
         .animation(Theme.ease(0.25), value: isOn)
         .accessibilityLabel(label)
+    }
+
+    private var icon: some View {
+        Image(systemName: symbol)
+            .font(.subheadline.weight(.semibold))
+            .contentTransition(.symbolEffect(.replace))
     }
 
     @ViewBuilder

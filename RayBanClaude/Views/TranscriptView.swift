@@ -90,13 +90,7 @@ struct TranscriptView: View {
                 }
             }
         case .tool:
-            LineRow(
-                stop: .transfer(
-                    to: ToolLine.tone(for: entry.toolName),
-                    running: entry.toolState == .running, failed: entry.toolState == .failed
-                ),
-                tone: tone, isFirst: isFirst, isLast: isLast
-            ) {
+            LineRow(stop: toolStop(for: entry), tone: tone, isFirst: isFirst, isLast: isLast) {
                 ToolStop(entry: entry)
             }
         case .info:
@@ -110,6 +104,16 @@ struct TranscriptView: View {
                 ServiceNotice(text: entry.text)
             }
         }
+    }
+
+    /// Шаг на другой линии — пересадка в её цвете; шаг на своей (камера очков) — обычная отметка.
+    private func toolStop(for entry: TranscriptEntry) -> LineStop {
+        let running = entry.toolState == .running
+        let failed = entry.toolState == .failed
+        let destination = ToolLine.tone(for: entry.toolName)
+        return destination == tone
+            ? .tick(running: running, failed: failed)
+            : .transfer(to: destination, running: running, failed: failed)
     }
 
     @ViewBuilder

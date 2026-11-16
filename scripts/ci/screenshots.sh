@@ -51,6 +51,13 @@ for appearance in dark light; do
   sleep 1
   for item in $SCREENS; do
     # «экран@uz» — снимок на узбекском (или @en); без суффикса — на русском.
+    # «экран+a11y» — снимок с очень крупным шрифтом (Dynamic Type).
+    size="large"
+    if [[ "$item" == *+a11y* ]]; then
+      size="accessibility-large"
+      item="${item/+a11y/}"
+    fi
+    xcrun simctl ui "$UDID" content_size "$size" >/dev/null 2>&1 || true
     screen="${item%@*}"
     language="ru"
     [[ "$item" == *@* ]] && language="${item##*@}"
@@ -58,6 +65,7 @@ for appearance in dark light; do
     sleep 6
     name="$screen-$appearance"
     [[ "$language" != "ru" ]] && name="$screen-$language-$appearance"
+    [[ "$size" != "large" ]] && name="$name-a11y"
     xcrun simctl io "$UDID" screenshot --type=png "$OUT/$name.png" >/dev/null 2>&1
     # Иногда приложение не успевает нарисоваться, и снимок выходит пустым: ждём и снимаем ещё раз.
     if ! python3 -c "

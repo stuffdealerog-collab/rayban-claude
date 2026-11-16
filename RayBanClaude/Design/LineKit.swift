@@ -70,19 +70,14 @@ struct LineRail: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            GeometryReader { proxy in
-                let top = isFirst ? LineMetrics.nodeCenter : 0
-                let bottom = isLast ? LineMetrics.nodeCenter : proxy.size.height
-                Path { path in
-                    path.move(to: CGPoint(x: LineMetrics.rail / 2, y: top))
-                    path.addLine(to: CGPoint(x: LineMetrics.rail / 2, y: max(top, bottom)))
-                }
-                .trim(from: 0, to: drawn ? 1 : 0)
+            // Конец отрезка анимируется: когда строка перестаёт быть последней, линия едет от её
+            // станции вниз до следующей, а не появляется сразу.
+            RailLine(top: isFirst ? LineMetrics.nodeCenter : 0, tail: isLast ? 0 : 1, drawn: drawn ? 1 : 0)
                 .stroke(
                     tone.color.opacity(planned ? 0.45 : 1),
                     style: StrokeStyle(lineWidth: LineMetrics.stroke, lineCap: .round, dash: planned ? [2, 10] : [])
                 )
-            }
+                .animation(reduceMotion ? nil : Theme.ease(0.45), value: isLast)
             // Отметка шире рельса (ореол живой станции) не должна раздвигать колонку: иначе линия уезжает.
             node
                 .frame(width: LineMetrics.rail)
@@ -127,6 +122,32 @@ struct LineRail: View {
         case .none:
             EmptyView()
         }
+    }
+}
+
+/// Вертикальный отрезок линии в колонке рельса. `tail` — доля пути от отметки до низа строки
+/// (0 — линия кончается на станции, 1 — идёт до следующей строки), `drawn` — доля прорисовки.
+private struct RailLine: Shape {
+    var top: CGFloat
+    var tail: CGFloat
+    var drawn: CGFloat
+
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(tail, drawn) }
+        set {
+            tail = newValue.first
+            drawn = newValue.second
+        }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        let full = LineMetrics.nodeCenter + max(0, rect.height - LineMetrics.nodeCenter) * tail
+        let bottom = top + (full - top) * drawn
+        var path = Path()
+        guard bottom > top else { return path }
+        path.move(to: CGPoint(x: LineMetrics.rail / 2, y: top))
+        path.addLine(to: CGPoint(x: LineMetrics.rail / 2, y: bottom))
+        return path
     }
 }
 
@@ -329,7 +350,7 @@ struct RouteMap: View {
                 station(at(-3.9, 2.8), L("Заметки"), .bottom)
                 station(at(3.9, -2.8), L("Люди"), .top)
                 station(at(0, -2.5), L("Календарь"), .trailing)
-                station(at(0, 2.5), L("Напоминания"), .trailing)
+                station(at(0, 2.5), L("Таймеры"), .trailing)
 
                 Circle()
                     .fill(Theme.porcelain)
@@ -348,7 +369,7 @@ struct RouteMap: View {
             }
         }
         .accessibilityElement()
-        .accessibilityLabel(L("Схема: разговор, перевод и почта, память, календарь и напоминания сходятся на станции %@", hub))
+        .accessibilityLabel(L("Схема: разговор, перевод и почта, память, календарь и таймеры сходятся на станции %@", hub))
     }
 
     private func line(_ points: [CGPoint], _ tone: Theme.Tone) -> some View {
@@ -384,5 +405,32 @@ struct RouteMap: View {
                 label.frame(width: 110, alignment: .trailing).position(x: point.x - 14 - 55, y: point.y)
             }
         }
+    }
+}
+
+/// Крупное название экрана в панели навигации, которое не сворачивается при прокрутке.
+/// Нужно экранам с линией разговора: лента всегда прокручена к концу, и системный крупный
+/// заголовок там сразу сжимался бы в мелкий.
+struct FixedTitle: ToolbarContent {
+    let title: String
+
+    var body: some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            // Заголовок — не кнопка: без стеклянной подложки.
+            ToolbarItem(placement: .topBarLeading) { label }
+                .sharedBackgroundVisibility(.hidden)
+        } else {
+            ToolbarItem(placement: .topBarLeading) { label }
+        }
+    }
+
+    private var label: some View {
+        Text(title)
+            .font(.sign(.largeTitle))
+            .foregroundStyle(Theme.textPrimary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityAddTraits(.isHeader)
     }
 }

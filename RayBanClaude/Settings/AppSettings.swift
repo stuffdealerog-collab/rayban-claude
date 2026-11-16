@@ -304,11 +304,6 @@ final class AppSettings {
         liveRecognition = defaults.object(forKey: Keys.liveRecognition) as? Bool ?? true
         mixedSpeech = defaults.object(forKey: Keys.mixedSpeech) as? Bool ?? false
         language = defaults.string(forKey: Keys.language).flatMap(AssistantLanguage.init(rawValue:)) ?? Self.systemLanguage
-        // didSet в init не срабатывает — язык интерфейса задаём явно.
-        L10n.setLanguage(language.isoCode)
-        if !onboardingCompleted, Persona.defaultNames.contains(persona.assistantName) {
-            persona.assistantName = language == .russian ? "Джарвис" : "Jarvis"
-        }
         if let saved = defaults.string(forKey: Keys.addressing).flatMap(AddressingMode.init(rawValue:)) {
             addressing = saved
         } else {
@@ -330,6 +325,12 @@ final class AppSettings {
         translatorTheirs = defaults.string(forKey: Keys.translatorTheirs) ?? "en-US"
         translatorSpeaks = defaults.object(forKey: Keys.translatorSpeaks) as? Bool ?? true
         translatorPartnerSpeaker = defaults.object(forKey: Keys.translatorPartnerSpeaker) as? Bool ?? true
+
+        // didSet в init не срабатывает — язык интерфейса задаём явно, когда все свойства уже заполнены.
+        L10n.setLanguage(language.isoCode)
+        if !onboardingCompleted, Persona.defaultNames.contains(persona.assistantName) {
+            persona.assistantName = language == .russian ? "Джарвис" : "Jarvis"
+        }
     }
 
     /// Язык при первом запуске — по языку iPhone: узбекский, английский, иначе русский.

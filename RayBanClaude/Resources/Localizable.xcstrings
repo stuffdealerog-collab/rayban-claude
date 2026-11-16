@@ -4744,19 +4744,36 @@
         }
       }
     },
-    "Схема: разговор, перевод и почта, память, календарь и напоминания сходятся на станции %@": {
+    "Схема: разговор, перевод и почта, память, календарь и таймеры сходятся на станции %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Map: conversation, translation and mail, memory, calendar, and reminders meet at %@ station"
+            "value": "Map: conversation, translation and mail, memory, calendar and timers meet at %@ station"
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sxema: suhbat, tarjima va pochta, xotira, taqvim va eslatmalar %@ bekatida tutashadi"
+            "value": "Sxema: suhbat, tarjima va pochta, xotira, taqvim va taymerlar %@ bekatida tutashadi"
+          }
+        }
+      }
+    },
+    "Таймеры": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timers"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taymerlar"
           }
         }
       }
