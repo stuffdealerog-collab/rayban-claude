@@ -613,6 +613,8 @@ struct PersonaEditorView: View {
         }
         .navigationTitle(L("Ассистент"))
         .navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden)
+        .background(Theme.background)
     }
 }
 
@@ -660,6 +662,8 @@ struct MailSettingsView: View {
         }
         .navigationTitle(L("Почта"))
         .navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden)
+        .background(Theme.background)
     }
 
     private func check() async {

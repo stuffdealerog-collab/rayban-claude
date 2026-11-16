@@ -23,9 +23,8 @@ struct TranscriptView: View {
                         // Разговора ещё не было. Служебные сообщения (например, о голосе) — объявлениями
                         // над приветствием: они не должны прятать первый экран.
                         ForEach(entries) { entry in
-                            ServiceNotice(text: entry.text, isFault: entry.role == .error)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.bottom, Theme.Space.l)
+                            ServiceNotice(text: entry.text, isFault: entry.role == .error, fillsWidth: true)
+                                .padding(.bottom, Theme.Space.m)
                                 .transition(.opacity)
                         }
                         emptyState
@@ -235,6 +234,8 @@ enum ToolLine {
 struct ServiceNotice: View {
     let text: String
     var isFault = true
+    /// Над приветствием объявления стоят стопкой и должны быть одной ширины.
+    var fillsWidth = false
 
     var body: some View {
         Label {
@@ -245,6 +246,7 @@ struct ServiceNotice: View {
             Image(systemName: isFault ? "exclamationmark.triangle.fill" : "info.circle.fill")
                 .foregroundStyle(isFault ? Theme.negative : Theme.textSecondary)
         }
+        .frame(maxWidth: fillsWidth ? .infinity : nil, alignment: .leading)
         .padding(.horizontal, Theme.Space.m)
         .padding(.vertical, Theme.Space.s + 2)
         .background(

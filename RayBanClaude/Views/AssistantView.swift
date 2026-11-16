@@ -326,19 +326,22 @@ struct SideControl: View {
     let tone: Theme.Tone
     let action: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
         Button(action: action) {
-            // При очень крупном шрифте подпись не сжимается и не обрезается: остаётся значок,
-            // а название читает VoiceOver.
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 6) {
-                    icon
+            // При очень крупном шрифте остаётся значок, а название читает VoiceOver. Решает размер шрифта,
+            // а не измерение текста: ViewThatFits из-за округления ширины терял подпись у части надписей
+            // («На связи» пропадала, «Текстом» оставалась).
+            HStack(spacing: 6) {
+                icon
+                if !typeSize.isAccessibilitySize {
                     Text(label)
                         .font(.sign(.subheadline, weight: .semibold))
                         .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                         .contentTransition(.opacity)
                 }
-                icon
             }
             .foregroundStyle(isOn ? tone.onColor : Theme.textPrimary)
             .padding(.horizontal, Theme.Space.m)
@@ -460,6 +463,8 @@ struct GlassesSheet: View {
             }
             .navigationTitle(L("Очки"))
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(Theme.background)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(L("Готово")) { dismiss() }

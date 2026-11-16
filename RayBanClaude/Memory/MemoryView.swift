@@ -273,6 +273,8 @@ private struct NoteEditorView: View {
             }
             .navigationTitle(isNew ? L("Новая заметка") : title)
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(Theme.background)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(L("Отмена")) { dismiss() }
