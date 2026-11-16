@@ -34,7 +34,11 @@ final class AssistantController {
     private(set) var microphone = "—"
     /// Микрофоном сейчас пользуется переводчик.
     private(set) var translatorActive = false
+    /// «На связи»: разговор идёт как звонок, микрофон работает и с заблокированным экраном.
+    private(set) var callState: CallSession.State = .idle
     var errorMessage: String?
+
+    var onCall: Bool { callState != .idle }
 
     let settings: AppSettings
     let glasses: GlassesManager
@@ -43,6 +47,9 @@ final class AssistantController {
     @ObservationIgnored private let audio = AudioSessionManager()
     @ObservationIgnored private let listener = SpeechListener()
     @ObservationIgnored private let speaker = SpeechSpeaker()
+    @ObservationIgnored private let call = CallSession()
+    /// Что ассистент скажет, как только звонок соединится.
+    @ObservationIgnored private var callGreeting: String?
     @ObservationIgnored private let conversation = ClaudeConversation(maxToolIterations: 12)
     @ObservationIgnored private let locationProvider = LocationProvider()
     @ObservationIgnored private var chunker = SentenceChunker()
@@ -62,13 +69,21 @@ final class AssistantController {
     @ObservationIgnored private var resetPending = false
     /// После «Джарвис» без вопроса и ответа «Да?» следующая фраза — вопрос, даже без обращения.
     @ObservationIgnored private var wakeArmedUntil = Date.distantPast
+    /// В этом ходе ассистент уже что-то произнёс.
+    @ObservationIgnored private var spokeThisTurn = false
+    @ObservationIgnored private var turnStarted = Date()
+    /// Переводчик: языки, на которые собеседники могут перейти (BCP-47) — для определения языка фразы.
+    @ObservationIgnored private var translationOtherLanguages: [String] = []
 
     // Переводчик
-    @ObservationIgnored private var translationHandler: ((String) -> Void)?
+    @ObservationIgnored private var translationHandler: ((String, String?) -> Void)?
+    @ObservationIgnored private var translationPartialHandler: ((String, String?) -> Void)?
     @ObservationIgnored private var translationIdleHandler: (() -> Void)?
     @ObservationIgnored private var translationContinuous = false
     @ObservationIgnored private var translationLanguage: String?
     @ObservationIgnored private var handsFreeBeforeTranslation = false
+    /// Перевод сейчас звучит из динамика телефона (для собеседника).
+    @ObservationIgnored private var partnerSpeakerOn = false
 
     /// После такой паузы диалог начинается заново (контекст не раздувается бесконечно).
     private let conversationTimeout: TimeInterval = 10 * 60
@@ -83,7 +98,9 @@ final class AssistantController {
         Self.shared = self
 
         listener.onPartial = { [weak self] text in
-            self?.partialTranscript = text
+            guard let self else { return }
+            self.partialTranscript = text
+            self.translationPartialHandler?(text, self.listener.lastLanguage)
         }
         listener.onUtterance = { [weak self] text in
             self?.handleUtterance(text)
@@ -112,6 +129,18 @@ final class AssistantController {
         }
         speaker.onVoiceProblem = { [weak self] message in
             self?.entries.append(TranscriptEntry(role: .info, text: message))
+        }
+        call.onStateChanged = { [weak self] state in
+            self?.callStateChanged(state)
+        }
+        call.onAudioActivated = { [weak self] in
+            self?.callAudioActivated()
+        }
+        call.onAudioDeactivated = { [weak self] in
+            self?.callAudioDeactivated()
+        }
+        call.onResumed = { [weak self] in
+            self?.recoverCallAudio()
         }
     }
 
@@ -166,6 +195,10 @@ final class AssistantController {
             handsFree = true
             if phase == .idle { startListening() }
         } else {
+            if onCall {
+                endCall()
+                return
+            }
             handsFree = false
             if phase == .listening {
                 listener.cancelCapture()
@@ -173,6 +206,153 @@ final class AssistantController {
             }
             releaseMicrophoneIfIdle()
         }
+    }
+
+    // MARK: - На связи (звонок)
+
+    /// Кнопка «На связи»: начать или закончить разговор-звонок. Начать можно только с экрана приложения,
+    /// дальше телефон можно заблокировать и убрать в карман.
+    func toggleCall() async {
+        if onCall {
+            endCall()
+            return
+        }
+        guard !translatorActive, !isPreparingAudio else { return }
+        guard await ensureAudioPermissions() else { return }
+        releaseAudioForCall()
+        callGreeting = Self.callGreeting(settings.language)
+        do {
+            try await call.startOutgoing(name: settings.persona.displayName)
+        } catch {
+            errorMessage = "Не удалось выйти на связь: \(error.localizedDescription)"
+        }
+    }
+
+    /// Ассистент звонит сам: команда Siri, автоматизация «надел очки», напоминание. Работает из фона.
+    /// `message` — что он скажет, когда вы ответите.
+    func ringUser(message: String? = nil) async {
+        if onCall {
+            // Уже на связи — просто слушаем следующую фразу без обращения.
+            wakeArmedUntil = Date().addingTimeInterval(10)
+            if phase == .idle { resumeListening() }
+            return
+        }
+        guard !translatorActive else { return }
+        releaseAudioForCall()
+        callGreeting = message ?? Self.callGreeting(settings.language)
+        do {
+            try await call.ring(name: settings.persona.displayName)
+        } catch {
+            journal("звонок", "позвонить не удалось: \(error.localizedDescription)")
+        }
+    }
+
+    func endCall() {
+        call.end()
+    }
+
+    private static func callGreeting(_ language: AssistantLanguage) -> String {
+        switch language {
+        case .russian: return "На связи."
+        case .uzbek: return "Aloqadaman."
+        case .english: return "I'm here."
+        }
+    }
+
+    /// Перед звонком свою аудиосессию нужно отпустить: иначе система не сможет включить звонковую.
+    private func releaseAudioForCall() {
+        turnTask?.cancel()
+        turnTask = nil
+        currentTurnID = nil
+        speaker.stop()
+        markRunningToolsFinished()
+        endBackgroundWork()
+        handsFree = false
+        phase = .idle
+        releaseTask?.cancel()
+        listener.rebuildEngine()
+        audio.deactivate()
+    }
+
+    private func callStateChanged(_ state: CallSession.State) {
+        let wasOnCall = onCall
+        callState = state
+        switch state {
+        case .idle where wasOnCall:
+            turnTask?.cancel()
+            turnTask = nil
+            currentTurnID = nil
+            speaker.stop()
+            markRunningToolsFinished()
+            endBackgroundWork()
+            handsFree = false
+            phase = .idle
+            callGreeting = nil
+            listener.rebuildEngine()
+            audio.callAudioDeactivated()
+        case .held:
+            suspendForAudioInterruption()
+        default:
+            break
+        }
+    }
+
+    /// Система включила звук звонка: запускаем микрофон и здороваемся.
+    private func callAudioActivated() {
+        audio.callAudioActivated()
+        Task {
+            guard await prepareAudio() else { return }
+            handsFree = true
+            if let greeting = callGreeting {
+                callGreeting = nil
+                phase = .speaking
+                speaker.speak(greeting, language: LanguageGuess.iso(for: greeting, fallback: settings.language.isoCode))
+                await speaker.waitUntilFinished()
+                guard phase == .speaking else { return }
+                phase = .idle
+            }
+            // Первая фраза после соединения — вопрос, даже без обращения.
+            wakeArmedUntil = Date().addingTimeInterval(10)
+            if phase == .idle, onCall { startListening() }
+        }
+    }
+
+    private func callAudioDeactivated() {
+        audio.callAudioDeactivated()
+        listener.cancelCapture()
+        if phase == .listening { phase = .idle }
+    }
+
+    /// Вызов сняли с удержания после обычного звонка. Система не всегда возвращает звук сама:
+    /// пробуем включить его, а если нельзя — перезваниваем.
+    private func recoverCallAudio() {
+        Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard callState == .connecting else { return }
+            if audio.reactivateForCall() {
+                journal("звонок", "звук возвращён после удержания")
+                call.markActive()
+                callAudioActivated()
+                return
+            }
+            journal("звонок", "звук не вернулся — перезваниваю")
+            call.end()
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            let message: String
+            switch settings.language {
+            case .russian: message = "Я снова на связи."
+            case .uzbek: message = "Yana aloqadaman."
+            case .english: message = "I'm back."
+            }
+            await ringUser(message: message)
+        }
+    }
+
+    /// Фраза, которой заканчивают разговор-звонок.
+    private static func isHangUp(_ text: String) -> Bool {
+        let normalized = text.lowercased().trimmingCharacters(in: .punctuationCharacters.union(.whitespaces))
+        return ["отбой", "конец связи", "пока", "до связи", "xayr", "aloqa tugadi", "goodbye", "bye", "hang up"]
+            .contains(normalized)
     }
 
     /// Прерывает текущий ответ (и запрос к Claude, если он ещё идёт).
@@ -268,36 +448,52 @@ final class AssistantController {
 
     // MARK: - Listening
 
+    private func ensureAudioPermissions() async -> Bool {
+        if audioPermissionsGranted { return true }
+        guard await SpeechListener.requestPermissions() else {
+            errorMessage = "Нужен доступ к микрофону (Настройки iOS → Конфиденциальность → Микрофон)."
+            return false
+        }
+        audioPermissionsGranted = true
+        return true
+    }
+
     private func prepareAudio() async -> Bool {
         guard !isPreparingAudio else { return false }
         isPreparingAudio = true
         defer { isPreparingAudio = false }
         releaseTask?.cancel()
 
-        if !audioPermissionsGranted {
-            guard await SpeechListener.requestPermissions() else {
-                errorMessage = "Нужен доступ к микрофону (Настройки iOS → Конфиденциальность → Микрофон)."
+        guard await ensureAudioPermissions() else { return false }
+        if onCall {
+            // Звонок: аудиосессию включает система. Наше дело — только движок микрофона.
+            guard audio.mode == .conversation else {
+                journal("звук", "звонок без звука (удержание) — микрофон не запускаю")
                 return false
             }
-            audioPermissionsGranted = true
         }
         // Движок мог остановиться (звонок, Siri, сброс медиасервисов, ответ через A2DP) — проверяем каждый раз.
         if !listener.isEngineRunning {
-            do {
-                try audio.activate()
-            } catch {
-                errorMessage = "Не удалось включить микрофон: \(error.localizedDescription)"
-                return false
+            if !onCall {
+                do {
+                    try audio.activate()
+                } catch {
+                    journal("звук", "сессия не включилась: \(error.localizedDescription)")
+                    errorMessage = "Не удалось включить микрофон: \(error.localizedDescription)"
+                    return false
+                }
+                await audio.waitForGlassesInput()
+                // Пока ждали гарнитуру, могли задать вопрос текстом — тогда аудио уже в режиме ответа.
+                guard audio.mode == .conversation else { return false }
             }
-            await audio.waitForGlassesInput()
-            // Пока ждали гарнитуру, могли задать вопрос текстом — тогда аудио уже в режиме ответа.
-            guard audio.mode == .conversation else { return false }
             do {
                 try listener.startEngine()
             } catch {
+                journal("звук", "микрофон не запустился: \(error.localizedDescription)")
                 errorMessage = "Не удалось включить микрофон: \(error.localizedDescription)"
                 return false
             }
+            journal("звук", "микрофон включён: \(audio.inputDescription)")
         }
         audio.preferGlassesInput()
         microphone = audio.inputDescription
@@ -307,24 +503,53 @@ final class AssistantController {
     }
 
     private func applyListeningLanguage() {
-        listener.setLanguage(translationLanguage ?? settings.language.rawValue)
+        let identifier = translationLanguage ?? settings.language.rawValue
+        listener.setLanguage(identifier)
         let key = settings.trimmedElevenLabsKey
         if key.isEmpty {
             listener.cloudTranscriber = nil
+            listener.liveSession = nil
+            listener.prefersCloud = false
+            return
+        }
+        listener.cloudTranscriber = { @Sendable audio, language in
+            try await ElevenLabsClient().transcribe(pcm16kHz: audio, languageCode: language, apiKey: key)
+        }
+        listener.prefersCloud = settings.usesLiveRecognition
+
+        // Поток: основной язык и те, на которые собеседник может перейти.
+        let language = String(identifier.prefix(2))
+        var configuration: ScribeLiveConfiguration?
+        if translatorActive {
+            let others = translationOtherLanguages.map { String($0.prefix(2)) }
+            configuration = settings.scribeConfiguration(
+                language: language, others: others, detectLanguage: !others.isEmpty, silence: 0.5
+            )
+            // Имена и цифры в переводе важнее смешанной речи: языки заданы явно.
+            configuration?.multilingual = false
         } else {
-            listener.cloudTranscriber = { @Sendable audio, language in
-                try await ElevenLabsClient().transcribe(pcm16kHz: audio, languageCode: language, apiKey: key)
+            configuration = settings.scribeConfiguration(language: language)
+            if handsFree, settings.wakeWordEnabled {
+                configuration?.keyterms = WakeWord.keyterms(for: settings.effectiveWakeWord)
             }
+        }
+        listener.liveDetectsLanguage = configuration?.detectLanguage ?? false
+        listener.liveSession = configuration.map { configuration in
+            { handler in ScribeLiveSession(configuration: configuration, handler: handler) }
         }
     }
 
     private func applyVoiceSettings() {
         speaker.languageCode = settings.language.rawValue
         speaker.elevenLabs = settings.elevenLabsConfiguration
+        speaker.streaming = settings.streamingVoiceConfiguration
     }
 
     private func startListening() {
         guard phase == .idle || phase == .listening else { return }
+        // «Без рук» ждёт обращения часами: поток распознавания открывается, только когда кто-то заговорил.
+        // По кнопке и сразу после «Да?» — заранее, чтобы не терять ни доли секунды.
+        listener.connectImmediately = translatorActive || !handsFree || Date() < wakeArmedUntil
         do {
             try listener.beginCapture()
             partialTranscript = ""
@@ -343,7 +568,7 @@ final class AssistantController {
 
         if let handler = translationHandler {
             phase = .idle
-            handler(text)
+            handler(text, listener.lastLanguage)
             return
         }
 
@@ -361,6 +586,12 @@ final class AssistantController {
                 resumeListening()
                 return
             }
+        }
+
+        if onCall, Self.isHangUp(query) {
+            phase = .idle
+            endCall()
+            return
         }
 
         guard !query.isEmpty else {
@@ -431,6 +662,7 @@ final class AssistantController {
 
     /// Звонок или Siri забрали аудио: прекращаем ответ и прослушивание, режим «без рук» сохраняем.
     private func suspendForAudioInterruption() {
+        journal("звук", "аудио прервано (звонок, Siri или другое приложение)")
         turnTask?.cancel()
         currentTurnID = nil
         speaker.stop()
@@ -444,6 +676,12 @@ final class AssistantController {
 
     private func resumeAfterAudioInterruption() {
         guard handsFree || (translatorActive && translationContinuous) else { return }
+        journal("звук", "прерывание закончилось")
+        if onCall, audio.mode != .conversation {
+            // Обычный звонок закончился: в этот момент система разрешает вернуть звук самим.
+            guard audio.reactivateForCall() else { return }
+            call.markActive()
+        }
         Task {
             guard await prepareAudio() else { return }
             if phase == .idle { startListening() }
@@ -537,6 +775,8 @@ final class AssistantController {
         }
         entries.append(TranscriptEntry(role: .user, text: text))
         replyLanguage = LanguageGuess.iso(for: text, fallback: settings.language.isoCode)
+        spokeThisTurn = false
+        turnStarted = Date()
         applyVoiceSettings()
         switchToPlaybackIfNeeded()
         beginBackgroundWork()
@@ -572,7 +812,8 @@ final class AssistantController {
             maxTokens: 8_000,
             webSearch: settings.webSearchEnabled,
             contextEditing: settings.saveTokens,
-            contextEditingExcludedTools: ["notes"]
+            contextEditingExcludedTools: ["notes"],
+            thinking: settings.instantAnswers ? settings.model.instantThinking : nil
         )
 
         do {
@@ -613,6 +854,8 @@ final class AssistantController {
         lastInteraction = Date()
         phase = .idle
         if handsFree {
+            // Уточняющий вопрос сразу после ответа не требует обращения по имени.
+            wakeArmedUntil = Date().addingTimeInterval(settings.followUpSeconds)
             try? await Task.sleep(nanoseconds: 300_000_000) // хвост звука не должен попасть в микрофон
             if handsFree, phase == .idle { resumeListening() }
         } else {
@@ -630,6 +873,8 @@ final class AssistantController {
 
         case .toolStarted(let name, let input):
             closeAssistantEntry()
+            sayHoldingPhrase(for: name)
+            speaker.flushPending()
             let presentation = ToolPresentation.make(name: name, input: input)
             entries.append(TranscriptEntry(
                 role: .tool, text: presentation.title, symbol: presentation.symbol, toolName: name, toolState: .running
@@ -647,6 +892,8 @@ final class AssistantController {
 
         case .serverToolStarted(let name):
             closeAssistantEntry()
+            sayHoldingPhrase(for: name)
+            speaker.flushPending()
             let presentation = ToolPresentation.make(name: name, input: nil)
             entries.append(TranscriptEntry(role: .tool, text: presentation.title, symbol: presentation.symbol, toolName: name, toolState: .done))
 
@@ -658,8 +905,20 @@ final class AssistantController {
     private func say(sentence: String) {
         let language = LanguageGuess.iso(for: sentence, fallback: replyLanguage)
         replyLanguage = language
+        if !spokeThisTurn {
+            spokeThisTurn = true
+            journal("ход", "первая фраза ответа через \(Int(Date().timeIntervalSince(turnStarted) * 1_000)) мс")
+        }
         speaker.speak(sentence, language: language)
         if phase == .thinking { phase = .speaking }
+    }
+
+    /// Инструмент работает секунды (камера, почта, поиск). Если ассистент ещё ничего не сказал,
+    /// коротко отзывается — тишина в очках ощущается как поломка.
+    private func sayHoldingPhrase(for tool: String) {
+        guard !spokeThisTurn, let phrase = HoldingPhrase.make(tool: tool, language: replyLanguage) else { return }
+        spokeThisTurn = true
+        speaker.speak(phrase, language: replyLanguage)
     }
 
     private func appendAssistantText(_ delta: String) {
@@ -701,11 +960,15 @@ final class AssistantController {
     // MARK: - Переводчик
 
     /// Переводчик забирает микрофон: ассистент замолкает и слушает речь на языке `language` (BCP-47).
-    /// `continuous` — слушать фразу за фразой (субтитры), иначе одну фразу.
+    /// `others` — языки, на которые говорящие могут перейти: тогда каждой фразе сообщается её язык.
+    /// `continuous` — слушать фразу за фразой, иначе одну фразу.
+    /// `onPartial` и `onText` получают текст и язык фразы (ISO 639), если распознавание его определило.
     func beginTranslationCapture(
         language: String,
+        others: [String] = [],
         continuous: Bool,
-        onText: @escaping (String) -> Void,
+        onPartial: ((String, String?) -> Void)? = nil,
+        onText: @escaping (String, String?) -> Void,
         onIdle: @escaping () -> Void
     ) async -> Bool {
         if phase == .thinking || phase == .speaking { interrupt() }
@@ -716,9 +979,11 @@ final class AssistantController {
         phase = .idle
         translatorActive = true
         translationHandler = onText
+        translationPartialHandler = onPartial
         translationIdleHandler = onIdle
         translationContinuous = continuous
         translationLanguage = language
+        translationOtherLanguages = others
         guard await prepareAudio(), translatorActive else {
             endTranslationCapture()
             return false
@@ -746,11 +1011,17 @@ final class AssistantController {
     func endTranslationCapture() {
         guard translatorActive else { return }
         translationHandler = nil
+        translationPartialHandler = nil
         translationIdleHandler = nil
         translationContinuous = false
         translationLanguage = nil
+        translationOtherLanguages = []
         listener.cancelCapture()
         speaker.stop()
+        if partnerSpeakerOn {
+            partnerSpeakerOn = false
+            audio.setPhoneSpeaker(false)
+        }
         translatorActive = false
         phase = .idle
         partialTranscript = ""
@@ -768,12 +1039,64 @@ final class AssistantController {
 
     /// Озвучивает перевод (ISO 639-1 языка) и ждёт конца.
     func speakTranslation(_ text: String, language: String) async {
-        speaker.elevenLabs = settings.elevenLabsConfiguration
+        applyVoiceSettings()
         speaker.speak(text, language: language)
         await speaker.waitUntilFinished()
     }
 
+    /// Перевод ещё пишется: очередная законченная фраза сразу уходит в озвучку.
+    /// `forPartner` — фраза для собеседника: звучит из динамика телефона, а не в очках.
+    func speakTranslationPiece(_ text: String, language: String, forPartner: Bool) {
+        guard translatorActive else { return }
+        if !speaker.isSpeaking {
+            applyVoiceSettings()
+            if forPartner, settings.translatorPartnerSpeaker, !partnerSpeakerOn {
+                partnerSpeakerOn = audio.setPhoneSpeaker(true)
+            }
+        }
+        speaker.speak(text, language: language)
+    }
+
+    /// Ждёт, пока договорит перевод, начатый `speakTranslationPiece`, и возвращает звук в очки.
+    func finishTranslationSpeech() async {
+        await speaker.waitUntilFinished()
+        if partnerSpeakerOn {
+            partnerSpeakerOn = false
+            audio.setPhoneSpeaker(false)
+            await audio.waitForGlassesInput()
+        }
+    }
+
+    /// Пока звучит перевод, распознавание выключено — иначе переводчик услышит сам себя.
+    func pauseListeningForSpeech() {
+        guard translatorActive, phase == .listening else { return }
+        listener.cancelCapture()
+        phase = .idle
+        partialTranscript = ""
+    }
+
     var isTranslationListening: Bool { translatorActive && phase == .listening }
+}
+
+/// Короткая реплика на время работы медленного инструмента.
+enum HoldingPhrase {
+    static func make(tool: String, language: String) -> String? {
+        let phrases: [String: String]
+        switch tool {
+        case "take_photo":
+            phrases = ["ru": "Смотрю.", "uz": "Qarayapman.", "en": "Looking."]
+        case "web_search", "web_fetch":
+            phrases = ["ru": "Ищу.", "uz": "Qidiryapman.", "en": "Searching."]
+        case "check_mail", "read_mail":
+            phrases = ["ru": "Проверяю почту.", "uz": "Pochtani tekshiryapman.", "en": "Checking your mail."]
+        case "get_location", "navigate":
+            phrases = ["ru": "Секунду.", "uz": "Bir soniya.", "en": "One moment."]
+        default:
+            // Календарь, заметки, таймеры отвечают мгновенно — реплика только задержала бы ответ.
+            return nil
+        }
+        return phrases[language] ?? phrases["ru"]
+    }
 }
 
 /// Как показать вызов инструмента в ленте: подпись и SF Symbol.
@@ -811,6 +1134,17 @@ enum WakeWord {
         "джарвис": ["джарвис", "джарвиз", "жарвис", "jarvis", "чарвис"],
         "jarvis": ["jarvis", "джарвис", "jarvi"],
     ]
+
+    /// Подсказки распознаванию: имя и его частые написания (не длиннее 20 знаков каждое).
+    static func keyterms(for wakeWord: String) -> [String] {
+        let key = wakeWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return [] }
+        var seen = Set<String>()
+        return ([wakeWord.trimmingCharacters(in: .whitespacesAndNewlines), transliterate(key)] + (variants[key] ?? []))
+            .filter { !$0.isEmpty && $0.count <= 20 && seen.insert($0.lowercased()).inserted }
+            .prefix(6)
+            .map { $0 }
+    }
 
     /// Возвращает запрос без обращения или `nil`, если обращения в первых словах нет.
     static func strip(_ wakeWord: String, from text: String) -> String? {

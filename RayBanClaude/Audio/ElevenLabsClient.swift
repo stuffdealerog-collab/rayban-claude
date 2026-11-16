@@ -1,26 +1,41 @@
 import Foundation
 
-/// Модели синтеза ElevenLabs, доступные в настройках. Обе говорят по-русски.
+/// Модели синтеза ElevenLabs, доступные в настройках.
 enum ElevenLabsModel: String, CaseIterable, Identifiable, Sendable {
-    /// ~100 мс, вдвое дешевле за символ.
+    /// Около 0,1 с до первого звука, 90+ языков, в том числе узбекский. Звук идёт потоком.
+    case v4Turbo = "eleven_v4_turbo"
+    /// Самая выразительная из новых; отвечает медленнее Turbo.
+    case v4 = "eleven_v4"
+    /// Прежняя быстрая: без узбекского.
     case flash = "eleven_flash_v2_5"
-    /// Медленнее, но естественнее интонации.
+    /// Прежняя качественная: без узбекского.
     case multilingual = "eleven_multilingual_v2"
-    /// Самая выразительная, 70+ языков, в том числе узбекский. Отвечает медленнее Flash.
+    /// Прежняя выразительная, с узбекским.
     case v3 = "eleven_v3"
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .flash: return "Быстрая (Flash v2.5)"
-        case .multilingual: return "Качественная (Multilingual v2)"
-        case .v3: return "Выразительная (v3)"
+        case .v4Turbo: return "Быстрая (v4 Turbo)"
+        case .v4: return "Выразительная (v4)"
+        case .flash: return "Flash v2.5"
+        case .multilingual: return "Multilingual v2"
+        case .v3: return "v3"
         }
     }
 
+    /// Говорит на всех языках приложения, включая узбекский.
+    var speaksUzbek: Bool { self == .v4Turbo || self == .v4 || self == .v3 }
+
+    /// Звук можно получать потоком, пока текст ещё пишется.
+    var streams: Bool { self == .v4Turbo || self == .v4 }
+
     /// `language_code` не поддерживает только Multilingual v2.
     fileprivate var supportsLanguageCode: Bool { self != .multilingual }
+
+    /// Связность с предыдущими фразами умеют только модели v2.
+    fileprivate var supportsPreviousText: Bool { self == .flash || self == .multilingual }
 
     /// Языки Flash v2.5 (ISO 639-1). Для остальных, например узбекского, нужна v3.
     static let flashLanguages: Set<String> = [
@@ -44,7 +59,7 @@ extension ElevenLabsConfiguration {
     func adapted(to language: String) -> ElevenLabsConfiguration {
         var copy = self
         copy.languageCode = language
-        if !ElevenLabsModel.flashLanguages.contains(language) { copy.model = .v3 }
+        if !model.speaksUzbek, !ElevenLabsModel.flashLanguages.contains(language) { copy.model = .v4Turbo }
         return copy
     }
 }
@@ -166,7 +181,7 @@ struct ElevenLabsClient: Sendable {
             text: text,
             modelID: configuration.model.rawValue,
             languageCode: configuration.model.supportsLanguageCode ? configuration.languageCode : nil,
-            previousText: configuration.model == .v3 ? nil : previousText
+            previousText: configuration.model.supportsPreviousText ? previousText : nil
         )
         request.httpBody = try JSONEncoder().encode(body)
 
@@ -176,8 +191,17 @@ struct ElevenLabsClient: Sendable {
         return data
     }
 
-    /// Распознаёт речь (Scribe): 16 кГц, моно, 16 бит PCM. Нужна для узбекского — у Apple его нет.
+    /// Распознаёт записанную фразу (Scribe): 16 кГц, моно, 16 бит PCM. Запасной путь для потокового
+    /// распознавания. Сначала новая модель; если сервер её не принял — прежняя.
     func transcribe(pcm16kHz: Data, languageCode: String?, apiKey: String) async throws -> String {
+        do {
+            return try await transcribe(pcm16kHz: pcm16kHz, languageCode: languageCode, apiKey: apiKey, model: "scribe_v3")
+        } catch ElevenLabsError.badRequest {
+            return try await transcribe(pcm16kHz: pcm16kHz, languageCode: languageCode, apiKey: apiKey, model: "scribe_v2")
+        }
+    }
+
+    private func transcribe(pcm16kHz: Data, languageCode: String?, apiKey: String, model: String) async throws -> String {
         var request = URLRequest(url: Self.baseURL.appendingPathComponent("v1/speech-to-text"))
         request.httpMethod = "POST"
         request.timeoutInterval = 20
@@ -189,7 +213,7 @@ struct ElevenLabsClient: Sendable {
         func field(_ name: String, _ value: String) {
             body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"\r\n\r\n\(value)\r\n".utf8))
         }
-        field("model_id", "scribe_v2")
+        field("model_id", model)
         field("file_format", "pcm_s16le_16")
         field("tag_audio_events", "false")
         if let languageCode { field("language_code", languageCode) }

@@ -103,13 +103,17 @@ struct TranslatorView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Theme.Space.l) {
-                    if translator.entries.isEmpty && !assistant.isTranslationListening {
+                    if translator.entries.isEmpty && translator.live == nil && !assistant.isTranslationListening {
                         emptyState
                     }
                     ForEach(translator.entries) { entry in
                         TranslationRow(entry: entry).id(entry.id)
                     }
-                    if assistant.isTranslationListening {
+                    if let live = translator.live {
+                        TranslationRow(entry: live)
+                            .opacity(0.6)
+                            .id("partial")
+                    } else if assistant.isTranslationListening {
                         Text(assistant.partialTranscript.isEmpty ? "Слушаю…" : assistant.partialTranscript)
                             .font(.callout)
                             .foregroundStyle(Theme.textSecondary)
@@ -131,11 +135,13 @@ struct TranslatorView: View {
 
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: Theme.Space.s) {
-            Text(translator.mode == .dialog ? "Говорите по очереди" : "Субтитры чужой речи")
+            Text(translator.mode == .dialog ? "Говорите по очереди" : "Говорите свободно")
                 .font(.headline)
             Text(translator.mode == .dialog
                 ? "Нажмите свою кнопку и скажите фразу — перевод прозвучит и появится крупно. Потом кнопку нажимает собеседник."
-                : "Переводчик слушает собеседника фразу за фразой и переводит в очки. Чтобы остановить, нажмите кнопку ещё раз.")
+                : (translator.conversationDetectsLanguage
+                    ? "Переводчик сам понимает, кто говорит: вашу речь переводит собеседнику, его речь — вам в очки."
+                    : "Переводчик слушает собеседника и переводит вам в очки. Чтобы он понимал обоих, добавьте ключ ElevenLabs."))
                 .font(.callout)
                 .foregroundStyle(Theme.textSecondary)
             if translator.mine.iso == "uz" || translator.theirs.iso == "uz" {
@@ -161,18 +167,19 @@ struct TranslatorView: View {
                 }
             } else {
                 SpeakerButton(
-                    title: translator.activeSide == nil ? "Начать субтитры" : "Остановить",
-                    language: "\(translator.theirs.name) → \(translator.mine.name)",
-                    isActive: translator.activeSide != nil,
+                    title: translator.isRunning ? "Остановить" : "Начать разговор",
+                    language: "\(translator.mine.name) ⇄ \(translator.theirs.name)",
+                    isActive: translator.isRunning,
                     filled: true
                 ) {
-                    Task { await translator.toggle(.them) }
+                    Task { await translator.toggleConversation() }
                 }
             }
         }
         .padding(Theme.Space.l)
         .background(alignment: .top) { Rectangle().fill(Theme.hairline).frame(height: 1) }
         .sensoryFeedback(.selection, trigger: translator.activeSide)
+        .sensoryFeedback(.selection, trigger: translator.isRunning)
     }
 }
 

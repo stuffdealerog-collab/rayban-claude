@@ -64,6 +64,48 @@ final class AudioSessionManager {
         mode = .inactive
     }
 
+    // MARK: - Звонок («На связи»)
+
+    /// Звук звонка включила система (CallKit): микрофон и динамик доступны и в фоне.
+    func callAudioActivated() {
+        mode = .conversation
+        preferGlassesInput()
+        journal("звук", "звонок: звук включён, микрофон — \(inputDescription)")
+    }
+
+    func callAudioDeactivated() {
+        mode = .inactive
+    }
+
+    /// После удержания (обычный звонок закончился) система не всегда включает звук сама.
+    func reactivateForCall() -> Bool {
+        do {
+            try session.setActive(true)
+            mode = .conversation
+            preferGlassesInput()
+            return true
+        } catch {
+            journal("звук", "вернуть звук звонка не удалось: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    /// Переводчик: фраза для собеседника звучит из динамика телефона, а не в очках.
+    /// Работает только в режиме разговора. Возвращает, удалось ли переключить.
+    @discardableResult
+    func setPhoneSpeaker(_ enabled: Bool) -> Bool {
+        guard mode == .conversation else { return false }
+        do {
+            try session.overrideOutputAudioPort(enabled ? .speaker : .none)
+            journal("звук", enabled ? "перевод собеседнику: динамик телефона" : "звук возвращён в очки")
+            if !enabled { preferGlassesInput() }
+            return true
+        } catch {
+            journal("звук", "динамик телефона не включился: \(error.localizedDescription)")
+            return false
+        }
+    }
+
     /// После переключения из A2DP канал гарнитуры (HFP) поднимается не сразу. Ждём его,
     /// чтобы первые слова не записались микрофоном телефона. Без очков возвращается сразу.
     func waitForGlassesInput(timeout: TimeInterval = 2) async {

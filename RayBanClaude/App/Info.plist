@@ -57,10 +57,12 @@
 	</dict>
 
 	<!-- Каналы связи с очками: BLE, Bluetooth Classic (видеопоток), Wi-Fi (большие объёмы).
-	     audio — чтобы режим «без рук» работал при заблокированном экране. -->
+	     audio — чтобы режим «без рук» работал при заблокированном экране.
+	     voip — режим «На связи» (CallKit): без него система не показывает входящий вызов ассистента. -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
+		<string>voip</string>
 		<string>processing</string>
 		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>

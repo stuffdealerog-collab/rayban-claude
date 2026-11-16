@@ -19,6 +19,9 @@ public struct ClaudeConfiguration: Sendable {
     public var contextEditing: Bool
     /// Инструменты, чьи результаты нельзя убирать (например, заметки памяти).
     public var contextEditingExcludedTools: [String]
+    /// `thinking.type`: например `between_tools` (Claude Sonnet 5.5) или `disabled` (Claude Haiku 5.5) —
+    /// модель не размышляет перед ответом, первая фраза приходит раньше. nil — поведение модели по умолчанию.
+    public var thinking: String?
 
     public init(
         apiKey: String,
@@ -29,7 +32,8 @@ public struct ClaudeConfiguration: Sendable {
         serverFallbacks: Bool = true,
         webSearch: Bool = true,
         contextEditing: Bool = true,
-        contextEditingExcludedTools: [String] = []
+        contextEditingExcludedTools: [String] = [],
+        thinking: String? = nil
     ) {
         self.apiKey = apiKey
         self.model = model
@@ -40,6 +44,7 @@ public struct ClaudeConfiguration: Sendable {
         self.webSearch = webSearch
         self.contextEditing = contextEditing
         self.contextEditingExcludedTools = contextEditingExcludedTools
+        self.thinking = thinking
     }
 
     static let fallbackBeta = "server-side-fallback-2026-07-01"
@@ -89,6 +94,8 @@ public actor ClaudeConversation {
     private let maxContinuations: Int
     /// API отклонил `context_management` (модель или аккаунт без беты) — дальше без него.
     private var contextEditingRejected = false
+    /// Сервер не принял настройку thinking для этой модели — дальше шлём без неё.
+    private var thinkingRejected = false
 
     public init(client: ClaudeClient = ClaudeClient(), maxToolIterations: Int = 8, maxContinuations: Int = 5) {
         self.client = client
@@ -160,8 +167,10 @@ public actor ClaudeConversation {
                 try Task.checkCancellation()
 
                 let contextEditing = configuration.contextEditing && !contextEditingRejected
+                var effective = configuration
+                if thinkingRejected { effective.thinking = nil }
                 let body = Self.requestBody(
-                    messages: messages, configuration: configuration, tools: tools, contextEditing: contextEditing
+                    messages: messages, configuration: effective, tools: tools, contextEditing: contextEditing
                 )
                 var betas: [String] = []
                 if configuration.serverFallbacks { betas.append(ClaudeConfiguration.fallbackBeta) }
@@ -183,6 +192,9 @@ public actor ClaudeConversation {
                 } catch let error as ClaudeAPIError where contextEditing && Self.rejectsContextManagement(error) {
                     // Ошибка пришла до начала стрима — повторяем тот же запрос без контекстного редактирования.
                     contextEditingRejected = true
+                    continue
+                } catch let error as ClaudeAPIError where effective.thinking != nil && Self.rejectsThinking(error) {
+                    thinkingRejected = true
                     continue
                 }
                 try Task.checkCancellation()
@@ -273,6 +285,9 @@ public actor ClaudeConversation {
         if configuration.serverFallbacks {
             body["fallbacks"] = "default"
         }
+        if let thinking = configuration.thinking {
+            body["thinking"] = ["type": .string(thinking)]
+        }
         if contextEditing {
             // Старые результаты инструментов (снимки, поиск) убираются, когда запрос перерастает
             // ~30 тыс. токенов; три последних остаются. Чистить меньше 5 тыс. невыгодно: очистка
@@ -289,6 +304,11 @@ public actor ClaudeConversation {
             body["context_management"] = ["edits": [.object(edit)]]
         }
         return .object(body)
+    }
+
+    /// 400 из-за настройки `thinking`: модель её не поддерживает (или её сменил серверный fallback).
+    static func rejectsThinking(_ error: ClaudeAPIError) -> Bool {
+        error.statusCode == 400 && error.message.lowercased().contains("thinking")
     }
 
     /// 400 из-за `context_management`: бета недоступна для модели или аккаунта.

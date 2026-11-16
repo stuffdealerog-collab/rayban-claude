@@ -159,6 +159,25 @@ actor EventLog {
         #expect(MockAPIProtocol.requests[2]["context_management"] == nil)
     }
 
+    @Test func thinkingSettingIsSentAndDroppedWhenRejected() async throws {
+        let rejection = #"{"type":"error","error":{"type":"invalid_request_error","message":"\"thinking.type.between_tools\" is not supported for this model."}}"#
+        MockAPIProtocol.responses = [(400, rejection), (200, finalAnswerStream), (200, finalAnswerStream)]
+        MockAPIProtocol.requests = []
+        let conversation = ClaudeConversation(client: MockAPIProtocol.makeClient())
+        var config = configuration
+        config.thinking = "between_tools"
+
+        let outcome = try await conversation.send(userText: "Привет", configuration: config, tools: []) { _ in }
+        #expect(outcome == .completed(text: " Это кружка."))
+        #expect(MockAPIProtocol.requests.count == 2)
+        #expect(MockAPIProtocol.requests[0]["thinking"]?["type"] == "between_tools")
+        #expect(MockAPIProtocol.requests[1]["thinking"] == nil)
+
+        // Отказ запоминается на весь разговор.
+        _ = try await conversation.send(userText: "Ещё", configuration: config, tools: []) { _ in }
+        #expect(MockAPIProtocol.requests[2]["thinking"] == nil)
+    }
+
     @Test func refusalRollsBackHistory() async throws {
         let refusal = sse([
             ("message_start", #"{"type":"message_start","message":{"id":"m","model":"claude-opus-5-5"}}"#),

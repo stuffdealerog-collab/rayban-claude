@@ -5,6 +5,7 @@ import Security
 
 /// Модели Claude, доступные в настройках.
 enum ClaudeModel: String, CaseIterable, Identifiable {
+    case haiku55 = "claude-haiku-5-5"
     case sonnet55 = "claude-sonnet-5-5"
     case opus55 = "claude-opus-5-5"
 
@@ -12,6 +13,7 @@ enum ClaudeModel: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
+        case .haiku55: return "Claude Haiku 5.5"
         case .sonnet55: return "Claude Sonnet 5.5"
         case .opus55: return "Claude Opus 5.5"
         }
@@ -19,8 +21,18 @@ enum ClaudeModel: String, CaseIterable, Identifiable {
 
     var subtitle: String {
         switch self {
-        case .sonnet55: return "Быстрее и вдвое дешевле — для живого разговора"
+        case .haiku55: return "Самый быстрый и в двадцать раз дешевле Sonnet"
+        case .sonnet55: return "Лучший баланс: живой разговор и хороший узбекский"
         case .opus55: return "Умнее в сложных задачах, медленнее и дороже"
+        }
+    }
+
+    /// Настройка «не размышлять перед ответом» для этой модели; nil — модель так не умеет.
+    var instantThinking: String? {
+        switch self {
+        case .haiku55: return "disabled"
+        case .sonnet55: return "between_tools"
+        case .opus55: return nil
         }
     }
 }
@@ -115,6 +127,10 @@ final class AppSettings {
     var saveTokens: Bool {
         didSet { defaults.set(saveTokens, forKey: Keys.saveTokens) }
     }
+    /// Отвечать сразу, без размышления перед ответом: быстрее первая фраза.
+    var instantAnswers: Bool {
+        didSet { defaults.set(instantAnswers, forKey: Keys.instantAnswers) }
+    }
 
     // MARK: Речь
 
@@ -132,6 +148,37 @@ final class AppSettings {
     var effectiveWakeWord: String {
         let custom = wakeWord.trimmingCharacters(in: .whitespacesAndNewlines)
         return custom.isEmpty ? persona.displayName : custom
+    }
+    /// Сколько секунд после ответа можно говорить без обращения по имени (0 — всегда с именем).
+    var followUpSeconds: Double {
+        didSet { defaults.set(followUpSeconds, forKey: Keys.followUpSeconds) }
+    }
+    /// Распознавать речь потоком через ElevenLabs (точнее, понимает узбекский) вместо Apple.
+    var liveRecognition: Bool {
+        didSet { defaults.set(liveRecognition, forKey: Keys.liveRecognition) }
+    }
+    /// Смешанная речь: узбекский и русский вперемешку в одной фразе.
+    var mixedSpeech: Bool {
+        didSet { defaults.set(mixedSpeech, forKey: Keys.mixedSpeech) }
+    }
+
+    /// Потоковое распознавание доступно и включено.
+    var usesLiveRecognition: Bool { liveRecognition && !trimmedElevenLabsKey.isEmpty }
+
+    /// Настройки потокового распознавания для языка (ISO 639-1); остальные языки приложения — запасные.
+    func scribeConfiguration(
+        language: String, others: [String]? = nil, detectLanguage: Bool = false, silence: Double = 0.7
+    ) -> ScribeLiveConfiguration? {
+        guard usesLiveRecognition else { return nil }
+        let expected = others ?? AssistantLanguage.allCases.map(\.isoCode).filter { $0 != language }
+        return ScribeLiveConfiguration(
+            apiKey: trimmedElevenLabsKey,
+            languageCode: language,
+            secondaryLanguages: expected,
+            multilingual: mixedSpeech,
+            silenceSeconds: silence,
+            detectLanguage: detectLanguage
+        )
     }
 
     // MARK: Голос
@@ -187,6 +234,10 @@ final class AppSettings {
     var translatorSpeaks: Bool {
         didSet { defaults.set(translatorSpeaks, forKey: Keys.translatorSpeaks) }
     }
+    /// Перевод ваших слов звучит из динамика телефона — для собеседника.
+    var translatorPartnerSpeaker: Bool {
+        didSet { defaults.set(translatorPartnerSpeaker, forKey: Keys.translatorPartnerSpeaker) }
+    }
 
     @ObservationIgnored private let defaults: UserDefaults
 
@@ -204,12 +255,20 @@ final class AppSettings {
         return ElevenLabsConfiguration(
             apiKey: trimmedElevenLabsKey,
             voiceID: voiceID,
-            model: ElevenLabsModel.flashLanguages.contains(code) || elevenLabsModel == .v3 ? elevenLabsModel : .v3,
+            model: elevenLabsModel,
             languageCode: code
-        )
+        ).adapted(to: code)
     }
 
     var elevenLabsConfiguration: ElevenLabsConfiguration? { voiceConfiguration() }
+
+    /// Потоковая озвучка — только для моделей v4.
+    var streamingVoiceConfiguration: DialogueSpeechConfiguration? {
+        guard elevenLabsModel.streams, let voice = voiceConfiguration() else { return nil }
+        return DialogueSpeechConfiguration(
+            apiKey: voice.apiKey, voiceID: voice.voiceID, model: elevenLabsModel.rawValue, languageCode: voice.languageCode
+        )
+    }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -219,13 +278,17 @@ final class AppSettings {
         model = defaults.string(forKey: Keys.model).flatMap(ClaudeModel.init(rawValue:)) ?? .sonnet55
         webSearchEnabled = defaults.object(forKey: Keys.webSearch) as? Bool ?? true
         saveTokens = defaults.object(forKey: Keys.saveTokens) as? Bool ?? true
+        instantAnswers = defaults.object(forKey: Keys.instantAnswers) as? Bool ?? true
+        liveRecognition = defaults.object(forKey: Keys.liveRecognition) as? Bool ?? true
+        mixedSpeech = defaults.object(forKey: Keys.mixedSpeech) as? Bool ?? false
         language = defaults.string(forKey: Keys.language).flatMap(AssistantLanguage.init(rawValue:)) ?? .russian
         wakeWordEnabled = defaults.object(forKey: Keys.wakeWordEnabled) as? Bool ?? true
         wakeWord = defaults.string(forKey: Keys.wakeWord) ?? ""
+        followUpSeconds = defaults.object(forKey: Keys.followUpSeconds) as? Double ?? 8
         elevenLabsAPIKey = KeychainStore.read(account: Keys.elevenLabsKey) ?? ""
         elevenLabsVoiceID = defaults.string(forKey: Keys.elevenLabsVoiceID) ?? ""
         elevenLabsVoiceName = defaults.string(forKey: Keys.elevenLabsVoiceName) ?? ""
-        elevenLabsModel = defaults.string(forKey: Keys.elevenLabsModel).flatMap(ElevenLabsModel.init(rawValue:)) ?? .flash
+        elevenLabsModel = defaults.string(forKey: Keys.elevenLabsModel).flatMap(ElevenLabsModel.init(rawValue:)) ?? .v4Turbo
         stereoAnswers = defaults.object(forKey: Keys.stereoAnswers) as? Bool ?? true
         mailAddress = defaults.string(forKey: Keys.mailAddress) ?? ""
         mailHost = defaults.string(forKey: Keys.mailHost) ?? ""
@@ -233,6 +296,7 @@ final class AppSettings {
         translatorMine = defaults.string(forKey: Keys.translatorMine) ?? "ru-RU"
         translatorTheirs = defaults.string(forKey: Keys.translatorTheirs) ?? "en-US"
         translatorSpeaks = defaults.object(forKey: Keys.translatorSpeaks) as? Bool ?? true
+        translatorPartnerSpeaker = defaults.object(forKey: Keys.translatorPartnerSpeaker) as? Bool ?? true
     }
 
     private enum Keys {
@@ -242,13 +306,17 @@ final class AppSettings {
         static let model = "model.v2"
         static let webSearch = "webSearchEnabled"
         static let saveTokens = "saveTokens"
+        static let instantAnswers = "instantAnswers"
+        static let liveRecognition = "liveRecognition"
+        static let mixedSpeech = "mixedSpeech"
         static let language = "language"
         static let wakeWordEnabled = "wakeWordEnabled"
         static let wakeWord = "wakeWord.v2"
+        static let followUpSeconds = "followUpSeconds"
         static let elevenLabsKey = "elevenlabs-api-key"
         static let elevenLabsVoiceID = "elevenLabsVoiceID"
         static let elevenLabsVoiceName = "elevenLabsVoiceName"
-        static let elevenLabsModel = "elevenLabsModel"
+        static let elevenLabsModel = "elevenLabsModel.v2"
         static let stereoAnswers = "stereoAnswers"
         static let mailAddress = "mailAddress"
         static let mailHost = "mailHost"
@@ -256,6 +324,7 @@ final class AppSettings {
         static let translatorMine = "translatorMine"
         static let translatorTheirs = "translatorTheirs"
         static let translatorSpeaks = "translatorSpeaks"
+        static let translatorPartnerSpeaker = "translatorPartnerSpeaker"
     }
 }
 

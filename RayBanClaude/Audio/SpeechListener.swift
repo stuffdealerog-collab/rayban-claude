@@ -1,3 +1,4 @@
+import AssistantCore
 @preconcurrency import AVFoundation
 import Speech
 
@@ -33,9 +34,12 @@ struct ListenerIdleReason {
 /// конец фразы определяется по паузе. Пока ассистент говорит, распознавание выключено,
 /// чтобы он не слышал сам себя.
 ///
-/// Два способа распознавания: Apple Speech (на устройстве, с промежуточным текстом) и облачный —
-/// фраза записывается и отправляется в ElevenLabs Scribe. Облачный нужен для языков, которых
-/// у Apple нет, прежде всего узбекского.
+/// Три способа распознавания:
+/// - **поток ElevenLabs** (Scribe Live): звук уходит по WebSocket, текст приходит на лету, конец фразы
+///   угадывает сервер. Понимает узбекский и смешанную речь, работает и в фоне;
+/// - **запись + запрос** (Scribe): фраза записывается и отправляется целиком — запасной путь, если
+///   поток не открылся;
+/// - **Apple Speech** на устройстве — когда ключа ElevenLabs нет (узбекского не умеет).
 @MainActor
 final class SpeechListener {
     /// Промежуточный текст для UI.
@@ -46,6 +50,16 @@ final class SpeechListener {
     var onIdle: ((ListenerIdleReason) -> Void)?
     /// Облачное распознавание: PCM 16 кГц моно → текст. nil — облака нет (нет ключа ElevenLabs).
     var cloudTranscriber: (@Sendable (Data, String) async throws -> String)?
+    /// Потоковое распознавание: создаёт сеанс для текущего языка. nil — потока нет.
+    var liveSession: ((@escaping ScribeLiveSession.Handler) -> ScribeLiveSession?)?
+    /// Распознавать облаком и те языки, которые умеет Apple.
+    var prefersCloud = false
+    /// Открывать поток сразу (нажали кнопку) или дождаться речи (режим «без рук»: тишина не тарифицируется).
+    var connectImmediately = true
+    /// Сеанс присылает язык фразы отдельным событием — дождаться его перед выдачей текста.
+    var liveDetectsLanguage = false
+    /// Язык последней фразы по мнению распознавания (ISO 639), если оно его сообщает.
+    private(set) var lastLanguage: String?
 
     /// Пауза после речи, по которой фраза считается законченной.
     var endOfUtteranceSilence: Double = 1.2
@@ -62,6 +76,11 @@ final class SpeechListener {
     private var task: SFSpeechRecognitionTask?
     private var silenceTimer: Task<Void, Never>?
     private var cloudMonitor: Task<Void, Never>?
+    private var live: ScribeLiveSession?
+    private var livePausedUntil = Date.distantPast
+    private var liveTextAt = Date.distantPast
+    private var pendingCommit: String?
+    private var pendingCommitTimer: Task<Void, Never>?
     private var latestText = ""
     private var captureStarted = Date.distantPast
     private var generation = UUID()
@@ -166,7 +185,7 @@ final class SpeechListener {
     /// Начинает распознавание одной фразы.
     func beginCapture() throws {
         guard engine.isRunning else { throw SpeechListenerError.engineStopped }
-        if usesCloud {
+        if usesCloud || (prefersCloud && cloudTranscriber != nil) {
             guard cloudTranscriber != nil else { throw SpeechListenerError.cloudRecognizerMissing }
             cancelCapture()
             beginCloudCapture()
@@ -212,6 +231,12 @@ final class SpeechListener {
         silenceTimer = nil
         cloudMonitor?.cancel()
         cloudMonitor = nil
+        pendingCommitTimer?.cancel()
+        pendingCommitTimer = nil
+        pendingCommit = nil
+        tapBox.detachSink()
+        live?.close()
+        live = nil
         tapBox.setRequest(nil)
         _ = tapBox.stopRecording()
         task?.cancel()
@@ -254,23 +279,28 @@ final class SpeechListener {
         }
     }
 
-    // MARK: - Облачное распознавание (узбекский)
+    // MARK: - Облачное распознавание
 
-    /// Записывает фразу и сам определяет её конец по громкости: речь, затем пауза.
+    /// Слушает фразу облаком. С потоком конец фразы решает сервер; без него — пауза по громкости,
+    /// после которой запись уходит одним запросом.
     private func beginCloudCapture() {
         tapBox.startRecording()
         isCapturing = true
         captureStarted = Date()
         latestText = ""
+        lastLanguage = nil
+        liveTextAt = .distantPast
         let current = UUID()
         generation = current
         let silence = endOfUtteranceSilence
+        if connectImmediately { openLive(generation: current) }
 
         cloudMonitor = Task { [weak self] in
             var noiseFloor: Float = 1
             var speechFrames = 0
             var heardSpeech = false
             var lastVoice = Date()
+            var committedLocally: Date?
             let started = Date()
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 50_000_000)
@@ -281,12 +311,34 @@ final class SpeechListener {
                 let threshold = max(noiseFloor + 0.12, 0.18)
                 if level > threshold {
                     speechFrames += 1
-                    if speechFrames >= 3 { heardSpeech = true }
+                    if speechFrames >= 3, !heardSpeech {
+                        heardSpeech = true
+                        // «Без рук»: поток открывается только сейчас, когда кто-то заговорил.
+                        if self.live == nil { self.openLive(generation: current) }
+                    }
                     lastVoice = Date()
                 } else {
                     speechFrames = 0
                 }
-                if heardSpeech, Date().timeIntervalSince(lastVoice) > silence || elapsed > 25 {
+                // Текст от сервера — тоже речь: тихий голос может не пробить порог громкости.
+                if self.liveTextAt > lastVoice {
+                    heardSpeech = true
+                    lastVoice = self.liveTextAt
+                }
+                let quiet = Date().timeIntervalSince(lastVoice)
+
+                if self.live != nil {
+                    // Конец фразы решает сервер. Страховка на случай, если он молчит.
+                    if heardSpeech, committedLocally == nil, quiet > silence + 1.0 || elapsed > 25 {
+                        committedLocally = Date()
+                        self.live?.commit()
+                    }
+                    if let committedLocally, Date().timeIntervalSince(committedLocally) > 2.5 {
+                        self.dropLive(reason: "сервер не завершил фразу")
+                        self.finishCloudCapture(generation: current)
+                        return
+                    }
+                } else if heardSpeech, quiet > silence || elapsed > 25 {
                     self.finishCloudCapture(generation: current)
                     return
                 }
@@ -298,6 +350,83 @@ final class SpeechListener {
                 }
             }
         }
+    }
+
+    // MARK: - Поток
+
+    private func openLive(generation current: UUID) {
+        guard live == nil, livePausedUntil < Date(), let liveSession else { return }
+        let handler: ScribeLiveSession.Handler = { [weak self] event in
+            Task { @MainActor in self?.handleLive(event, generation: current) }
+        }
+        guard let session = liveSession(handler) else { return }
+        live = session
+        // Уже записанное начало фразы уходит первым — слова до подключения не теряются.
+        tapBox.attachSink(prerollSeconds: 1.5) { [session] chunk in session.send(chunk) }
+        session.start()
+    }
+
+    /// Поток не справился: эту фразу дослушает запись, следующую минуту поток не открываем.
+    private func dropLive(reason: String) {
+        journal("речь", "поток выключен на минуту: \(reason)")
+        tapBox.detachSink()
+        live?.close()
+        live = nil
+        livePausedUntil = Date().addingTimeInterval(60)
+    }
+
+    private func handleLive(_ event: ScribeLiveEvent, generation current: UUID) {
+        guard current == generation, isCapturing else { return }
+        switch event {
+        case .started(let model):
+            journal("речь", "поток открыт (\(model.isEmpty ? "модель не названа" : model))")
+        case .partial(let text, let language, _):
+            if let language, !language.isEmpty { lastLanguage = language }
+            let clean = Self.withoutSoundTags(text)
+            guard !clean.isEmpty, clean != latestText else { return }
+            latestText = clean
+            liveTextAt = Date()
+            onPartial?(clean)
+        case .committed(let text):
+            let clean = Self.withoutSoundTags(text)
+            guard !clean.isEmpty else {
+                // Сервер закрыл отрезок тишины или шума — фразы ещё не было.
+                latestText = ""
+                return
+            }
+            guard liveDetectsLanguage else {
+                deliver(clean)
+                return
+            }
+            // Язык фразы приходит следом отдельным событием — ждём его совсем недолго.
+            pendingCommit = clean
+            pendingCommitTimer?.cancel()
+            pendingCommitTimer = Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 250_000_000)
+                guard !Task.isCancelled, let self, self.generation == current, let text = self.pendingCommit else { return }
+                self.deliver(text)
+            }
+        case .language(let code):
+            lastLanguage = code
+            if let text = pendingCommit { deliver(text) }
+        case .failed(let error):
+            journal("речь", "поток: ошибка \(error.kind) — \(error.message)")
+            if error.isPermanent {
+                cancelCapture()
+                onIdle?(ListenerIdleReason(
+                    error: "Распознавание ElevenLabs: \(error.localizedDescription)", isQuickFailure: false, isFatal: true
+                ))
+            } else {
+                dropLive(reason: error.localizedDescription)
+            }
+        case .closed:
+            break
+        }
+    }
+
+    private func deliver(_ text: String) {
+        cancelCapture()
+        onUtterance?(text)
     }
 
     private func finishCloudCapture(generation current: UUID) {
@@ -351,6 +480,7 @@ private final class TapBox: @unchecked Sendable {
     private var recording = false
     private var recorded = Data()
     private var converter: AVAudioConverter?
+    private var sink: (@Sendable (Data) -> Void)?
     private let targetFormat = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16_000, channels: 1, interleaved: true)
 
     func prepare(inputFormat: AVAudioFormat) {
@@ -374,6 +504,24 @@ private final class TapBox: @unchecked Sendable {
         lock.unlock()
     }
 
+    /// С этого момента каждый кусок звука (PCM 16 кГц) уходит получателю. Первым он получает
+    /// уже записанный хвост не длиннее `prerollSeconds` — начало фразы. Всё под одним замком,
+    /// чтобы новый кусок не обогнал хвост.
+    func attachSink(prerollSeconds: Double, _ sink: @escaping @Sendable (Data) -> Void) {
+        lock.lock()
+        defer { lock.unlock() }
+        let bytes = Int(prerollSeconds * 16_000) * 2
+        let tail = Data(recorded.suffix(bytes))
+        if !tail.isEmpty { sink(tail) }
+        self.sink = sink
+    }
+
+    func detachSink() {
+        lock.lock()
+        sink = nil
+        lock.unlock()
+    }
+
     /// Останавливает запись и отдаёт её: PCM 16 бит, 16 кГц, моно.
     func stopRecording() -> Data {
         lock.lock()
@@ -391,10 +539,11 @@ private final class TapBox: @unchecked Sendable {
         let request = self.request
         let shouldRecord = recording && recorded.count < 16_000 * 2 * 30 // не больше 30 секунд
         let converter = self.converter
+        let hasSink = sink != nil
         lock.unlock()
 
         request?.append(buffer)
-        guard shouldRecord, let converter, let targetFormat else { return }
+        guard shouldRecord || hasSink, let converter, let targetFormat else { return }
 
         let ratio = targetFormat.sampleRate / buffer.format.sampleRate
         let capacity = AVAudioFrameCount(Double(buffer.frameLength) * ratio) + 32
@@ -412,7 +561,9 @@ private final class TapBox: @unchecked Sendable {
         guard error == nil, let samples = output.int16ChannelData else { return }
         let bytes = Data(bytes: samples[0], count: Int(output.frameLength) * 2)
         lock.lock()
-        if recording { recorded.append(bytes) }
+        if recording, shouldRecord { recorded.append(bytes) }
+        // Под замком: порядок кусков сохраняется и при подключении получателя на лету.
+        sink?(bytes)
         lock.unlock()
     }
 

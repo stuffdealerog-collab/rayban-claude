@@ -10,7 +10,24 @@ struct ListenIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        await AssistantController.shared?.listenFromShortcut()
+        await AppContainer.shared.assistant.listenFromShortcut()
+        return .result()
+    }
+}
+
+/// «На связь»: ассистент звонит в очки — примите вызов и говорите. В отличие от «Спросить»,
+/// работает с заблокированным телефоном и из автоматизаций («надел очки», «в 8:00»).
+struct ConnectIntent: AppIntent {
+    static let title: LocalizedStringResource = "Выйти на связь"
+    static let description = IntentDescription(
+        "Ассистент звонит вам: примите вызов касанием очков и говорите. Работает с заблокированным телефоном."
+    )
+    static let openAppWhenRun = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        journal("команда", "«Выйти на связь»")
+        await AppContainer.shared.assistant.ringUser()
         return .result()
     }
 }
@@ -39,6 +56,16 @@ struct AssistantShortcuts: AppShortcutsProvider {
             ],
             shortTitle: "Спросить",
             systemImageName: "waveform"
+        )
+        AppShortcut(
+            intent: ConnectIntent(),
+            phrases: [
+                "\(.applicationName), на связь",
+                "Свяжи меня с \(.applicationName)",
+                "Call me, \(.applicationName)",
+            ],
+            shortTitle: "На связь",
+            systemImageName: "phone.arrow.down.left"
         )
         AppShortcut(
             intent: TranslateIntent(),
