@@ -425,12 +425,17 @@ struct FixedTitle: ToolbarContent {
     }
 
     private var label: some View {
+        // Панель сжимает свои элементы до минимума, поэтому заголовок сам держит ширину по тексту:
+        // иначе от имени остаётся «Д…». Длинное имя ужимается и обрезается у 210 pt, чтобы не задеть кнопки.
+        // Высота панели не растёт с размером шрифта, поэтому рост заголовка ограничен.
         Text(title)
             .font(.sign(.largeTitle))
             .foregroundStyle(Theme.textPrimary)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
-            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: 210, alignment: .leading)
+            .fixedSize()
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .accessibilityAddTraits(.isHeader)
     }
 }

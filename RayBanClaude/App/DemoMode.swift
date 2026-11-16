@@ -4,6 +4,8 @@ import Foundation
 import UIKit
 
 /// Готовые состояния экранов для снимков в CI: запуск с аргументами `-demo <экран>`.
+/// Разделы настроек: `settings-persona`, `-conversation`, `-voice`, `-claude`, `-background`, `-mail`,
+/// `-translator`, `-journal`.
 /// Работает только в Debug и ничего не пишет в настоящую память.
 @MainActor
 enum DemoMode {

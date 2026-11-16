@@ -24,7 +24,7 @@ struct MainTabView: View {
         switch DemoMode.screen {
         case .some(let screen) where screen.hasPrefix("translator"): return .translator
         case "memory", "note": return .memory
-        case "settings": return .settings
+        case .some(let screen) where screen.hasPrefix("settings"): return .settings
         default: break
         }
         #endif

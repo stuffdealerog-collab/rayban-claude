@@ -205,7 +205,9 @@ struct AssistantView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            HStack(alignment: .center, spacing: 0) {
+            // Микрофон строго по центру, боковым кнопкам — поровну места: иначе стопка делит ширину
+            // по-разному для разных подписей, и одна из них теряет текст.
+            HStack(alignment: .center, spacing: Theme.Space.s) {
                 SideControl(
                     symbol: assistant.onCall ? "phone.down.fill" : "phone.arrow.up.right.fill",
                     label: lineButtonLabel,
@@ -232,15 +234,12 @@ struct AssistantView: View {
                 .disabled(assistant.translatorActive)
                 .accessibilityValue(assistant.onCall ? L("на связи") : (assistant.handsFree ? L("слушает") : L("выключено")))
                 .accessibilityHint(L("Разговор продолжается с заблокированным телефоном"))
-
-                Spacer(minLength: Theme.Space.s)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 MicButton(phase: assistant.translatorActive ? .idle : assistant.phase) {
                     Task { await assistant.mainButtonTapped() }
                 }
                 .disabled(assistant.translatorActive)
-
-                Spacer(minLength: Theme.Space.s)
 
                 SideControl(
                     symbol: showKeyboard ? "keyboard.chevron.compact.down" : "keyboard",
@@ -251,6 +250,7 @@ struct AssistantView: View {
                     withAnimation(Theme.ease(0.3)) { showKeyboard.toggle() }
                     fieldFocused = showKeyboard
                 }
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
         .padding(.horizontal, Theme.Space.l)

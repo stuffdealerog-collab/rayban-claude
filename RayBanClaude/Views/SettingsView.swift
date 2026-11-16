@@ -9,9 +9,20 @@ struct SettingsView: View {
 
     @State private var showGlasses = false
     @State private var confirmReset = false
+    /// Раздел, открытый сразу при запуске для снимка (`-demo settings-voice`); в обычной работе пуст.
+    @State private var opened: [String] = SettingsView.demoSection
+
+    private static var demoSection: [String] {
+        #if DEBUG
+        if let screen = DemoMode.screen, screen.hasPrefix("settings-") {
+            return [String(screen.dropFirst("settings-".count))]
+        }
+        #endif
+        return []
+    }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $opened) {
             Form {
                 Section {
                     NavigationLink {
@@ -93,6 +104,7 @@ struct SettingsView: View {
             .toolbarTitleDisplayMode(.inlineLarge)
             .scrollContentBackground(.hidden)
             .background(Theme.background)
+            .navigationDestination(for: String.self) { name in section(name) }
             .sheet(isPresented: $showGlasses) { GlassesSheet() }
             .confirmationDialog(L("Пройти первую настройку заново?"), isPresented: $confirmReset, titleVisibility: .visible) {
                 Button(L("Начать")) {
@@ -105,6 +117,20 @@ struct SettingsView: View {
             } message: {
                 Text(L("Память, ключи и разговоры сохранятся."))
             }
+        }
+    }
+
+    @ViewBuilder
+    private func section(_ name: String) -> some View {
+        switch name {
+        case "persona": PersonaEditorView()
+        case "conversation": ConversationSettingsView()
+        case "voice": VoiceSettingsView()
+        case "claude": ClaudeSettingsView()
+        case "background": BackgroundSettingsView()
+        case "mail": MailSettingsView()
+        case "translator": TranslatorSettingsView()
+        default: JournalView()
         }
     }
 
