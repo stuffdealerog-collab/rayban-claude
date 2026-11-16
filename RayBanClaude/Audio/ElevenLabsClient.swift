@@ -83,6 +83,10 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
             || labels["language"]?.lowercased().hasPrefix(iso) == true
     }
 
+    /// Стандартный голос ElevenLabs. Только такие работают через API на бесплатном тарифе:
+    /// голоса, добавленные из Voice Library, сервер отклоняет («Free users cannot use library voices»).
+    var isPremade: Bool { category == "premade" }
+
     /// Название для списка: «Имя · узб. — пол, акцент».
     var title: String {
         let details = ["gender", "accent", "age"].compactMap { labels[$0] }.filter { !$0.isEmpty }
@@ -112,6 +116,25 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
     }
 }
 
+extension Array where Element == ElevenLabsVoice {
+    /// Голос для автоматического выбора: носитель языка ассистента, иначе первый по порядку ElevenLabs.
+    /// На бесплатном тарифе — только из стандартных; `excluding` — голоса, которые сервер уже отклонил.
+    func preferred(language: String, freePlan: Bool, excluding: Set<String> = []) -> ElevenLabsVoice? {
+        let candidates = filter { !excluding.contains($0.voiceID) && (!freePlan || $0.isPremade) }
+        return candidates.first { $0.speaks(language) } ?? candidates.first
+    }
+
+    /// Порядок для списка в настройках: сначала то, что заработает (на бесплатном тарифе — стандартные),
+    /// внутри — сначала голоса носителей языка ассистента.
+    func arranged(language: String, freePlan: Bool) -> [ElevenLabsVoice] {
+        func nativeFirst(_ voices: [ElevenLabsVoice]) -> [ElevenLabsVoice] {
+            voices.filter { $0.speaks(language) } + voices.filter { !$0.speaks(language) }
+        }
+        guard freePlan else { return nativeFirst(self) }
+        return nativeFirst(filter(\.isPremade)) + nativeFirst(filter { !$0.isPremade })
+    }
+}
+
 enum ElevenLabsError: LocalizedError, Equatable {
     case unauthorized(String)
     case quotaExceeded
@@ -129,6 +152,7 @@ enum ElevenLabsError: LocalizedError, Equatable {
         case .quotaExceeded:
             return L("закончился лимит символов ElevenLabs.")
         case .paymentRequired(let detail):
+            if voiceNeedsPaidPlan { return L("голос из библиотеки ElevenLabs работает только на платном тарифе.") }
             return L("нужен платный тариф ElevenLabs%@.", Self.suffix(detail))
         case .voiceNotFound:
             return L("выбранный голос не найден — выберите другой в настройках.")
@@ -143,6 +167,13 @@ enum ElevenLabsError: LocalizedError, Equatable {
         }
     }
 
+    /// Отказ относится к выбранному голосу (голос из Voice Library на бесплатном тарифе), а не к ключу
+    /// или модели: другой голос на том же ключе заработает.
+    var voiceNeedsPaidPlan: Bool {
+        guard case .paymentRequired(let detail) = self else { return false }
+        return detail.lowercased().contains("voice")
+    }
+
     /// Сама не пройдёт (ключ, лимит, голос): до смены настроек говорим голосом iOS.
     var isPermanent: Bool {
         switch self {
@@ -152,7 +183,9 @@ enum ElevenLabsError: LocalizedError, Equatable {
     }
 
     private static func suffix(_ detail: String) -> String {
-        detail.isEmpty ? "" : ": \(detail)"
+        // Сервер заканчивает текст точкой, а надпись ставит свою: иначе выходит «…voice..».
+        let clean = detail.trimmingCharacters(in: CharacterSet(charactersIn: ". \n"))
+        return clean.isEmpty ? "" : ": \(clean)"
     }
 }
 
@@ -258,6 +291,17 @@ struct ElevenLabsClient: Sendable {
         return all
     }
 
+    /// Тариф аккаунта: «free», «starter», «creator»… По нему решаем, какие голоса предлагать.
+    /// Ключ с ограниченными правами может не дать этот запрос — тогда тариф считается неизвестным.
+    func subscriptionTier(apiKey: String) async throws -> String {
+        var request = URLRequest(url: Self.baseURL.appendingPathComponent("v1/user/subscription"))
+        request.timeoutInterval = 10
+        request.setValue(apiKey, forHTTPHeaderField: "xi-api-key")
+        let (data, response) = try await session.data(for: request)
+        try Self.check(response, data)
+        return try JSONDecoder().decode(SubscriptionResponse.self, from: data).tier.lowercased()
+    }
+
     // MARK: - Ошибки
 
     private static func check(_ response: URLResponse, _ data: Data) throws {
@@ -321,6 +365,10 @@ private struct SpeechRequest: Encodable {
 
 private struct TranscriptionResponse: Decodable {
     let text: String
+}
+
+private struct SubscriptionResponse: Decodable {
+    let tier: String
 }
 
 private struct VoicePage: Decodable {

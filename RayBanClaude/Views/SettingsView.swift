@@ -286,7 +286,7 @@ struct VoiceSettingsView: View {
                                     .tag(settings.elevenLabsVoiceID)
                             }
                             ForEach(voices) { voice in
-                                Text(voice.title).tag(voice.voiceID)
+                                Text(title(for: voice)).tag(voice.voiceID)
                             }
                         }
                     }
@@ -334,10 +334,18 @@ struct VoiceSettingsView: View {
     }
 
     private var modelFooter: String {
-        if settings.elevenLabsModel.streams {
-            return L("Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Голоса носителей узбекского помечены «узб.»; другие добавляются из библиотеки голосов в «My Voices» на сайте ElevenLabs.")
+        var text = settings.elevenLabsModel.streams
+            ? L("Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Голоса носителей узбекского помечены «узб.»; другие добавляются из библиотеки голосов в «My Voices» на сайте ElevenLabs.")
+            : L("Прежние модели озвучивают ответ фразу за фразой, с заметной паузой. Для быстрого ответа и узбекского выберите v4 Turbo.")
+        if settings.elevenLabsFreePlan {
+            text += "\n\n" + L("У вас бесплатный тариф ElevenLabs: в приложении работают только стандартные голоса. Голоса из библиотеки (Voice Library) требуют платного тарифа.")
         }
-        return L("Прежние модели озвучивают ответ фразу за фразой, с заметной паузой. Для быстрого ответа и узбекского выберите v4 Turbo.")
+        return text
+    }
+
+    /// На бесплатном тарифе голоса из библиотеки помечены: выбрать можно, но сервер их отклонит.
+    private func title(for voice: ElevenLabsVoice) -> String {
+        settings.elevenLabsFreePlan && !voice.isPremade ? voice.title + L(" · платный тариф") : voice.title
     }
 
     private func loadVoices() async {
@@ -351,12 +359,17 @@ struct VoiceSettingsView: View {
         voicesError = nil
         defer { loadingVoices = false }
         do {
-            let list = try await ElevenLabsClient().voices(apiKey: key)
+            let client = ElevenLabsClient()
+            let list = try await client.voices(apiKey: key)
+            // Тариф решает, какие голоса заработают; если ключ не даёт его узнать — остаётся прежний.
+            let tier = try? await client.subscriptionTier(apiKey: key)
             guard key == settings.trimmedElevenLabsKey else { return }
-            // Сначала голоса носителей языка ассистента, потом остальные в порядке ElevenLabs.
+            if let tier { settings.elevenLabsTier = tier }
+            // Сначала то, что заработает на этом тарифе, внутри — голоса носителей языка ассистента.
             let native = settings.language.isoCode
-            voices = list.filter { $0.speaks(native) } + list.filter { !$0.speaks(native) }
-            if settings.elevenLabsVoiceID.isEmpty, let first = voices.first {
+            let free = settings.elevenLabsFreePlan
+            voices = list.arranged(language: native, freePlan: free)
+            if settings.elevenLabsVoiceID.isEmpty, let first = list.preferred(language: native, freePlan: free) ?? voices.first {
                 settings.elevenLabsVoiceID = first.voiceID
                 settings.elevenLabsVoiceName = first.name
             }

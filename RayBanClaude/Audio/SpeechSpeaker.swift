@@ -37,6 +37,9 @@ final class SpeechSpeaker: NSObject {
 
     /// Сообщение для ленты, когда ElevenLabs перестал работать и включился голос iOS.
     var onVoiceProblem: ((String) -> Void)?
+    /// Сервер отклонил сам голос (голос из библиотеки на бесплатном тарифе): передаём его идентификатор,
+    /// чтобы владелец подобрал другой. Пока замены нет, говорит голос iOS.
+    var onVoiceRejected: ((String) -> Void)?
 
     var isSpeaking: Bool { !queue.isEmpty || stream != nil || !afterStream.isEmpty }
 
@@ -305,7 +308,7 @@ final class SpeechSpeaker: NSObject {
                 self.neuralSucceeded()
                 return data
             } catch {
-                if !Task.isCancelled { self.neuralFailed(error) }
+                if !Task.isCancelled { self.neuralFailed(error, voiceID: configuration.voiceID) }
                 return nil
             }
         }
@@ -318,9 +321,17 @@ final class SpeechSpeaker: NSObject {
         reportedProblem = nil
     }
 
-    private func neuralFailed(_ error: Error) {
+    private func neuralFailed(_ error: Error, voiceID: String) {
         if let error = error as? ElevenLabsError, error.isPermanent {
             neuralBlocked = true
+            if error.voiceNeedsPaidPlan, let onVoiceRejected {
+                // Одно сообщение на голос: остальные фразы очереди уже идут голосом iOS.
+                guard reportedProblem != voiceID else { return }
+                reportedProblem = voiceID
+                journal("голос", "голос отклонён: на этом тарифе он не работает через API")
+                onVoiceRejected(voiceID)
+                return
+            }
             report(L("Голос ElevenLabs недоступен: %@ Пока говорю голосом iOS.", error.localizedDescription))
             return
         }

@@ -54,6 +54,8 @@ final class AssistantController {
     @ObservationIgnored private let call = CallSession()
     @ObservationIgnored private let addresseeGate = AddresseeGate()
     @ObservationIgnored private var voiceLookup: Task<Void, Never>?
+    /// Голоса, которые сервер отклонил из-за тарифа: повторно их не выбираем.
+    @ObservationIgnored private var rejectedVoices: Set<String> = []
     /// Что ассистент скажет, как только звонок соединится.
     @ObservationIgnored private var callGreeting: String?
     @ObservationIgnored private let conversation = ClaudeConversation(maxToolIterations: 12)
@@ -134,7 +136,10 @@ final class AssistantController {
             self.microphone = self.audio.inputDescription
         }
         speaker.onVoiceProblem = { [weak self] message in
-            self?.entries.append(TranscriptEntry(role: .info, text: message))
+            self?.entries.append(TranscriptEntry(role: .error, text: message))
+        }
+        speaker.onVoiceRejected = { [weak self] voiceID in
+            self?.replaceRejectedVoice(voiceID)
         }
         call.onStateChanged = { [weak self] state in
             self?.callStateChanged(state)
@@ -586,26 +591,64 @@ final class AssistantController {
     }
 
     /// Ключ ElevenLabs есть, а голос ещё не выбран (так бывает сразу после первой настройки):
-    /// берём голос носителя языка ассистента или первый из библиотеки, чтобы он сразу говорил живым голосом.
+    /// берём голос носителя языка ассистента или первый по порядку, чтобы он сразу говорил живым голосом.
+    /// На бесплатном тарифе — только из стандартных: голоса из библиотеки сервер там отклоняет.
     @discardableResult
     private func selectVoiceIfNeeded() -> Task<Void, Never>? {
         if let voiceLookup { return voiceLookup }
         let key = settings.trimmedElevenLabsKey
         guard !key.isEmpty, settings.elevenLabsVoiceID.isEmpty else { return nil }
         let task = Task { [weak self] in
-            let voices = try? await ElevenLabsClient().voices(apiKey: key)
+            let client = ElevenLabsClient()
+            let tier = try? await client.subscriptionTier(apiKey: key)
+            let voices = try? await client.voices(apiKey: key)
             guard let self else { return }
             self.voiceLookup = nil
             guard let voices, key == self.settings.trimmedElevenLabsKey, self.settings.elevenLabsVoiceID.isEmpty else { return }
+            if let tier { self.settings.elevenLabsTier = tier }
             let native = self.settings.language.isoCode
-            guard let voice = voices.first(where: { $0.speaks(native) }) ?? voices.first else { return }
+            let free = self.settings.elevenLabsFreePlan
+            // На бесплатном тарифе без стандартных голосов лучше взять любой, чем остаться без голоса:
+            // если сервер его отклонит, сработает замена.
+            guard let voice = voices.preferred(language: native, freePlan: free, excluding: self.rejectedVoices)
+                ?? voices.preferred(language: native, freePlan: false, excluding: self.rejectedVoices)
+            else { return }
             self.settings.elevenLabsVoiceID = voice.voiceID
             self.settings.elevenLabsVoiceName = voice.name
-            journal("голос", "голос выбран автоматически: \(voice.name)")
+            journal("голос", "голос выбран автоматически: \(voice.name), тариф \(tier ?? "неизвестен"), стандартный: \(voice.isPremade)")
             self.applyVoiceSettings()
         }
         voiceLookup = task
         return task
+    }
+
+    /// Сервер отклонил выбранный голос: он из библиотеки, а тариф бесплатный. Подбираем стандартный
+    /// и говорим им дальше; если стандартных нет — объясняем, что сделать.
+    private func replaceRejectedVoice(_ voiceID: String) {
+        guard !voiceID.isEmpty, voiceID == settings.elevenLabsVoiceID else { return }
+        rejectedVoices.insert(voiceID)
+        let key = settings.trimmedElevenLabsKey
+        let oldName = settings.elevenLabsVoiceName
+        Task { [weak self] in
+            let voices = (try? await ElevenLabsClient().voices(apiKey: key)) ?? []
+            guard let self, key == self.settings.trimmedElevenLabsKey, self.settings.elevenLabsVoiceID == voiceID else { return }
+            // Раз сервер отказал в голосе из библиотеки, тариф бесплатный, что бы ни было записано раньше.
+            self.settings.elevenLabsTier = "free"
+            // Больше двух замен подряд не делаем: значит, дело не в голосе.
+            let replacement = self.rejectedVoices.count <= 2
+                ? voices.preferred(language: self.settings.language.isoCode, freePlan: true, excluding: self.rejectedVoices)
+                : nil
+            guard let replacement else {
+                journal("голос", "замены отклонённому голосу нет")
+                self.entries.append(TranscriptEntry(role: .error, text: L("Выбранный голос ElevenLabs работает только на платном тарифе. Выберите стандартный голос: Настройки → Голос. Пока говорю голосом iOS.")))
+                return
+            }
+            self.settings.elevenLabsVoiceID = replacement.voiceID
+            self.settings.elevenLabsVoiceName = replacement.name
+            journal("голос", "голос «\(oldName)» отклонён, заменён на стандартный «\(replacement.name)»")
+            self.applyVoiceSettings()
+            self.entries.append(TranscriptEntry(role: .info, text: L("Голос «%@» из библиотеки ElevenLabs на бесплатном тарифе не работает. Теперь говорю голосом «%@» — сменить можно в настройках.", oldName, replacement.name)))
+        }
     }
 
     /// Дождаться автоматического выбора голоса (перед первым приветствием).

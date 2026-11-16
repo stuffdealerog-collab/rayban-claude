@@ -32,6 +32,10 @@ Text and icons on a fill (`Tone.onColor`): white on scarlet and cobalt, ink on g
 
 The selected tab tints the tab bar with its line colour. The same table governs Settings icon tiles, tool steps in the transcript and the stations on the welcome map: a colour always names its line.
 
+## Language
+
+The interface ships in Russian (source), Uzbek (Latin) and English, switched inside the app together with the assistant's language. Uzbek strings run about a quarter longer than Russian: titles and buttons are one line with a fallback (shrink, then icon), body copy wraps. Uzbek uses ʻ (U+02BB) in oʻ and gʻ and ʼ (U+02BC) for the tutuq belgisi, never a straight apostrophe.
+
 ## Type
 
 San Francisco only, through system text styles (Dynamic Type).
@@ -62,10 +66,10 @@ One curve everywhere: `timingCurve(0.22, 1, 0.36, 1)`. Things travel along the l
 
 ## Components
 
-- Titles: one large condensed title in `textPrimary` at the leading edge of the system navigation bar on all four tabs, toolbar items on the right. Memory and Settings use `toolbarTitleDisplayMode(.inlineLarge)` and collapse when their lists scroll, as any iOS list does. The two screens with a conversation line (assistant, translator) use `FixedTitle`, a leading toolbar item that does not collapse: their transcript is always scrolled to its end, and the assistant's name must stay large.
+- Titles: one large condensed title in `textPrimary` at the leading edge of the system navigation bar on all four tabs, toolbar items on the right. Memory and Settings use `toolbarTitleDisplayMode(.inlineLarge)` and collapse when their lists scroll, as any iOS list does. The two screens with a conversation line (assistant, translator) use `FixedTitle`, a leading toolbar item that does not collapse: their transcript is always scrolled to its end, and the assistant's name must stay large. `FixedTitle` hugs its text (a toolbar squeezes anything flexible down to an ellipsis), shrinks and truncates past 210 pt so it never reaches the buttons, and stops growing at the xxLarge text size because the bar does not get taller.
 - `LineStatus` — line swatch, state in plain words, optional detail on the right.
 - `MicButton` — 80 pt porcelain disc in a 6 pt scarlet ring; inverts to scarlet while busy.
-- `SideControl` — capsule with icon and label; glass on iOS 26; filled with the line colour when on.
+- `SideControl` — capsule with icon and label; glass on iOS 26; filled with the line colour when on. The two side controls get equal slots either side of the centred microphone; a label that does not fit its slot (long translation, very large type) drops to the icon alone and stays in the accessibility label.
 - `LinePill` — small capsule in a line colour for folder and language badges.
 - `ServiceNotice` — amber box with a warning icon for errors.
 - Settings and lists: native inset-grouped `Form`/`List` over `background` with rows on `surface` and section labels in the world's text colours; each row carries an icon tile in the ink of the line it belongs to.

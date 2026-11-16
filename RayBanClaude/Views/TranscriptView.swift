@@ -19,7 +19,15 @@ struct TranscriptView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    if entries.isEmpty, phase == .idle, let emptyState {
+                    if onlyNotices, phase == .idle, let emptyState {
+                        // Разговора ещё не было. Служебные сообщения (например, о голосе) — объявлениями
+                        // над приветствием: они не должны прятать первый экран.
+                        ForEach(entries) { entry in
+                            ServiceNotice(text: entry.text, isFault: entry.role == .error)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.bottom, Theme.Space.l)
+                                .transition(.opacity)
+                        }
                         emptyState
                     } else {
                         ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
@@ -44,6 +52,11 @@ struct TranscriptView: View {
             .onChange(of: phase) { _, _ in scrollToBottom(proxy) }
             .onAppear { proxy.scrollTo("bottom", anchor: .bottom) }
         }
+    }
+
+    /// В ленте нет ни реплик, ни шагов — только служебные сообщения (или вообще ничего).
+    private var onlyNotices: Bool {
+        entries.allSatisfy { $0.role == .info || $0.role == .error }
     }
 
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
@@ -94,7 +107,7 @@ struct TranscriptView: View {
                 ToolStop(entry: entry)
             }
         case .info:
-            LineRow(stop: .none, tone: tone, isFirst: isFirst, isLast: isLast) {
+            LineRow(stop: .tick(running: false, failed: false), tone: tone, isFirst: isFirst, isLast: isLast) {
                 Text(entry.text)
                     .font(.footnote)
                     .foregroundStyle(Theme.textMuted)
@@ -218,9 +231,10 @@ enum ToolLine {
     }
 }
 
-/// Сообщение о сбое: как объявление на линии — жёлтое, со значком.
+/// Объявление на линии. Сбой — янтарное, со знаком предупреждения; обычное сообщение — спокойное.
 struct ServiceNotice: View {
     let text: String
+    var isFault = true
 
     var body: some View {
         Label {
@@ -228,11 +242,14 @@ struct ServiceNotice: View {
                 .font(.footnote)
                 .foregroundStyle(Theme.textPrimary)
         } icon: {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(Theme.negative)
+            Image(systemName: isFault ? "exclamationmark.triangle.fill" : "info.circle.fill")
+                .foregroundStyle(isFault ? Theme.negative : Theme.textSecondary)
         }
         .padding(.horizontal, Theme.Space.m)
         .padding(.vertical, Theme.Space.s + 2)
-        .background(Theme.negative.opacity(0.14), in: RoundedRectangle(cornerRadius: Theme.Radius.control, style: .continuous))
+        .background(
+            isFault ? Theme.negative.opacity(0.14) : Theme.surface,
+            in: RoundedRectangle(cornerRadius: Theme.Radius.control, style: .continuous)
+        )
     }
 }

@@ -49,6 +49,17 @@ enum DemoMode {
             assistant.loadDemo(entries: chat, phase: .idle)
         case "assistant-listening":
             assistant.loadDemo(entries: Array(chat.prefix(3)), phase: .listening, partial: "Напомни в час выйти")
+        case "assistant-notice":
+            // Сбой голоса до первого разговора: объявление над приветствием.
+            assistant.loadDemo(entries: [
+                TranscriptEntry(role: .info, text: L("Голос «%@» из библиотеки ElevenLabs на бесплатном тарифе не работает. Теперь говорю голосом «%@» — сменить можно в настройках.", "Lola", "Sarah")),
+                TranscriptEntry(role: .error, text: L("ElevenLabs не отвечает (%@). Минуту говорю голосом iOS.", "HTTP 503")),
+            ], phase: .idle)
+        case "assistant-notice-chat":
+            assistant.loadDemo(entries: Array(chat.prefix(3)) + [
+                TranscriptEntry(role: .info, text: L("Голос «%@» из библиотеки ElevenLabs на бесплатном тарифе не работает. Теперь говорю голосом «%@» — сменить можно в настройках.", "Lola", "Sarah")),
+                TranscriptEntry(role: .error, text: L("ElevenLabs не отвечает (%@). Минуту говорю голосом iOS.", "HTTP 503")),
+            ], phase: .idle)
         case "assistant-speaking":
             assistant.loadDemo(entries: Array(chat.prefix(3)), phase: .speaking)
         default:

@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "ru",
   "strings": {
+    " · платный тариф": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · paid plan"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · pullik tarif"
+          }
+        }
+      }
+    },
     " · рус.": {
       "extractionState": "manual",
       "localizations": {
@@ -596,6 +613,23 @@
         }
       }
     },
+    "Выбранный голос ElevenLabs работает только на платном тарифе. Выберите стандартный голос: Настройки → Голос. Пока говорю голосом iOS.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected ElevenLabs voice needs a paid plan. Choose a standard voice: Settings → Voice. For now I speak with the iOS voice."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanlangan ElevenLabs ovozi faqat pullik tarifda ishlaydi. Standart ovozni tanlang: Sozlamalar → Ovoz. Hozircha iOS ovozida gapiraman."
+          }
+        }
+      }
+    },
     "Выразительная (v4)": {
       "extractionState": "manual",
       "localizations": {
@@ -728,6 +762,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "ElevenLabs ovozi ishlamayapti: %@ Hozircha iOS ovozida gapiraman."
+          }
+        }
+      }
+    },
+    "Голос «%@» из библиотеки ElevenLabs на бесплатном тарифе не работает. Теперь говорю голосом «%@» — сменить можно в настройках.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The “%@” voice from the ElevenLabs library does not work on the free plan. I now speak with “%@” — you can change it in Settings."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs kutubxonasidagi “%@” ovozi bepul tarifda ishlamaydi. Endi “%@” ovozida gapiraman — uni sozlamalarda almashtirish mumkin."
           }
         }
       }
@@ -4812,6 +4863,23 @@
         }
       }
     },
+    "У вас бесплатный тариф ElevenLabs: в приложении работают только стандартные голоса. Голоса из библиотеки (Voice Library) требуют платного тарифа.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are on the ElevenLabs free plan: only the standard voices work in the app. Voice Library voices need a paid plan."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sizda ElevenLabs bepul tarifi: ilovada faqat standart ovozlar ishlaydi. Kutubxonadagi (Voice Library) ovozlar uchun pullik tarif kerak."
+          }
+        }
+      }
+    },
     "Убрать виртуальные очки": {
       "extractionState": "manual",
       "localizations": {
@@ -5182,6 +5250,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "iOS ovozi"
+          }
+        }
+      }
+    },
+    "голос из библиотеки ElevenLabs работает только на платном тарифе.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs library voices only work on a paid plan."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ElevenLabs kutubxonasidagi ovoz faqat pullik tarifda ishlaydi."
           }
         }
       }

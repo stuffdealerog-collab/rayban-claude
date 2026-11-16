@@ -219,6 +219,12 @@ final class AppSettings {
     var elevenLabsModel: ElevenLabsModel {
         didSet { defaults.set(elevenLabsModel.rawValue, forKey: Keys.elevenLabsModel) }
     }
+    /// Тариф аккаунта ElevenLabs, каким он был при последней проверке («free», «starter»…); пусто — неизвестен.
+    var elevenLabsTier: String {
+        didSet { defaults.set(elevenLabsTier, forKey: Keys.elevenLabsTier) }
+    }
+    /// На бесплатном тарифе через API работают только стандартные голоса.
+    var elevenLabsFreePlan: Bool { elevenLabsTier == "free" }
     /// В режиме кнопки отвечать через A2DP (стерео, полное качество) вместо гарнитурного HFP.
     var stereoAnswers: Bool {
         didSet { defaults.set(stereoAnswers, forKey: Keys.stereoAnswers) }
@@ -317,6 +323,7 @@ final class AppSettings {
         elevenLabsVoiceID = defaults.string(forKey: Keys.elevenLabsVoiceID) ?? ""
         elevenLabsVoiceName = defaults.string(forKey: Keys.elevenLabsVoiceName) ?? ""
         elevenLabsModel = defaults.string(forKey: Keys.elevenLabsModel).flatMap(ElevenLabsModel.init(rawValue:)) ?? .v4Turbo
+        elevenLabsTier = defaults.string(forKey: Keys.elevenLabsTier) ?? ""
         stereoAnswers = defaults.object(forKey: Keys.stereoAnswers) as? Bool ?? true
         mailAddress = defaults.string(forKey: Keys.mailAddress) ?? ""
         mailHost = defaults.string(forKey: Keys.mailHost) ?? ""
@@ -364,6 +371,7 @@ final class AppSettings {
         static let elevenLabsVoiceID = "elevenLabsVoiceID"
         static let elevenLabsVoiceName = "elevenLabsVoiceName"
         static let elevenLabsModel = "elevenLabsModel.v2"
+        static let elevenLabsTier = "elevenLabsTier"
         static let stereoAnswers = "stereoAnswers"
         static let mailAddress = "mailAddress"
         static let mailHost = "mailHost"
