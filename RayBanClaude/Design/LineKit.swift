@@ -10,8 +10,11 @@ enum LineStop: Equatable {
     case station
     /// Пересадка: ответ ассистента.
     case interchange
-    /// Короткая остановка: шаг ассистента (инструмент).
+    /// Короткая остановка: служебная отметка сбоку от линии.
     case tick(running: Bool, failed: Bool)
+    /// Пересадка на другую линию: шаг ассистента. Ветка и её станция — в цвете линии, куда он сходил
+    /// (календарь — жёлтая, память — зелёная, сеть — синяя).
+    case transfer(to: Theme.Tone, running: Bool, failed: Bool)
     /// Живая станция: здесь разговор идёт прямо сейчас.
     case live(LivePhase)
     /// Строка без отметки: линия просто идёт мимо.
@@ -53,13 +56,17 @@ struct LineRow<Content: View>: View {
     }
 }
 
-/// Отрезок линии высотой в строку и отметка на нём.
+/// Отрезок линии высотой в строку и отметка на нём. Новый отрезок прорисовывается сверху вниз:
+/// линия «доезжает» до следующей станции.
 struct LineRail: View {
     let stop: LineStop
     let tone: Theme.Tone
     let isFirst: Bool
     let isLast: Bool
     let planned: Bool
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var drawn = false
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -70,16 +77,27 @@ struct LineRail: View {
                     path.move(to: CGPoint(x: LineMetrics.rail / 2, y: top))
                     path.addLine(to: CGPoint(x: LineMetrics.rail / 2, y: max(top, bottom)))
                 }
+                .trim(from: 0, to: drawn ? 1 : 0)
                 .stroke(
                     tone.color.opacity(planned ? 0.45 : 1),
                     style: StrokeStyle(lineWidth: LineMetrics.stroke, lineCap: .round, dash: planned ? [2, 10] : [])
                 )
             }
             // Отметка шире рельса (ореол живой станции) не должна раздвигать колонку: иначе линия уезжает.
-            node.frame(width: LineMetrics.rail)
+            node
+                .frame(width: LineMetrics.rail)
+                .opacity(drawn ? 1 : 0)
         }
         .frame(width: LineMetrics.rail)
         .accessibilityHidden(true)
+        .onAppear {
+            guard !drawn else { return }
+            if reduceMotion {
+                drawn = true
+            } else {
+                withAnimation(Theme.ease(0.45)) { drawn = true }
+            }
+        }
     }
 
     @ViewBuilder
@@ -100,6 +118,9 @@ struct LineRail: View {
         case .tick(let running, let failed):
             TickMark(running: running, color: failed ? Theme.negative : Theme.textPrimary)
                 .offset(x: 7, y: LineMetrics.nodeCenter - 2.5)
+        case .transfer(let destination, let running, let failed):
+            TransferMark(color: failed ? Theme.negative : destination.color, running: running)
+                .offset(x: TransferMark.width / 2, y: LineMetrics.nodeCenter - TransferMark.height / 2)
         case .live(let phase):
             LiveStation(phase: phase, tone: tone)
                 .offset(y: LineMetrics.nodeCenter - LiveStation.box / 2)
@@ -109,10 +130,48 @@ struct LineRail: View {
     }
 }
 
+/// Пересадка: короткая ветка от основной линии к маленькой станции другой линии.
+/// Пока шаг выполняется, станция ветки мерцает.
+private struct TransferMark: View {
+    let color: Color
+    let running: Bool
+
+    static let width: CGFloat = 22
+    static let height: CGFloat = 12
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var dim = false
+
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            Capsule()
+                .fill(color)
+                .frame(width: Self.width, height: 5)
+            Circle()
+                .fill(Theme.background)
+                .overlay(Circle().strokeBorder(color, lineWidth: 3.5))
+                .frame(width: Self.height, height: Self.height)
+                .opacity(running && dim ? 0.3 : 1)
+        }
+        .frame(width: Self.width, height: Self.height)
+        .onAppear { animate() }
+        .onChange(of: running) { _, _ in animate() }
+    }
+
+    private func animate() {
+        guard running, !reduceMotion else {
+            dim = false
+            return
+        }
+        withAnimation(.easeInOut(duration: 0.55).repeatForever(autoreverses: true)) { dim = true }
+    }
+}
+
 /// Отметка остановки: короткая планка сбоку от линии. Пока шаг выполняется, она мерцает.
 private struct TickMark: View {
     let running: Bool
     let color: Color
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var dim = false
 
     var body: some View {
@@ -125,7 +184,7 @@ private struct TickMark: View {
     }
 
     private func animate() {
-        guard running else {
+        guard running, !reduceMotion else {
             dim = false
             return
         }
@@ -266,11 +325,11 @@ struct RouteMap: View {
                 station(at(-3, 0), "Вопрос", .top)
                 station(at(3, 0), "Камера", .top)
                 station(at(-3.9, -2.8), "Перевод", .top)
-                station(at(3.9, 2.8), "Субтитры", .bottom)
+                station(at(3.9, 2.8), "Почта", .bottom)
                 station(at(-3.9, 2.8), "Заметки", .bottom)
                 station(at(3.9, -2.8), "Люди", .top)
                 station(at(0, -2.5), "Календарь", .trailing)
-                station(at(0, 2.5), "Почта", .trailing)
+                station(at(0, 2.5), "Напоминания", .trailing)
 
                 Circle()
                     .fill(Theme.porcelain)
@@ -289,7 +348,7 @@ struct RouteMap: View {
             }
         }
         .accessibilityElement()
-        .accessibilityLabel("Схема: разговор, перевод, память и дела сходятся на станции \(hub)")
+        .accessibilityLabel("Схема: разговор, перевод и почта, память, календарь и напоминания сходятся на станции \(hub)")
     }
 
     private func line(_ points: [CGPoint], _ tone: Theme.Tone) -> some View {
@@ -324,58 +383,6 @@ struct RouteMap: View {
             case .leading:
                 label.frame(width: 110, alignment: .trailing).position(x: point.x - 14 - 55, y: point.y)
             }
-        }
-    }
-}
-
-/// Шапка экрана: крупное название узким жирным начертанием и кнопки справа.
-/// Стоит на месте, пока лента прокручивается, — название не пропадает.
-struct ScreenHeader<Trailing: View>: View {
-    let title: String
-    @ViewBuilder var trailing: Trailing
-
-    var body: some View {
-        HStack(alignment: .center, spacing: Theme.Space.s) {
-            Text(title)
-                .font(.sign(.largeTitle))
-                .foregroundStyle(Theme.textPrimary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: Theme.Space.s)
-            trailing
-        }
-        .padding(.horizontal, Theme.Space.l + 4)
-        .padding(.top, Theme.Space.s)
-        .padding(.bottom, Theme.Space.xs)
-    }
-}
-
-/// Круглая кнопка шапки. На iOS 26 — системное «жидкое стекло».
-struct HeaderGlyph: View {
-    let symbol: String
-    var text: String?
-
-    var body: some View {
-        HStack(spacing: 5) {
-            Image(systemName: symbol)
-                .font(.body.weight(.semibold))
-            if let text {
-                Text(text).font(.sign(.subheadline, weight: .semibold).monospacedDigit())
-            }
-        }
-        .foregroundStyle(Theme.textPrimary)
-        .padding(.horizontal, text == nil ? 0 : 14)
-        .frame(minWidth: 44, minHeight: 44)
-        .background(background)
-    }
-
-    @ViewBuilder
-    private var background: some View {
-        if #available(iOS 26.0, *) {
-            Capsule().fill(.clear).glassEffect(.regular.interactive(), in: .capsule)
-        } else {
-            Capsule().fill(Theme.surface).overlay(Capsule().strokeBorder(Theme.hairline))
         }
     }
 }

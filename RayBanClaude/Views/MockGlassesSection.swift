@@ -24,9 +24,12 @@ struct MockGlassesSection: View {
             }
         } header: {
             Text("Отладка")
+                .foregroundStyle(Theme.textSecondary)
         } footer: {
             Text("MockDeviceKit имитирует Ray-Ban Meta: регистрация и разрешения выдаются сразу. На iPhone «камерой очков» служит задняя камера телефона, в симуляторе — тестовый ролик и фото.")
+                .foregroundStyle(Theme.textMuted)
         }
+        .listRowBackground(Theme.surface)
     }
 
     private func pair() {

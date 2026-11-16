@@ -30,6 +30,8 @@ enum DemoMode {
         settings.onboardingCompleted = onboardingStep == nil
         settings.persona.assistantName = "Джарвис"
         settings.persona.userName = "Тимур"
+        settings.translatorMine = "ru-RU"
+        settings.translatorTheirs = "uz-UZ"
         seed(memory)
 
         switch screen {
@@ -63,19 +65,20 @@ enum DemoMode {
 
     private static var chat: [TranscriptEntry] {
         var photo = TranscriptEntry(role: .tool, text: "Смотрю через очки", symbol: "camera.viewfinder", toolName: "take_photo")
+        photo.duration = 1.9
         if let url = Bundle.main.url(forResource: "mock_photo", withExtension: "jpg"), let data = try? Data(contentsOf: url) {
             photo.image = UIImage(data: data)
         }
         return [
             TranscriptEntry(role: .user, text: "Что у меня завтра?"),
-            TranscriptEntry(role: .tool, text: "Смотрю календарь", symbol: "calendar", toolName: "list_events"),
+            TranscriptEntry(role: .tool, text: "Смотрю календарь", symbol: "calendar", toolName: "list_events", duration: 0.4),
             TranscriptEntry(role: .assistant, text: "Завтра в десять созвон с командой, в половине третьего стоматолог на Амира Темура. Вечер свободен."),
             TranscriptEntry(role: .user, text: "Напомни в час выйти пораньше"),
-            TranscriptEntry(role: .tool, text: "Создаю напоминание", symbol: "checklist", toolName: "create_reminder"),
+            TranscriptEntry(role: .tool, text: "Создаю напоминание", symbol: "checklist", toolName: "create_reminder", duration: 0.3),
             TranscriptEntry(role: .assistant, text: "Готово, напомню в 13:00."),
             TranscriptEntry(role: .user, text: "Что передо мной?"),
             photo,
-            TranscriptEntry(role: .assistant, text: "Вход в медресе Кукельдаш, шестнадцатый век. Справа касса, билет стоит двадцать тысяч сумов."),
+            TranscriptEntry(role: .assistant, text: "Кружка кофе на деревянном столе, за ней зелёная доска в рамке. Похоже на кафе."),
         ]
     }
 

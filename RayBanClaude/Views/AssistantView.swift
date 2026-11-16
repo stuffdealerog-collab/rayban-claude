@@ -17,18 +17,6 @@ struct AssistantView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                ScreenHeader(title: settings.persona.displayName) {
-                    GlassesChip { showGlasses = true }
-                    Button {
-                        assistant.newConversation()
-                    } label: {
-                        HeaderGlyph(symbol: "square.and.pencil")
-                    }
-                    .accessibilityLabel("Новый разговор")
-                    .disabled(assistant.entries.isEmpty)
-                    .opacity(assistant.entries.isEmpty ? 0.45 : 1)
-                }
-
                 LineStatus(tone: tone, text: stateLine, detail: stateDetail, active: assistant.phase != .idle || assistant.onCall)
                     .padding(.horizontal, Theme.Space.l + 4)
                     .padding(.top, Theme.Space.xs)
@@ -56,7 +44,23 @@ struct AssistantView: View {
                 controls
             }
             .background(Theme.background)
-            .toolbar(.hidden, for: .navigationBar)
+            .navigationTitle(settings.persona.displayName)
+            // Крупное название остаётся в панели и не сворачивается: имя ассистента видно всегда.
+            .toolbarTitleDisplayMode(.inlineLarge)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    GlassesChip { showGlasses = true }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        assistant.newConversation()
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    .accessibilityLabel("Новый разговор")
+                    .disabled(assistant.entries.isEmpty)
+                }
+            }
             .sheet(isPresented: $showGlasses) {
                 GlassesSheet()
                     .presentationDetents([.medium, .large])
@@ -90,7 +94,7 @@ struct AssistantView: View {
     private var stateDetail: String? {
         guard !assistant.translatorActive else { return nil }
         switch assistant.phase {
-        case .listening: return "микрофон: \(assistant.microphone)"
+        case .listening: return assistant.microphone == "—" ? nil : "микрофон: \(assistant.microphone)"
         case .speaking, .thinking: return "нажмите, чтобы перебить"
         case .idle: return assistant.onCall || assistant.handsFree ? addressingHint : nil
         }
@@ -115,7 +119,6 @@ struct AssistantView: View {
         VStack(alignment: .leading, spacing: 0) {
             LineRow(stop: .interchange, tone: tone, isFirst: true) {
                 VStack(alignment: .leading, spacing: Theme.Space.xs) {
-                    Text(settings.persona.displayName).plateStyle(tone.text)
                     Text(greeting)
                         .font(.sign(.title))
                         .foregroundStyle(Theme.textPrimary)
@@ -272,6 +275,7 @@ struct MicButton: View {
     let phase: AssistantController.Phase
     var tone = Theme.Tone.assistant
     let action: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Button(action: action) {
@@ -279,7 +283,7 @@ struct MicButton: View {
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(phase == .idle ? Theme.ink : .white)
                 .contentTransition(.symbolEffect(.replace))
-                .symbolEffect(.variableColor.iterative, options: .repeating, isActive: phase == .listening)
+                .symbolEffect(.variableColor.iterative, options: .repeating, isActive: phase == .listening && !reduceMotion)
                 .frame(width: 80, height: 80)
                 .background(
                     Circle()
@@ -327,10 +331,13 @@ struct SideControl: View {
                 Text(label)
                     .font(.sign(.subheadline, weight: .semibold))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                     .contentTransition(.opacity)
             }
             .foregroundStyle(isOn ? tone.onColor : Theme.textPrimary)
-            .frame(width: 112, height: 50)
+            .padding(.horizontal, Theme.Space.m)
+            // Растёт вместе с размером текста, но не вытесняет микрофон.
+            .frame(minWidth: 104, maxWidth: 132, minHeight: 50)
             .background(background)
         }
         .buttonStyle(PressScaleStyle())
@@ -367,11 +374,22 @@ private struct GlassesChip: View {
 
     var body: some View {
         Button(action: action) {
-            HeaderGlyph(
-                symbol: connected ? "eyeglasses" : "eyeglasses.slash",
-                text: connected ? glasses.batteryLevel.map { "\($0)%" } : nil
-            )
-            .opacity(connected ? 1 : 0.6)
+            HStack(spacing: Theme.Space.xs) {
+                Image(systemName: "eyeglasses")
+                    // Не на связи — жёлтая отметка, как объявление о сбое: кнопка при этом работает.
+                    .overlay(alignment: .topTrailing) {
+                        if !connected {
+                            Circle()
+                                .fill(Theme.negative)
+                                .frame(width: 8, height: 8)
+                                .offset(x: 4, y: -3)
+                        }
+                    }
+                if connected, let battery = glasses.batteryLevel {
+                    Text("\(battery)%")
+                        .font(.sign(.subheadline, weight: .semibold).monospacedDigit())
+                }
+            }
         }
         .accessibilityLabel(connected ? "Очки на связи" : "Очки не подключены")
     }
@@ -405,6 +423,7 @@ struct GlassesSheet: View {
                     }
                     .padding(.vertical, Theme.Space.xs)
                 }
+                .listRowBackground(Theme.surface)
 
                 Section {
                     if !glasses.isRegistered {
@@ -424,7 +443,9 @@ struct GlassesSheet: View {
                     }
                 } footer: {
                     Text("Нужен Meta AI с включённым режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode.")
+                        .foregroundStyle(Theme.textMuted)
                 }
+                .listRowBackground(Theme.surface)
             }
             .navigationTitle("Очки")
             .navigationBarTitleDisplayMode(.inline)

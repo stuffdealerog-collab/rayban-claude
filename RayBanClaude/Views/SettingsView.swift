@@ -21,7 +21,9 @@ struct SettingsView: View {
                     }
                 } footer: {
                     Text("Имя, характер и манера общения.")
+                        .foregroundStyle(Theme.textMuted)
                 }
+                .listRowBackground(Theme.surface)
 
                 Section {
                     NavigationLink {
@@ -32,14 +34,15 @@ struct SettingsView: View {
                     NavigationLink {
                         VoiceSettingsView()
                     } label: {
-                        SettingsRow(symbol: "waveform", tone: .translator, title: "Голос", value: voiceSummary)
+                        SettingsRow(symbol: "waveform", tone: .assistant, title: "Голос", value: voiceSummary)
                     }
                     NavigationLink {
                         ClaudeSettingsView()
                     } label: {
-                        SettingsRow(symbol: "sparkles", tone: .memory, title: "Claude", value: settings.trimmedAPIKey.isEmpty ? "нет ключа" : settings.model.shortTitle)
+                        SettingsRow(symbol: "sparkles", tone: .assistant, title: "Claude", value: settings.trimmedAPIKey.isEmpty ? "нет ключа" : settings.model.shortTitle)
                     }
                 }
+                .listRowBackground(Theme.surface)
 
                 Section {
                     NavigationLink {
@@ -64,6 +67,7 @@ struct SettingsView: View {
                         SettingsRow(symbol: "character.bubble", tone: .translator, title: "Переводчик", value: nil)
                     }
                 }
+                .listRowBackground(Theme.surface)
 
                 Section {
                     NavigationLink {
@@ -74,15 +78,19 @@ struct SettingsView: View {
                     Button("Пройти первую настройку заново") { confirmReset = true }
                 } header: {
                     Text("Данные")
+                        .foregroundStyle(Theme.textSecondary)
                 } footer: {
                     Text("Заметки памяти — файлы Markdown: Файлы → На iPhone → это приложение. Ключи и пароль почты хранятся только в Keychain этого iPhone.")
+                        .foregroundStyle(Theme.textMuted)
                 }
+                .listRowBackground(Theme.surface)
 
                 #if DEBUG
                 MockGlassesSection()
                 #endif
             }
             .navigationTitle("Настройки")
+            .toolbarTitleDisplayMode(.inlineLarge)
             .scrollContentBackground(.hidden)
             .background(Theme.background)
             .sheet(isPresented: $showGlasses) { GlassesSheet() }
@@ -157,7 +165,9 @@ struct ConversationSettingsView: View {
                 }
             } footer: {
                 Text("На этом языке ассистент слушает и отвечает по умолчанию. Заговорите на другом из трёх — ответит на нём.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Picker("Когда отвечать", selection: $settings.addressing) {
@@ -170,9 +180,12 @@ struct ConversationSettingsView: View {
                 }
             } header: {
                 Text("Когда отвечать")
+                    .foregroundStyle(Theme.textSecondary)
             } footer: {
                 Text("\(settings.addressing.detail) Действует в режимах «Без рук» и «На связи». Сразу после ответа можно продолжать без имени.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Toggle("Распознавание ElevenLabs", isOn: $settings.liveRecognition)
@@ -182,9 +195,12 @@ struct ConversationSettingsView: View {
                 }
             } header: {
                 Text("Распознавание")
+                    .foregroundStyle(Theme.textSecondary)
             } footer: {
                 Text(recognitionFooter)
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("Разговор")
         .navigationBarTitleDisplayMode(.inline)
@@ -222,7 +238,9 @@ struct VoiceSettingsView: View {
                     .autocorrectionDisabled()
             } footer: {
                 Text("elevenlabs.io → Developers → API Keys. С ключом ассистент говорит живым голосом и понимает узбекский. Без ключа звучит голос iOS.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             if !settings.trimmedElevenLabsKey.isEmpty {
                 Section {
@@ -255,7 +273,9 @@ struct VoiceSettingsView: View {
                     .disabled(loadingVoices)
                 } footer: {
                     Text(modelFooter)
+                        .foregroundStyle(Theme.textMuted)
                 }
+                .listRowBackground(Theme.surface)
             }
 
             Section {
@@ -266,7 +286,9 @@ struct VoiceSettingsView: View {
                 .disabled(assistant.phase != .idle || assistant.translatorActive)
             } footer: {
                 Text("Стерео: когда вы спрашиваете по кнопке, ответ идёт в очки как музыка, а не в телефонном качестве гарнитуры.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("Голос")
         .navigationBarTitleDisplayMode(.inline)
@@ -334,7 +356,9 @@ struct ClaudeSettingsView: View {
                     .autocorrectionDisabled()
             } footer: {
                 Text("platform.claude.com → API Keys. Оплата — за использование.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Picker("Модель", selection: $settings.model) {
@@ -350,7 +374,9 @@ struct ClaudeSettingsView: View {
                 .labelsHidden()
             } header: {
                 Text("Модель")
+                    .foregroundStyle(Theme.textSecondary)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Toggle("Отвечать сразу", isOn: $settings.instantAnswers)
@@ -359,7 +385,9 @@ struct ClaudeSettingsView: View {
                 Toggle("Экономить на длинных разговорах", isOn: $settings.saveTokens)
             } footer: {
                 Text("«Отвечать сразу»: модель не размышляет перед ответом, первая фраза звучит раньше. Для сложных вопросов выключите. Экономия: из длинного разговора сервер убирает старые снимки и результаты поиска.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("Claude")
         .navigationBarTitleDisplayMode(.inline)
@@ -383,9 +411,12 @@ struct BackgroundSettingsView: View {
                     .foregroundStyle(Theme.textSecondary)
             } header: {
                 Text("Как это работает")
+                    .foregroundStyle(Theme.textSecondary)
             } footer: {
                 Text("Пока идёт такой звонок, звук в очках телефонного качества, музыка на паузе, очки расходуют заряд как при разговоре. Чтобы закончить, скажите «Отбой» или завершите вызов.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 GuideRow(number: 1, text: "Siri: «\(settings.persona.displayName), на связь» — ассистент позвонит в очки, даже если телефон заблокирован.")
@@ -393,9 +424,12 @@ struct BackgroundSettingsView: View {
                 GuideRow(number: 3, text: "Фокусирование: разрешите уведомления и звонки от этого приложения, иначе режим «Не беспокоить» заглушит вызов.")
             } header: {
                 Text("Ассистент звонит сам")
+                    .foregroundStyle(Theme.textSecondary)
             } footer: {
                 Text("Из фона ассистент может только позвонить вам — принять вызов нужно касанием очков или на экране.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Stepper(value: $settings.followUpSeconds, in: 0...20, step: 2) {
@@ -403,16 +437,21 @@ struct BackgroundSettingsView: View {
                 }
             } footer: {
                 Text("Столько секунд после ответа ассистент слушает уточняющий вопрос без обращения по имени.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Toggle("Жесты очков", isOn: $settings.glassesGestures)
                     .onChange(of: settings.glassesGestures) { _, _ in assistant.applyGlassesGestures() }
             } header: {
                 Text("Эксперимент")
+                    .foregroundStyle(Theme.textSecondary)
             } footer: {
                 Text("Двойное касание дужки или кнопка камеры вызывают ассистента и перебивают ответ. Это пробная возможность очков: что именно приходит с ваших очков, видно в журнале. Одиночное касание и удержание очки оставляют себе.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("На связи и фон")
         .navigationBarTitleDisplayMode(.inline)
@@ -454,7 +493,9 @@ struct TranslatorSettingsView: View {
                     .disabled(!settings.translatorSpeaks)
             } footer: {
                 Text("Перевод слов собеседника звучит у вас в очках. Перевод ваших слов — из динамика телефона, чтобы его услышал собеседник. Без озвучки переводчик не делает пауз и показывает перевод на экране, пока человек ещё говорит.")
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("Переводчик")
         .navigationBarTitleDisplayMode(.inline)
@@ -470,13 +511,21 @@ struct PersonaEditorView: View {
     var body: some View {
         @Bindable var settings = settings
         Form {
-            Section("Имя ассистента") {
+            Section {
                 TextField("Джарвис", text: $settings.persona.assistantName)
                     .font(.title3)
+            } header: {
+                Text("Имя ассистента")
+                    .foregroundStyle(Theme.textSecondary)
             }
-            Section("Как вас зовут") {
+            .listRowBackground(Theme.surface)
+            Section {
                 TextField("Ваше имя", text: $settings.persona.userName)
+            } header: {
+                Text("Как вас зовут")
+                    .foregroundStyle(Theme.textSecondary)
             }
+            .listRowBackground(Theme.surface)
             Section {
                 Picker("Характер", selection: $settings.persona.character) {
                     ForEach(PersonaCharacter.allCases) { character in
@@ -495,8 +544,10 @@ struct PersonaEditorView: View {
                 }
             } header: {
                 Text("Характер")
+                    .foregroundStyle(Theme.textSecondary)
             }
-            Section("Манера") {
+            .listRowBackground(Theme.surface)
+            Section {
                 Picker("Обращение", selection: $settings.persona.address) {
                     ForEach(AddressForm.allCases) { Text($0.title).tag($0) }
                 }
@@ -515,7 +566,11 @@ struct PersonaEditorView: View {
                         Image(systemName: "face.smiling")
                     }
                 }
+            } header: {
+                Text("Манера")
+                    .foregroundStyle(Theme.textSecondary)
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("Ассистент")
         .navigationBarTitleDisplayMode(.inline)
@@ -546,7 +601,9 @@ struct MailSettingsView: View {
                 Яндекс — Яндекс ID → Безопасность → Пароли приложений → Почта; Mail.ru — Настройки → Безопасность → Пароли для внешних приложений; \
                 iCloud — appleid.apple.com → Пароли приложений. Сервер для этих почт определяется сам. Письма только читаются и не помечаются прочитанными.
                 """)
+                    .foregroundStyle(Theme.textMuted)
             }
+            .listRowBackground(Theme.surface)
             Section {
                 Button {
                     Task { await check() }
@@ -564,6 +621,7 @@ struct MailSettingsView: View {
                         .foregroundStyle(Theme.textSecondary)
                 }
             }
+            .listRowBackground(Theme.surface)
         }
         .navigationTitle("Почта")
         .navigationBarTitleDisplayMode(.inline)

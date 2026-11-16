@@ -1,5 +1,5 @@
 @preconcurrency import AVFoundation
-import CallKit
+@preconcurrency import CallKit
 
 /// «На связи»: разговор с ассистентом оформлен как звонок через CallKit.
 ///

@@ -16,19 +16,6 @@ struct TranslatorView: View {
 
         NavigationStack {
             VStack(spacing: 0) {
-                ScreenHeader(title: "Переводчик") {
-                    Menu {
-                        Toggle("Озвучивать перевод", isOn: $settings.translatorSpeaks)
-                        Button("Показать собеседнику", systemImage: "rectangle.portrait.rotate") { showToPartner = true }
-                            .disabled(translator.latestTranslation == nil)
-                        Button("Очистить", systemImage: "trash", role: .destructive) { translator.clear() }
-                            .disabled(translator.entries.isEmpty)
-                    } label: {
-                        HeaderGlyph(symbol: "ellipsis")
-                    }
-                    .accessibilityLabel("Действия переводчика")
-                }
-
                 route
                     .padding(.horizontal, Theme.Space.l)
                     .padding(.top, Theme.Space.xs)
@@ -45,7 +32,22 @@ struct TranslatorView: View {
                 controls
             }
             .background(Theme.background)
-            .toolbar(.hidden, for: .navigationBar)
+            .navigationTitle("Переводчик")
+            .toolbarTitleDisplayMode(.inlineLarge)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Toggle("Озвучивать перевод", isOn: $settings.translatorSpeaks)
+                        Button("Показать собеседнику", systemImage: "rectangle.portrait.rotate") { showToPartner = true }
+                            .disabled(translator.latestTranslation == nil)
+                        Button("Очистить", systemImage: "trash", role: .destructive) { translator.clear() }
+                            .disabled(translator.entries.isEmpty)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                    }
+                    .accessibilityLabel("Действия переводчика")
+                }
+            }
             .fullScreenCover(isPresented: $showToPartner) {
                 PartnerView(entry: translator.latestTranslation) { showToPartner = false }
             }
@@ -178,7 +180,6 @@ struct TranslatorView: View {
     private var emptyState: some View {
         LineRow(stop: .interchange, tone: tone, isFirst: true, isLast: true) {
             VStack(alignment: .leading, spacing: Theme.Space.s) {
-                Text(translator.mode == .dialog ? "По очереди" : "Разговор").plateStyle(tone.text)
                 Text(translator.mode == .dialog ? "Говорите по очереди" : "Говорите свободно")
                     .font(.sign(.title))
                     .foregroundStyle(Theme.textPrimary)
@@ -208,16 +209,16 @@ struct TranslatorView: View {
     private var controls: some View {
         HStack(spacing: Theme.Space.m) {
             if translator.mode == .dialog {
-                SpeakerButton(title: "Я", language: translator.mine.name, isActive: translator.activeSide == .me, filled: true, tone: tone) {
+                SpeakerButton(title: "Я", language: Text(translator.mine.name), isActive: translator.activeSide == .me, filled: true, tone: tone) {
                     Task { await translator.toggle(.me) }
                 }
-                SpeakerButton(title: "Собеседник", language: translator.theirs.name, isActive: translator.activeSide == .them, filled: false, tone: tone) {
+                SpeakerButton(title: "Собеседник", language: Text(translator.theirs.name), isActive: translator.activeSide == .them, filled: false, tone: tone) {
                     Task { await translator.toggle(.them) }
                 }
             } else {
                 SpeakerButton(
                     title: translator.isRunning ? "Остановить" : "Начать разговор",
-                    language: "\(translator.mine.name) ⇄ \(translator.theirs.name)",
+                    language: Text("\(translator.mine.name) \(Image(systemName: "arrow.left.arrow.right")) \(translator.theirs.name)"),
                     isActive: translator.isRunning,
                     filled: true,
                     tone: tone
@@ -261,23 +262,23 @@ private struct TranslationStop: View {
 
 private struct SpeakerButton: View {
     let title: String
-    let language: String
+    let language: Text
     let isActive: Bool
     let filled: Bool
     let tone: Theme.Tone
     let action: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 2) {
                 HStack(spacing: Theme.Space.s) {
                     Image(systemName: isActive ? "waveform" : "mic.fill")
-                        .symbolEffect(.variableColor.iterative, options: .repeating, isActive: isActive)
+                        .symbolEffect(.variableColor.iterative, options: .repeating, isActive: isActive && !reduceMotion)
                     Text(title).font(.sign(.title3))
                 }
-                Text(language)
-                    .font(.caption)
-                    .opacity(0.85)
+                language
+                    .font(.caption.weight(.medium))
             }
             .frame(maxWidth: .infinity, minHeight: 64)
             .foregroundStyle(foreground)

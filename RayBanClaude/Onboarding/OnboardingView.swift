@@ -78,6 +78,7 @@ struct OnboardingView: View {
             StepPage(title: "Как его зовут", subtitle: "По этому имени он будет откликаться в режиме «Без рук».") {
                 TextField("Имя", text: $settings.persona.assistantName)
                     .font(.sign(.largeTitle))
+                    .foregroundStyle(Theme.textPrimary)
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .padding(.vertical, Theme.Space.s)
@@ -89,16 +90,25 @@ struct OnboardingView: View {
 
         case .character:
             StepPage(title: "Какой у него характер", subtitle: "Это определяет, как \(settings.persona.displayName) говорит и шутит. Можно поменять в настройках.") {
-                VStack(spacing: Theme.Space.s) {
-                    ForEach(PersonaCharacter.allCases) { character in
-                        ChoiceRow(title: character.title, detail: character.summary, isSelected: settings.persona.character == character) {
-                            withAnimation(Theme.ease(0.2)) { settings.persona.character = character }
+                VStack(alignment: .leading, spacing: 0) {
+                    // Характеры — станции одной линии: выбранная становится пересадкой.
+                    let characters = PersonaCharacter.allCases
+                    ForEach(Array(characters.enumerated()), id: \.element) { index, character in
+                        let isSelected = settings.persona.character == character
+                        LineRow(
+                            stop: isSelected ? .interchange : .station, tone: tone,
+                            isFirst: index == 0, isLast: index == characters.count - 1
+                        ) {
+                            ChoiceRow(title: character.title, detail: character.summary, isSelected: isSelected, tone: tone) {
+                                withAnimation(Theme.ease(0.2)) { settings.persona.character = character }
+                            }
                         }
                     }
                     if settings.persona.character == .custom {
                         TextField("Например: спокойный, говорит как старый друг, немного философ", text: $settings.persona.customCharacter, axis: .vertical)
                             .lineLimit(3...5)
                             .padding(Theme.Space.m)
+                            .padding(.top, Theme.Space.s)
                             .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous))
                             .overlay(RoundedRectangle(cornerRadius: Theme.Radius.control + 2, style: .continuous).strokeBorder(Theme.hairline))
                     }
@@ -177,14 +187,17 @@ struct OnboardingView: View {
                 VStack(spacing: Theme.Space.s) {
                     AccessRow(
                         symbol: "mic",
-                        title: "Микрофон и распознавание речи",
-                        state: micGranted == true ? "Разрешено" : (micGranted == false ? "Запрещено в Настройках" : nil)
+                        title: "Микрофон и речь",
+                        state: micGranted == true ? "Разрешено" : nil
                     ) {
                         Task { micGranted = await SpeechListener.requestPermissions() }
                     }
+                    if micGranted == false {
+                        ServiceNotice(text: "Микрофон запрещён. Разрешите его: Настройки iPhone → это приложение → Микрофон.")
+                    }
                     AccessRow(
                         symbol: "eyeglasses",
-                        title: "Очки Ray-Ban Meta",
+                        title: "Очки Ray-Ban",
                         state: glasses.isRegistered ? "Подключены" : nil
                     ) {
                         Task { await glasses.connect() }
@@ -192,6 +205,7 @@ struct OnboardingView: View {
                     Text("Для очков нужен Meta AI с режимом разработчика: Meta AI → Настройки → ваши очки → Developer Mode. Подключить можно и позже.")
                         .font(.footnote)
                         .foregroundStyle(Theme.textMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, Theme.Space.s)
                 }
             }
@@ -286,6 +300,7 @@ struct OnboardingView: View {
             let greeting = assistant.greeting
             Task {
                 try? await Task.sleep(nanoseconds: 700_000_000)
+                await assistant.prepareVoice()
                 await assistant.say(greeting)
             }
         }
@@ -337,39 +352,27 @@ private struct StepPage<Content: View>: View {
     }
 }
 
+/// Вариант на линии: название и пояснение. Отметку рисует сама линия.
 private struct ChoiceRow: View {
     let title: String
     let detail: String
     let isSelected: Bool
+    let tone: Theme.Tone
     let action: () -> Void
-
-    private let tone = Theme.Tone.assistant
 
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .center, spacing: Theme.Space.m) {
-                // Выбранный вариант — станция в кольце линии.
-                Circle()
-                    .fill(isSelected ? Theme.porcelain : Theme.background)
-                    .overlay(Circle().strokeBorder(isSelected ? tone.color : Theme.textMuted.opacity(0.6), lineWidth: isSelected ? 6 : 3))
-                    .frame(width: 24, height: 24)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.sign(.title3))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text(detail)
-                        .font(.footnote)
-                        .foregroundStyle(Theme.textSecondary)
-                        .multilineTextAlignment(.leading)
-                }
-                Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.sign(.title3))
+                    .foregroundStyle(isSelected ? tone.text : Theme.textPrimary)
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.textSecondary)
+                    .multilineTextAlignment(.leading)
             }
-            .padding(Theme.Space.m + 2)
-            .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous)
-                    .strokeBorder(isSelected ? tone.color : Theme.hairline, lineWidth: isSelected ? 3 : 1)
-            )
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)
+            .contentShape(Rectangle())
         }
         .buttonStyle(PressScaleStyle())
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -422,6 +425,7 @@ private struct KeyField: View {
         VStack(alignment: .leading, spacing: Theme.Space.s) {
             Text(title)
                 .font(.sign(.title3))
+                .foregroundStyle(Theme.textPrimary)
             SecureField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -435,6 +439,7 @@ private struct KeyField: View {
     }
 }
 
+/// Строка разрешения: нажимается целиком.
 private struct AccessRow: View {
     let symbol: String
     let title: String
@@ -442,27 +447,33 @@ private struct AccessRow: View {
     let action: () -> Void
 
     var body: some View {
-        HStack(spacing: Theme.Space.m) {
-            Image(systemName: symbol)
-                .font(.body)
-                .frame(width: 24)
-                .foregroundStyle(Theme.textSecondary)
-            Text(title)
-                .font(.body)
-                .foregroundStyle(Theme.textPrimary)
-            Spacer()
-            if let state {
-                Text(state)
-                    .font(.footnote)
+        Button(action: action) {
+            HStack(spacing: Theme.Space.m) {
+                Image(systemName: symbol)
+                    .font(.body.weight(.medium))
+                    .frame(width: 26)
                     .foregroundStyle(Theme.textSecondary)
-            } else {
-                Button("Разрешить", action: action)
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                Text(title)
+                    .font(.body)
+                    .foregroundStyle(Theme.textPrimary)
+                    .multilineTextAlignment(.leading)
+                Spacer(minLength: Theme.Space.s)
+                if let state {
+                    Label(state, systemImage: "checkmark")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Theme.positive)
+                } else {
+                    Text("Разрешить")
+                        .font(.sign(.subheadline, weight: .semibold))
+                        .foregroundStyle(Theme.Tone.assistant.text)
+                }
             }
+            .padding(.horizontal, Theme.Space.l)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous).strokeBorder(Theme.hairline))
         }
-        .padding(Theme.Space.m)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous).strokeBorder(Theme.hairline))
+        .buttonStyle(PressScaleStyle())
+        .disabled(state != nil)
     }
 }

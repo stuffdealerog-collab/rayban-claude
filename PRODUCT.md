@@ -40,7 +40,7 @@ Unlike Meta AI (region-locked, generic persona) and unlike desktop agents such a
 
 ## Evidence on Hand
 
-- App icon: `RayBanClaude/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png` (warm gradient, white glasses, sound waves).
+- App icon: `RayBanClaude/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png` — four metro lines meeting at a porcelain interchange on midnight enamel; drawn by `scripts/design/make_app_icon.py`.
 - No testimonials, metrics, or press exist; none may be invented.
 
 ## Product Principles
@@ -53,4 +53,4 @@ Unlike Meta AI (region-locked, generic persona) and unlike desktop agents such a
 
 ## Accessibility & Inclusion
 
-- Dynamic Type and VoiceOver for all screens; Reduce Motion honored by the voice orb and transitions. *(Assumption: standard iOS expectations; no specific user need was stated.)*
+- Dynamic Type and VoiceOver for all screens; Reduce Motion honored by the live station on the conversation line and by transitions. *(Assumption: standard iOS expectations; no specific user need was stated.)*

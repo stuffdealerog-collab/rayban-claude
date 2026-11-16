@@ -44,8 +44,8 @@ enum Theme {
         /// Краска линии: заливки, кольца станций, плашки.
         var color: Color {
             switch self {
-            case .assistant: return Color(light: 0xDC1F2E, dark: 0xF0343F)
-            case .translator: return Color(light: 0x1E5BFF, dark: 0x4F82FF)
+            case .assistant: return Color(light: 0xDC1F2E, dark: 0xE02A38)
+            case .translator: return Color(light: 0x1E5BFF, dark: 0x2A63FF)
             case .memory: return Color(light: 0x16994A, dark: 0x2CC561)
             case .system: return Color(light: 0xF2B200, dark: 0xFFC20E)
             }
@@ -61,9 +61,13 @@ enum Theme {
             }
         }
 
-        /// Цвет значка или текста поверх заливки этой линии.
+        /// Цвет значка или текста поверх заливки этой линии: контраст не ниже 4,5:1 в обеих темах.
+        /// На красной и синей — белый, на зелёной и жёлтой — тёмная эмаль.
         var onColor: Color {
-            self == .system ? Theme.ink : .white
+            switch self {
+            case .assistant, .translator: return .white
+            case .memory, .system: return Theme.ink
+            }
         }
     }
 
@@ -108,8 +112,11 @@ enum Theme {
         let large = UIFont.systemFont(ofSize: 36, weight: .bold, width: .condensed)
         let inline = UIFont.systemFont(ofSize: 18, weight: .semibold, width: .condensed)
         let metrics = UIFontMetrics(forTextStyle: .largeTitle)
-        UINavigationBar.appearance().largeTitleTextAttributes = [.font: metrics.scaledFont(for: large)]
-        UINavigationBar.appearance().titleTextAttributes = [.font: UIFontMetrics(forTextStyle: .headline).scaledFont(for: inline)]
+        let color = UIColor(Theme.textPrimary)
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font: metrics.scaledFont(for: large), .foregroundColor: color]
+        UINavigationBar.appearance().titleTextAttributes = [
+            .font: UIFontMetrics(forTextStyle: .headline).scaledFont(for: inline), .foregroundColor: color,
+        ]
     }
 }
 

@@ -23,8 +23,9 @@ struct TranscriptView: View {
                         emptyState
                     } else {
                         ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                            // Строка проявляется, а её отрезок линии сам дотягивается до новой станции.
                             row(for: entry, index: index)
-                                .transition(.opacity.combined(with: .offset(y: 10)))
+                                .transition(.opacity)
                         }
                         liveRow
                     }
@@ -72,7 +73,7 @@ struct TranscriptView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Вы · \(Self.time(entry.date))").plateStyle()
                     Text(entry.text)
-                        .font(.title3.weight(.semibold))
+                        .font(.title2.weight(.semibold))
                         .foregroundStyle(Theme.textPrimary)
                         .textSelection(.enabled)
                 }
@@ -82,14 +83,20 @@ struct TranscriptView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(assistantName).plateStyle(tone.text)
                     Text(entry.text)
-                        .font(.body)
-                        .lineSpacing(3)
+                        .font(.title3)
+                        .lineSpacing(4)
                         .foregroundStyle(Theme.textPrimary)
                         .textSelection(.enabled)
                 }
             }
         case .tool:
-            LineRow(stop: .tick(running: entry.toolState == .running, failed: entry.toolState == .failed), tone: tone, isFirst: isFirst, isLast: isLast) {
+            LineRow(
+                stop: .transfer(
+                    to: ToolLine.tone(for: entry.toolName),
+                    running: entry.toolState == .running, failed: entry.toolState == .failed
+                ),
+                tone: tone, isFirst: isFirst, isLast: isLast
+            ) {
                 ToolStop(entry: entry)
             }
         case .info:
@@ -114,7 +121,7 @@ struct TranscriptView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(listeningCaption).plateStyle(tone.text)
                     Text(partial.isEmpty ? "Говорите" : partial)
-                        .font(.title3.weight(.semibold))
+                        .font(.title2.weight(.semibold))
                         .foregroundStyle(partial.isEmpty ? Theme.textMuted : Theme.textPrimary)
                         .contentTransition(.opacity)
                 }
@@ -154,14 +161,20 @@ private struct ToolStop: View {
                     .foregroundStyle(entry.toolState == .failed ? Theme.negative : ToolLine.tone(for: entry.toolName).text)
                     .frame(width: 18)
                 Text(entry.text)
-                    .font(.footnote.weight(.medium))
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(1)
+                Spacer(minLength: Theme.Space.s)
+                // Правая колонка: сколько занял шаг — или что он не удался.
                 if entry.toolState == .failed {
                     Text("сбой")
-                        .font(.sign(.caption2, weight: .bold))
+                        .font(.sign(.caption, weight: .bold))
                         .textCase(.uppercase)
                         .foregroundStyle(Theme.negative)
+                } else if let duration = entry.duration, entry.toolState == .done {
+                    Text(Self.seconds(duration))
+                        .font(.sign(.footnote, weight: .semibold).monospacedDigit())
+                        .foregroundStyle(Theme.textMuted)
                 }
             }
             if let image = entry.image {
@@ -177,6 +190,16 @@ private struct ToolStop: View {
     }
 }
 
+extension ToolStop {
+    /// «0,8 с», «12 с» — как время в пути на табло.
+    static func seconds(_ duration: TimeInterval) -> String {
+        let value = duration < 10
+            ? duration.formatted(.number.precision(.fractionLength(1)))
+            : duration.formatted(.number.precision(.fractionLength(0)))
+        return "\(value) с"
+    }
+}
+
 /// К какой линии относится шаг: память — зелёная, календарь и таймеры — жёлтая,
 /// всё из внешнего мира — синяя, камера очков — красная.
 enum ToolLine {
@@ -185,6 +208,7 @@ enum ToolLine {
         case "notes": return .memory
         case "list_events", "create_event", "create_reminder", "set_timer": return .system
         case "take_photo": return .assistant
+        // Почта, поиск, карты, контакты, сообщения — внешний мир, синяя линия.
         default: return .translator
         }
     }

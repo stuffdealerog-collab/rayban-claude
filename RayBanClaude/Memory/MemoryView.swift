@@ -26,6 +26,7 @@ struct MemoryView: View {
             }
             .background(Theme.background)
             .navigationTitle("Память")
+            .toolbarTitleDisplayMode(.inlineLarge)
             .navigationDestination(for: MemoryNote.self) { note in
                 NoteDetailView(note: note, memory: memory) { linked in
                     if let target = memory.note(titled: linked) { path.append(target) }
@@ -117,6 +118,7 @@ struct MemoryView: View {
                     .textCase(nil)
                     .padding(.bottom, Theme.Space.xs)
                 }
+                .listRowBackground(Theme.surface)
             }
         }
         .listStyle(.insetGrouped)
@@ -128,7 +130,6 @@ struct MemoryView: View {
             VStack(alignment: .leading, spacing: 0) {
                 LineRow(stop: .interchange, tone: .memory, isFirst: true) {
                     VStack(alignment: .leading, spacing: Theme.Space.s) {
-                        Text("Память").plateStyle(Theme.Tone.memory.text)
                         Text("Здесь \(settings.persona.displayName) хранит то, что узнаёт о вас")
                             .font(.sign(.title))
                             .foregroundStyle(Theme.textPrimary)
@@ -198,19 +199,19 @@ private struct NoteDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Theme.Space.l) {
-                if !note.folder.isEmpty {
-                    LinePill(text: note.folder, tone: .memory)
-                }
-                MarkdownBlocks(text: text)
-            }
-            .padding(Theme.Space.l)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            MarkdownBlocks(text: text)
+                .padding(Theme.Space.l)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Theme.background)
         .navigationTitle(note.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            // В панели — ветка, на которой стоит заметка; её название и так крупно в тексте.
+            ToolbarItem(placement: .principal) {
+                LinePill(text: note.folder.isEmpty ? "Главное" : note.folder, tone: .memory)
+                    .accessibilityLabel("Папка \(note.folder.isEmpty ? "Главное" : note.folder)")
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Править") { editing = true }
             }
@@ -249,9 +250,13 @@ private struct NoteEditorView: View {
         NavigationStack {
             Form {
                 if isNew {
-                    Section("Название") {
+                    Section {
                         TextField("Например, Обо мне", text: $title)
+                    } header: {
+                        Text("Название")
+                            .foregroundStyle(Theme.textSecondary)
                     }
+                    .listRowBackground(Theme.surface)
                 }
                 Section {
                     TextEditor(text: $text)
@@ -259,7 +264,9 @@ private struct NoteEditorView: View {
                         .font(.body)
                 } footer: {
                     Text("Markdown: # заголовок, - список, [[Другая заметка]] — ссылка.")
+                        .foregroundStyle(Theme.textMuted)
                 }
+                .listRowBackground(Theme.surface)
                 if let error {
                     Text(error).foregroundStyle(Theme.negative)
                 }

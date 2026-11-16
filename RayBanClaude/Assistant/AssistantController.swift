@@ -19,6 +19,8 @@ struct TranscriptEntry: Identifiable, Equatable {
     var symbol: String?
     var toolName: String?
     var toolState: ToolState = .done
+    /// Сколько шёл шаг ассистента, секунд.
+    var duration: TimeInterval?
 }
 
 /// Связывает микрофон, Claude, инструменты, память и озвучку в голосовой цикл:
@@ -51,6 +53,7 @@ final class AssistantController {
     @ObservationIgnored private let speaker = SpeechSpeaker()
     @ObservationIgnored private let call = CallSession()
     @ObservationIgnored private let addresseeGate = AddresseeGate()
+    @ObservationIgnored private var voiceLookup: Task<Void, Never>?
     /// Что ассистент скажет, как только звонок соединится.
     @ObservationIgnored private var callGreeting: String?
     @ObservationIgnored private let conversation = ClaudeConversation(maxToolIterations: 12)
@@ -579,6 +582,35 @@ final class AssistantController {
         speaker.languageCode = settings.language.rawValue
         speaker.elevenLabs = settings.elevenLabsConfiguration
         speaker.streaming = settings.streamingVoiceConfiguration
+        selectVoiceIfNeeded()
+    }
+
+    /// Ключ ElevenLabs есть, а голос ещё не выбран (так бывает сразу после первой настройки):
+    /// берём голос носителя языка ассистента или первый из библиотеки, чтобы он сразу говорил живым голосом.
+    @discardableResult
+    private func selectVoiceIfNeeded() -> Task<Void, Never>? {
+        if let voiceLookup { return voiceLookup }
+        let key = settings.trimmedElevenLabsKey
+        guard !key.isEmpty, settings.elevenLabsVoiceID.isEmpty else { return nil }
+        let task = Task { [weak self] in
+            let voices = try? await ElevenLabsClient().voices(apiKey: key)
+            guard let self else { return }
+            self.voiceLookup = nil
+            guard let voices, key == self.settings.trimmedElevenLabsKey, self.settings.elevenLabsVoiceID.isEmpty else { return }
+            let native = self.settings.language.isoCode
+            guard let voice = voices.first(where: { $0.speaks(native) }) ?? voices.first else { return }
+            self.settings.elevenLabsVoiceID = voice.voiceID
+            self.settings.elevenLabsVoiceName = voice.name
+            journal("голос", "голос выбран автоматически: \(voice.name)")
+            self.applyVoiceSettings()
+        }
+        voiceLookup = task
+        return task
+    }
+
+    /// Дождаться автоматического выбора голоса (перед первым приветствием).
+    func prepareVoice() async {
+        await selectVoiceIfNeeded()?.value
     }
 
     private func startListening() {
@@ -967,6 +999,7 @@ final class AssistantController {
             if let index = entries.lastIndex(where: { $0.role == .tool && $0.toolName == name && $0.toolState == .running }) {
                 entries[index].image = image
                 entries[index].toolState = output.isError ? .failed : .done
+                entries[index].duration = Date().timeIntervalSince(entries[index].date)
             }
 
         case .serverToolStarted(let name):
