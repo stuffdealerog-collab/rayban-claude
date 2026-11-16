@@ -20,7 +20,8 @@ if [[ -z "$XCODE_APP" || ! -d "$XCODE_APP" ]]; then
 fi
 
 sudo xcode-select -s "$XCODE_APP/Contents/Developer"
-VERSION=$(xcodebuild -version | head -1 | awk '{print $2}')
+# awk читает вывод до конца: с head xcodebuild иногда падал на закрытом канале (Broken pipe).
+VERSION=$(xcodebuild -version | awk 'NR == 1 {print $2}')
 echo "Выбран $XCODE_APP (Xcode $VERSION)"
 
 MAJOR=${VERSION%%.*}
