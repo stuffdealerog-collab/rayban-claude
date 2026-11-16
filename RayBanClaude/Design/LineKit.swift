@@ -75,7 +75,8 @@ struct LineRail: View {
                     style: StrokeStyle(lineWidth: LineMetrics.stroke, lineCap: .round, dash: planned ? [2, 10] : [])
                 )
             }
-            node
+            // Отметка шире рельса (ореол живой станции) не должна раздвигать колонку: иначе линия уезжает.
+            node.frame(width: LineMetrics.rail)
         }
         .frame(width: LineMetrics.rail)
         .accessibilityHidden(true)
@@ -239,7 +240,7 @@ struct LineStatus: View {
     }
 }
 
-/// Маленькая схема из четырёх линий, сходящихся на одной пересадке: всё, что умеет ассистент.
+/// Схема из четырёх линий, сходящихся на одной пересадке: всё, что умеет ассистент.
 /// Линии идут только под 45° и 90°, как на настоящей схеме.
 struct RouteMap: View {
     /// Имя ассистента — название центральной пересадки.
@@ -248,45 +249,47 @@ struct RouteMap: View {
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            let unit = min(size.width / 10, size.height / 8)
-            let center = CGPoint(x: size.width / 2, y: size.height * 0.52)
+            let unit = min(size.width / 9.6, size.height / 7.6)
+            let center = CGPoint(x: size.width / 2, y: size.height / 2)
             let at: (CGFloat, CGFloat) -> CGPoint = { x, y in CGPoint(x: center.x + x * unit, y: center.y + y * unit) }
 
             ZStack {
-                // Красная: разговор — сверху слева вниз направо через центр.
-                line([at(-4.4, -3.2), at(-2.2, -3.2), at(0, -1), at(0, 0), at(2.2, 2.2), at(4.4, 2.2)], .assistant)
-                // Синяя: перевод — горизонталь с изломом.
-                line([at(-4.6, 0.9), at(-0.9, 0.9), at(0, 0), at(1.2, -1.2), at(4.6, -1.2)], .translator)
-                // Зелёная: память — снизу вверх.
-                line([at(-2.6, 3.4), at(-2.6, 2.6), at(0, 0), at(0, -1), at(2.4, -3.4), at(4.2, -3.4)], .memory)
-                // Жёлтая: почта и календарь.
-                line([at(-4.4, 2.4), at(-3.4, 2.4), at(-1, 0), at(0, 0), at(3.4, 0), at(4.6, 1.2)], .system)
+                // Жёлтая — дела: вертикаль.
+                line([at(0, -3.5), at(0, 3.5)], .system)
+                // Зелёная — память: снизу слева вверх направо.
+                line([at(-4.6, 2.8), at(-2.8, 2.8), at(2.8, -2.8), at(4.6, -2.8)], .memory)
+                // Синяя — перевод: сверху слева вниз направо.
+                line([at(-4.6, -2.8), at(-2.8, -2.8), at(2.8, 2.8), at(4.6, 2.8)], .translator)
+                // Красная — разговор: горизонталь через центр.
+                line([at(-4.6, 0), at(4.6, 0)], .assistant)
 
-                station(at(-2.2, -3.2), "Вопрос", .bottom)
-                station(at(3.3, 2.2), "Камера", .top)
-                station(at(-3, 0.9), "Перевод", .top)
-                station(at(3, -1.2), "Субтитры", .bottom)
-                station(at(-2.6, 2.6), "Заметки", .trailing)
-                station(at(2.4, -3.4), "Люди", .bottom)
-                station(at(2.2, 0), "Календарь", .top)
-                station(at(-3.4, 2.4), "Почта", .top)
+                station(at(-3, 0), "Вопрос", .top)
+                station(at(3, 0), "Камера", .top)
+                station(at(-3.9, -2.8), "Перевод", .top)
+                station(at(3.9, 2.8), "Субтитры", .bottom)
+                station(at(-3.9, 2.8), "Заметки", .bottom)
+                station(at(3.9, -2.8), "Люди", .top)
+                station(at(0, -2.5), "Календарь", .trailing)
+                station(at(0, 2.5), "Почта", .trailing)
 
                 Circle()
                     .fill(Theme.porcelain)
-                    .overlay(Circle().strokeBorder(Theme.ink, lineWidth: 4))
-                    .frame(width: unit * 1.05, height: unit * 1.05)
+                    .overlay(Circle().strokeBorder(Theme.ink, lineWidth: 5))
+                    .frame(width: unit * 1.2, height: unit * 1.2)
                     .position(center)
                 Text(hub)
                     .font(.sign(.headline))
-                    .foregroundStyle(Theme.textPrimary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Theme.background, in: Capsule())
-                    .position(x: center.x + unit * 1.9, y: center.y + unit * 0.95)
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(1)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Theme.porcelain, in: Capsule())
+                    .fixedSize()
+                    .position(x: center.x + unit * 2.75, y: center.y + unit * 1.0)
             }
         }
         .accessibilityElement()
-        .accessibilityLabel("Схема: разговор, перевод, память, почта и календарь сходятся на станции \(hub)")
+        .accessibilityLabel("Схема: разговор, перевод, память и дела сходятся на станции \(hub)")
     }
 
     private func line(_ points: [CGPoint], _ tone: Theme.Tone) -> some View {
@@ -295,30 +298,84 @@ struct RouteMap: View {
             path.move(to: first)
             for point in points.dropFirst() { path.addLine(to: point) }
         }
-        .stroke(tone.color, style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round))
+        .stroke(tone.color, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
     }
 
     private func station(_ point: CGPoint, _ name: String, _ side: Edge) -> some View {
-        let offset: CGSize
-        switch side {
-        case .top: offset = CGSize(width: 0, height: -17)
-        case .bottom: offset = CGSize(width: 0, height: 17)
-        case .leading: offset = CGSize(width: -34, height: 0)
-        case .trailing: offset = CGSize(width: 38, height: 0)
-        }
+        let label = Text(name)
+            .font(.sign(.caption2, weight: .semibold))
+            .textCase(.uppercase)
+            .tracking(0.5)
+            .foregroundStyle(Theme.textSecondary)
+            .fixedSize()
         return ZStack {
             Circle()
                 .fill(Theme.background)
-                .overlay(Circle().strokeBorder(Theme.textPrimary, lineWidth: 3))
-                .frame(width: 13, height: 13)
+                .overlay(Circle().strokeBorder(Theme.textPrimary, lineWidth: 3.5))
+                .frame(width: 15, height: 15)
                 .position(point)
-            Text(name)
-                .font(.sign(.caption2, weight: .semibold))
-                .textCase(.uppercase)
-                .tracking(0.5)
-                .foregroundStyle(Theme.textSecondary)
-                .fixedSize()
-                .position(x: point.x + offset.width, y: point.y + offset.height)
+            switch side {
+            case .top:
+                label.position(x: point.x, y: point.y - 19)
+            case .bottom:
+                label.position(x: point.x, y: point.y + 19)
+            case .trailing:
+                label.frame(width: 110, alignment: .leading).position(x: point.x + 14 + 55, y: point.y)
+            case .leading:
+                label.frame(width: 110, alignment: .trailing).position(x: point.x - 14 - 55, y: point.y)
+            }
+        }
+    }
+}
+
+/// Шапка экрана: крупное название узким жирным начертанием и кнопки справа.
+/// Стоит на месте, пока лента прокручивается, — название не пропадает.
+struct ScreenHeader<Trailing: View>: View {
+    let title: String
+    @ViewBuilder var trailing: Trailing
+
+    var body: some View {
+        HStack(alignment: .center, spacing: Theme.Space.s) {
+            Text(title)
+                .font(.sign(.largeTitle))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: Theme.Space.s)
+            trailing
+        }
+        .padding(.horizontal, Theme.Space.l + 4)
+        .padding(.top, Theme.Space.s)
+        .padding(.bottom, Theme.Space.xs)
+    }
+}
+
+/// Круглая кнопка шапки. На iOS 26 — системное «жидкое стекло».
+struct HeaderGlyph: View {
+    let symbol: String
+    var text: String?
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: symbol)
+                .font(.body.weight(.semibold))
+            if let text {
+                Text(text).font(.sign(.subheadline, weight: .semibold).monospacedDigit())
+            }
+        }
+        .foregroundStyle(Theme.textPrimary)
+        .padding(.horizontal, text == nil ? 0 : 14)
+        .frame(minWidth: 44, minHeight: 44)
+        .background(background)
+    }
+
+    @ViewBuilder
+    private var background: some View {
+        if #available(iOS 26.0, *) {
+            Capsule().fill(.clear).glassEffect(.regular.interactive(), in: .capsule)
+        } else {
+            Capsule().fill(Theme.surface).overlay(Capsule().strokeBorder(Theme.hairline))
         }
     }
 }

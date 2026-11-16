@@ -16,6 +16,19 @@ struct TranslatorView: View {
 
         NavigationStack {
             VStack(spacing: 0) {
+                ScreenHeader(title: "Переводчик") {
+                    Menu {
+                        Toggle("Озвучивать перевод", isOn: $settings.translatorSpeaks)
+                        Button("Показать собеседнику", systemImage: "rectangle.portrait.rotate") { showToPartner = true }
+                            .disabled(translator.latestTranslation == nil)
+                        Button("Очистить", systemImage: "trash", role: .destructive) { translator.clear() }
+                            .disabled(translator.entries.isEmpty)
+                    } label: {
+                        HeaderGlyph(symbol: "ellipsis")
+                    }
+                    .accessibilityLabel("Действия переводчика")
+                }
+
                 route
                     .padding(.horizontal, Theme.Space.l)
                     .padding(.top, Theme.Space.xs)
@@ -32,21 +45,7 @@ struct TranslatorView: View {
                 controls
             }
             .background(Theme.background)
-            .navigationTitle("Переводчик")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Toggle("Озвучивать перевод", isOn: $settings.translatorSpeaks)
-                        Button("Показать собеседнику", systemImage: "rectangle.portrait.rotate") { showToPartner = true }
-                            .disabled(translator.latestTranslation == nil)
-                        Button("Очистить", systemImage: "trash", role: .destructive) { translator.clear() }
-                            .disabled(translator.entries.isEmpty)
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                    .accessibilityLabel("Действия переводчика")
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .fullScreenCover(isPresented: $showToPartner) {
                 PartnerView(entry: translator.latestTranslation) { showToPartner = false }
             }

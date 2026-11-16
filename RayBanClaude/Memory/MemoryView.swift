@@ -181,8 +181,8 @@ private struct NoteRow: View {
                     .lineLimit(1)
             }
             Text(note.modified, format: .relative(presentation: .named))
-                .plateStyle()
-                .padding(.top, 1)
+                .font(.caption)
+                .foregroundStyle(Theme.textMuted)
         }
     }
 }

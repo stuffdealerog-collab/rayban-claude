@@ -17,6 +17,18 @@ struct AssistantView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                ScreenHeader(title: settings.persona.displayName) {
+                    GlassesChip { showGlasses = true }
+                    Button {
+                        assistant.newConversation()
+                    } label: {
+                        HeaderGlyph(symbol: "square.and.pencil")
+                    }
+                    .accessibilityLabel("Новый разговор")
+                    .disabled(assistant.entries.isEmpty)
+                    .opacity(assistant.entries.isEmpty ? 0.45 : 1)
+                }
+
                 LineStatus(tone: tone, text: stateLine, detail: stateDetail, active: assistant.phase != .idle || assistant.onCall)
                     .padding(.horizontal, Theme.Space.l + 4)
                     .padding(.top, Theme.Space.xs)
@@ -33,7 +45,10 @@ struct AssistantView: View {
                 .mask(
                     // Лента мягко уходит под кнопки, а не обрывается линией.
                     LinearGradient(
-                        stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.93), .init(color: .clear, location: 1)],
+                        stops: [
+                            .init(color: .clear, location: 0), .init(color: .black, location: 0.035),
+                            .init(color: .black, location: 0.93), .init(color: .clear, location: 1),
+                        ],
                         startPoint: .top, endPoint: .bottom
                     )
                 )
@@ -41,21 +56,7 @@ struct AssistantView: View {
                 controls
             }
             .background(Theme.background)
-            .navigationTitle(settings.persona.displayName)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    GlassesChip { showGlasses = true }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        assistant.newConversation()
-                    } label: {
-                        Image(systemName: "square.and.pencil")
-                    }
-                    .accessibilityLabel("Новый разговор")
-                    .disabled(assistant.entries.isEmpty)
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showGlasses) {
                 GlassesSheet()
                     .presentationDetents([.medium, .large])
@@ -366,14 +367,11 @@ private struct GlassesChip: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: Theme.Space.xs) {
-                Image(systemName: connected ? "eyeglasses" : "eyeglasses.slash")
-                if let battery = glasses.batteryLevel, connected {
-                    Text("\(battery)%")
-                        .font(.sign(.subheadline, weight: .semibold).monospacedDigit())
-                }
-            }
-            .foregroundStyle(connected ? Theme.textPrimary : Theme.textMuted)
+            HeaderGlyph(
+                symbol: connected ? "eyeglasses" : "eyeglasses.slash",
+                text: connected ? glasses.batteryLevel.map { "\($0)%" } : nil
+            )
+            .opacity(connected ? 1 : 0.6)
         }
         .accessibilityLabel(connected ? "Очки на связи" : "Очки не подключены")
     }

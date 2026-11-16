@@ -50,7 +50,7 @@ struct SettingsView: View {
                     Button {
                         showGlasses = true
                     } label: {
-                        SettingsRow(symbol: "eyeglasses", tone: .system, title: "Очки Ray-Ban Meta", value: glassesSummary)
+                        SettingsRow(symbol: "eyeglasses", tone: .system, title: "Очки", value: glassesSummary)
                     }
                     .foregroundStyle(Theme.textPrimary)
                     NavigationLink {
@@ -287,7 +287,7 @@ struct VoiceSettingsView: View {
 
     private var modelFooter: String {
         if settings.elevenLabsModel.streams {
-            return "Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Другие голоса добавляются в «My Voices» на сайте ElevenLabs."
+            return "Модели v4 говорят по-узбекски, по-русски и по-английски одним голосом; звук идёт потоком и начинается, пока ответ ещё пишется. Голоса носителей узбекского помечены «узб.»; другие добавляются из библиотеки голосов в «My Voices» на сайте ElevenLabs."
         }
         return "Прежние модели озвучивают ответ фразу за фразой, с заметной паузой. Для быстрого ответа и узбекского выберите v4 Turbo."
     }
@@ -305,8 +305,9 @@ struct VoiceSettingsView: View {
         do {
             let list = try await ElevenLabsClient().voices(apiKey: key)
             guard key == settings.trimmedElevenLabsKey else { return }
-            // Русские голоса — первыми, остальные в порядке ElevenLabs.
-            voices = list.filter(\.isRussian) + list.filter { !$0.isRussian }
+            // Сначала голоса носителей языка ассистента, потом остальные в порядке ElevenLabs.
+            let native = settings.language.isoCode
+            voices = list.filter { $0.speaks(native) } + list.filter { !$0.speaks(native) }
             if settings.elevenLabsVoiceID.isEmpty, let first = voices.first {
                 settings.elevenLabsVoiceID = first.voiceID
                 settings.elevenLabsVoiceName = first.name

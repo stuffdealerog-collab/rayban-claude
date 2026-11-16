@@ -75,15 +75,19 @@ struct ElevenLabsVoice: Identifiable, Hashable, Sendable, Decodable {
     var id: String { voiceID }
 
     /// Голос записан носителем русского (по меткам ElevenLabs).
-    var isRussian: Bool {
-        languages.contains { $0.lowercased().hasPrefix("ru") }
-            || labels["language"]?.lowercased().hasPrefix("ru") == true
+    var isRussian: Bool { speaks("ru") }
+
+    /// Голос записан носителем этого языка (ISO 639-1) — по меткам ElevenLabs.
+    func speaks(_ iso: String) -> Bool {
+        languages.contains { $0.lowercased().hasPrefix(iso) }
+            || labels["language"]?.lowercased().hasPrefix(iso) == true
     }
 
-    /// Название для списка: «Имя — пол, акцент».
+    /// Название для списка: «Имя · узб. — пол, акцент».
     var title: String {
         let details = ["gender", "accent", "age"].compactMap { labels[$0] }.filter { !$0.isEmpty }
-        let name = isRussian ? "\(self.name) · рус." : self.name
+        var name = self.name
+        if speaks("uz") { name += " · узб." } else if speaks("ru") { name += " · рус." }
         return details.isEmpty ? name : "\(name) — \(details.joined(separator: ", "))"
     }
 
