@@ -62,7 +62,7 @@ struct MemoryView: View {
             .onAppear {
                 reload()
                 #if DEBUG
-                if DemoMode.screen == "note", path.isEmpty, let note = memory.note(titled: L("Анна")) { path = [note] }
+                if DemoMode.screen == "note", path.isEmpty, let note = memory.note(titled: "Анна") { path = [note] }
                 #endif
             }
             .onReceive(NotificationCenter.default.publisher(for: .memoryDidChange)) { _ in reload() }

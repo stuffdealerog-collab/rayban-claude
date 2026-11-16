@@ -26,6 +26,13 @@ jobs:
       - name: Выбрать Xcode
         run: scripts/ci/select-xcode.sh
 
+      # Каждая надпись L("…") должна быть в каталоге, а каталог — собран из актуальных переводов.
+      - name: Проверить переводы интерфейса
+        run: |
+          python3 scripts/design/check_keys.py
+          python3 scripts/design/build_catalog.py
+          git diff --exit-code -- RayBanClaude/Resources/Localizable.xcstrings RayBanClaude/Resources/InfoPlist.xcstrings
+
       - name: Тесты ClaudeKit и AssistantCore
         run: |
           swift test --package-path Packages/ClaudeKit

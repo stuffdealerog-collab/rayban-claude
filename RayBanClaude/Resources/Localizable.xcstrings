@@ -426,23 +426,6 @@
         }
       }
     },
-    "Анна": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anna"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anna"
-          }
-        }
-      }
-    },
     "Ассистент": {
       "extractionState": "manual",
       "localizations": {
@@ -4808,23 +4791,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Faqat ismi aytilganda"
-          }
-        }
-      }
-    },
-    "Ты синхронный переводчик живой речи. Переведи реплику с языка «%@» на язык «%@». Если реплика уже на языке «%@», переведи её на «%@». Выведи только перевод — без кавычек, пояснений и вариантов. Сохраняй смысл, тон и вежливость, имена и числа. Пиши так, как говорят вслух. Реплика получена распознаванием речи и может содержать ошибки — переводи по смыслу.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You are a simultaneous interpreter of live speech. Translate the utterance from “%@” into “%@”. If the utterance is already in “%@”, translate it into “%@”. Output only the translation — no quotation marks, explanations, or alternatives. Preserve the meaning, tone and politeness, names and numbers. Write the way people speak aloud. The utterance comes from speech recognition and may contain errors — translate by meaning."
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sen jonli nutqning sinxron tarjimonisan. Gapni “%@” tilidan “%@” tiliga tarjima qil. Agar gap allaqachon “%@” tilida boʻlsa, uni “%@” tiliga tarjima qil. Faqat tarjimaning oʻzini chiqar — qoʻshtirnoqsiz, izohlarsiz va variantlarsiz. Maʼno, ohang va xushmuomalalikni, ismlar va sonlarni saqla. Odamlar ogʻzaki nutqda qanday gapirsa, shunday yoz. Gap nutqni aniqlash orqali olingan va unda xatolar boʻlishi mumkin — maʼnosiga qarab tarjima qil."
           }
         }
       }
