@@ -8,7 +8,19 @@ struct MainTabView: View {
 
     enum Tab: Hashable { case assistant, translator, memory, settings }
 
-    @State private var tab: Tab = .assistant
+    @State private var tab: Tab = MainTabView.initialTab
+
+    private static var initialTab: Tab {
+        #if DEBUG
+        switch DemoMode.screen {
+        case .some(let screen) where screen.hasPrefix("translator"): return .translator
+        case "memory", "note": return .memory
+        case "settings": return .settings
+        default: break
+        }
+        #endif
+        return .assistant
+    }
 
     var body: some View {
         TabView(selection: $tab) {

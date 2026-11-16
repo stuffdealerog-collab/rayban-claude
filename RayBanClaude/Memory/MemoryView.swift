@@ -58,7 +58,12 @@ struct MemoryView: View {
             .sheet(item: $export) { target in
                 FolderExporter(url: target.url)
             }
-            .onAppear(perform: reload)
+            .onAppear {
+                reload()
+                #if DEBUG
+                if DemoMode.screen == "note", path.isEmpty, let note = memory.note(titled: "Анна") { path = [note] }
+                #endif
+            }
             .onReceive(NotificationCenter.default.publisher(for: .memoryDidChange)) { _ in reload() }
         }
     }

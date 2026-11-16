@@ -21,13 +21,22 @@ struct RayBanClaudeApp: App {
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
         let settings = AppSettings()
         let glasses = GlassesManager()
+        #if DEBUG
+        let memory = MemoryStore(root: DemoMode.isActive ? DemoMode.memoryFolder : Self.memoryFolder)
+        #else
         let memory = MemoryStore(root: Self.memoryFolder)
+        #endif
         try? memory.ensureExists()
         let assistant = AssistantController(settings: settings, glasses: glasses, memory: memory)
+        let translator = TranslatorController(settings: settings, assistant: assistant)
+        #if DEBUG
+        DemoMode.prepare(settings: settings, assistant: assistant, memory: memory)
+        DemoMode.prepare(translator: translator)
+        #endif
         _settings = State(initialValue: settings)
         _glasses = State(initialValue: glasses)
         _assistant = State(initialValue: assistant)
-        _translator = State(initialValue: TranslatorController(settings: settings, assistant: assistant))
+        _translator = State(initialValue: translator)
     }
 
     /// Папка памяти видна в приложении «Файлы» (На iPhone → это приложение → Память).

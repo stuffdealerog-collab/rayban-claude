@@ -155,6 +155,12 @@ final class TranslatorController {
         entries.removeAll()
     }
 
+    #if DEBUG
+    func loadDemo(entries: [Entry]) {
+        self.entries = entries
+    }
+    #endif
+
     /// Кнопка «я говорю» / «собеседник говорит»; в субтитрах — старт и стоп.
     func toggle(_ side: Side) async {
         if activeSide == side {

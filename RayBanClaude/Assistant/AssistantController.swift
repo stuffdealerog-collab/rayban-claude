@@ -220,6 +220,15 @@ final class AssistantController {
         errorMessage = nil
     }
 
+    #if DEBUG
+    /// Готовое состояние экрана для снимков (см. DemoMode).
+    func loadDemo(entries: [TranscriptEntry], phase: Phase, partial: String = "") {
+        self.entries = entries
+        self.phase = phase
+        partialTranscript = partial
+    }
+    #endif
+
     /// «Проверить голос» и приветствие после первой настройки.
     func say(_ text: String) async {
         guard phase == .idle, !translatorActive else { return }

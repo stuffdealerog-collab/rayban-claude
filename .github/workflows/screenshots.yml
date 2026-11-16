@@ -1,0 +1,56 @@
+# Снимки экранов из симулятора — чтобы видеть интерфейс без локального Xcode.
+# Запуск вручную: gh workflow run screenshots.yml [-f screens="assistant-chat settings"]
+name: Screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      screens:
+        description: "Экраны через пробел (пусто — все)"
+        required: false
+        default: ""
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Снимки экранов
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      XCODE_VERSION: ${{ vars.XCODE_VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Выбрать Xcode
+        run: scripts/ci/select-xcode.sh
+
+      - name: Сгенерировать Xcode-проект
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Сборка для симулятора
+        run: |
+          xcodebuild build -quiet \
+            -project RayBanClaude.xcodeproj -scheme RayBanClaude -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
+
+      - name: Снять экраны
+        env:
+          SCREENS: ${{ inputs.screens }}
+        run: |
+          scripts/ci/screenshots.sh \
+            "$RUNNER_TEMP/DerivedData/Build/Products/Debug-iphonesimulator/RayBanClaude.app" \
+            "$RUNNER_TEMP/shots" "$SCREENS"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: ${{ runner.temp }}/shots
+          retention-days: 7
+          if-no-files-found: error

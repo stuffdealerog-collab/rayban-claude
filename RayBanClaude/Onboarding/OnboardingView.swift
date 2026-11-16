@@ -11,7 +11,14 @@ struct OnboardingView: View {
         case welcome, name, character, manner, about, keys, access
     }
 
-    @State private var step: Step = .welcome
+    @State private var step: Step = OnboardingView.initialStep
+
+    private static var initialStep: Step {
+        #if DEBUG
+        if let raw = DemoMode.onboardingStep, let step = Step(rawValue: raw) { return step }
+        #endif
+        return .welcome
+    }
     @State private var forward = true
     @State private var aboutText = ""
     @State private var micGranted: Bool?
